@@ -4,7 +4,7 @@ A Kubernetes-native workflow execution engine for running containerized jobs wit
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 🚀 Overview
+## Overview
 
 This project provides a scalable, fault-tolerant workflow execution system that:
 
@@ -13,7 +13,7 @@ This project provides a scalable, fault-tolerant workflow execution system that:
 - Provides real-time log streaming via WebSocket
 - Uses event sourcing for reliable state management
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 workflow-execution-system/
@@ -28,7 +28,7 @@ workflow-execution-system/
 └── examples/           # Sample workflow definitions
 ```
 
-## 🛠️ Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -68,7 +68,7 @@ curl http://localhost:3000/
 # {"message":"Workflow Execution System API","version":"0.0.1","endpoints":["/health"]}
 ```
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────┐     ┌──────────────┐     ┌─────────────────┐
@@ -83,7 +83,7 @@ curl http://localhost:3000/
                 └──────────────┘     └─────────────────┘
 ```
 
-## 📖 Documentation
+## Documentation
 
 - [Project Structure](docs/structure.md) - Detailed file structure
 

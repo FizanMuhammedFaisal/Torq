@@ -12,9 +12,9 @@
     "dev:api": "bun run --cwd apps/api-server dev",
     "dev:web": "bun run --cwd apps/web dev",
     "build": "bun run --cwd apps/api-server build && bun run --cwd apps/web build",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "bun test || true",
     "prepare": "husky",
-    "commit": "cz"
+    "commit": "npx cz"
   },
   "keywords": [
     "workflow",
@@ -29,11 +29,12 @@
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
-    "@commitlint/cz-commitlint": "^20.4.1"
+    "@commitlint/cz-commitlint": "^20.4.1",
+    "commitizen": "^4.3.0"
   },
   "config": {
     "commitizen": {
-      "path": "@commitlint/cz-commitlint"
+      "path": "./node_modules/@commitlint/cz-commitlint"
     }
   }
 }

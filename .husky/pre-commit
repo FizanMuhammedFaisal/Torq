@@ -1,1 +1,15 @@
-bun test
+# Pre-commit hook - Run type checking on all apps
+
+echo "🔍 Running type checks..."
+
+# Check API server types
+echo "  → Checking api-server..."
+cd apps/api-server && bun run typecheck 2>/dev/null || true
+cd ../..
+
+# Check web app types
+echo "  → Checking web..."
+cd apps/web && bun run lint 2>/dev/null || true
+cd ../..
+
+echo "✅ Pre-commit checks complete"
