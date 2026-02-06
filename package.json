@@ -1,0 +1,39 @@
+{
+  "name": "workflow-execution-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "echo 'Run: bun run dev --filter=<app>'",
+    "dev:api": "bun run --cwd apps/api-server dev",
+    "dev:web": "bun run --cwd apps/web dev",
+    "build": "bun run --cwd apps/api-server build && bun run --cwd apps/web build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "commit": "cz"
+  },
+  "keywords": [
+    "workflow",
+    "kubernetes",
+    "execution-engine"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "husky": "^9.1.7"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.1",
+    "@commitlint/config-conventional": "^20.4.1",
+    "@commitlint/cz-commitlint": "^20.4.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "@commitlint/cz-commitlint"
+    }
+  }
+}
