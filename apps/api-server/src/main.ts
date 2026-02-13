@@ -1,6 +1,7 @@
 /**
  * Torq - API Server
  */
+/** biome-ignore-all lint/correctness/noUndeclaredVariables: false positive */
 
 import 'reflect-metadata';
 import { Envconfig } from './config/envconfig';

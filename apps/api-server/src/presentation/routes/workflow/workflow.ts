@@ -11,7 +11,7 @@ export class WorkflowRouter implements Router {
 	constructor(
 		@inject(TOKENS.WorkflowController)
 		private workflowController: IWorkflowController,
-	) { }
+	) {}
 
 	register() {
 		return new Elysia({ prefix: this.prefix }).get('/', (ctx) =>

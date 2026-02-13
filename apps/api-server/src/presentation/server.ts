@@ -48,6 +48,6 @@ export class HTTPServer {
 		this.setupRoutes();
 		this.app.listen(this.envconfig.server.port);
 
-		console.log(`🦊 Elysia is running at ${this.app.server?.hostname}:${this.app.server?.port}`);
+		console.log(`🦊 Server is running at ${this.app.server?.hostname}:${this.app.server?.port}`);
 	}
 }
