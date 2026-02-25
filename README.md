@@ -3,93 +3,79 @@
 A Kubernetes-native workflow execution engine for running containerized jobs with DAG-based orchestration.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=flat&logo=kubernetes&logoColor=white)](https://kubernetes.io/)
+[![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
+[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-## Overview
+[Getting Started](docs/getting-started.md) • [Concepts](docs/concepts.md) • [Architecture](docs/architecture.md) • [Contributing](CONTRIBUTING.md)
 
-This project provides a scalable, fault-tolerant workflow execution system that:
+</div>
 
-- Runs workflows as Kubernetes Jobs
-- Supports DAG-based task dependencies
-- Provides real-time log streaming via WebSocket
-- Uses event sourcing for reliable state management
+---
 
-## Project Structure
+## Accelerate Your Operations
 
-```
-workflow-execution-system/
-├── apps/
-│   ├── api-server/     # Bun REST + WebSocket API
-│   ├── operator/       # Kubernetes Workflow Operator (coming soon)
-│   └── web/            # React + Vite frontend
-├── packages/
-│   └── shared/         # Shared types and utilities (coming soon)
-├── infra/              # Kubernetes manifests (coming soon)
-├── docs/               # Documentation
-└── examples/           # Sample workflow definitions
-```
+**Workflow Execution System** is a security-first, event-driven orchestration engine designed to automate complex processes at scale. Built natively for Kubernetes, it empowers engineering teams to build, run, and monitor automation workflows with unparalleled reliability and speed.
 
-## Quick Start
+Stop writing glue code. Start orchestrating value.
 
-### Prerequisites
+## Key Capabilities
 
-- [Bun](https://bun.sh) (v1.0+)
-- Node.js 18+ (for Vite)
+### ⚡️ Event-Driven Automation
 
-### Installation
+Trigger workflows instantly from any source. Whether it's a webhook, a system event, or a scheduled task, our engine reacts in real-time to drive your business logic forward.
+
+### 🛡️ Assessing Security Posture
+
+Built with safety in mind. Execute arbitrary containerized steps with strict isolation. Define granular permissions and resource limits to ensure your automation never compromises your infrastructure.
+
+### 🔗 Seamless Integrations
+
+Connect your entire stack. Orchestrate actions across cloud providers, SaaS tools, and internal microservices. Our modular architecture allows for infinite extensibility.
+
+### Real-Time Observability
+
+Gain deep insights into your automation. Watch workflows execute step-by-step with live log streaming. Analyze performance metrics and trace execution paths to optimize your processes.
+
+## 🏗️ Architecture
+
+Built on modern foundations for maximum resilience:
+
+- **Kubernetes-Native**: Runs steps as K8s Jobs for scalability and isolation.
+- **Event Sourcing**: Every state change is immutable and auditable.
+- **High Performance**: Powered by Bun for lightning-fast API responses.
+- **Modern Frontend**: A reactive, beautiful UI built with React and Vite.
+
+## 📚 Documentation
+
+Explore our comprehensive guides to master the platform:
+
+| Topic                                          | Description                                                             |
+| :--------------------------------------------- | :---------------------------------------------------------------------- |
+| **[Getting Started](docs/getting-started.md)** | Deploy your first instance and run a "Hello World" workflow in minutes. |
+| **[Core Concepts](docs/concepts.md)**          | Learn about Workflows, Steps, Triggers, and Context.                    |
+| **[Architecture](docs/architecture.md)**       | Deep dive into the system internals and design decisions.               |
+
+## 🛠️ Quick Start
+
+Ready to dive in?
 
 ```bash
-# Clone the repo
+# Clone the repository
 git clone https://github.com/your-username/workflow-execution-system.git
-cd workflow-execution-system
 
 # Install dependencies
 bun install
+
+# Start the development server
+bun run dev
 ```
 
-### Development
-
-```bash
-# Start API server (http://localhost:3000)
-bun run dev:api
-
-# Start web app (http://localhost:5173)
-bun run dev:web
-```
-
-### Verify Setup
-
-```bash
-# Test API health
-curl http://localhost:3000/health
-# {"status":"ok","timestamp":"..."}
-
-# Test API root
-curl http://localhost:3000/
-# {"message":"Workflow Execution System API","version":"0.0.1","endpoints":["/health"]}
-```
-
-## Architecture
-
-```
-┌─────────┐     ┌──────────────┐     ┌─────────────────┐
-│ Client  │────▶│  API Server  │────▶│  K8s Control    │
-│ (Web)   │◀────│  (Bun)       │◀────│  Plane          │
-└─────────┘     └──────────────┘     └─────────────────┘
-                       │                      │
-                       ▼                      ▼
-                ┌──────────────┐     ┌─────────────────┐
-                │  PostgreSQL  │     │  Workflow       │
-                │  (Events)    │     │  Operator       │
-                └──────────────┘     └─────────────────┘
-```
-
-## Documentation
-
-- [Project Structure](docs/structure.md) - Detailed file structure
+For full deployment instructions, see the [Getting Started Guide](docs/getting-started.md).
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions from the community! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## 📄 License
 
