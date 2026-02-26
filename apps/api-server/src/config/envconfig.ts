@@ -16,6 +16,7 @@ export const Envconfig = {
 	services: {
 		email: {
 			resendKey: process.env.RESEND_KEY || 'NEEDED',
+			//resend verified domain since implemented service uses resend
 			appEmail: process.env.APP_EMAIL || 'fizanmuhammedfaisal@gmail.com',
 		},
 	},

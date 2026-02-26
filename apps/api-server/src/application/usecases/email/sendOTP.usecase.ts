@@ -4,8 +4,8 @@ import type {
 } from '@/application/port/usecases/email/emailSend.interface';
 import type { IOTPEmailStrategy } from '@/application/port/usecases/email/otpEmailStrategy.interface';
 import { TOKENS } from '@/config/di/tokens';
-import { inject } from 'tsyringe';
-
+import { inject, injectable } from 'tsyringe';
+@injectable()
 export class SendOTPUseCase implements ISendOTPEmail {
 	private strategies: Record<Exclude<OTPEmailType, 'forget-password'>, IOTPEmailStrategy>;
 	constructor(

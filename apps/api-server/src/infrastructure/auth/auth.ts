@@ -26,6 +26,8 @@ export const auth = betterAuth({
 				const sendOTP = container.resolve<ISendOTPEmail>(TOKENS.SendOTPEmail);
 				sendOTP.execute(email, otp, type);
 			},
+			expiresIn: 15 * 60,
+			allowedAttempts: 3,
 		}),
 		openAPI(),
 		jwt({
