@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useSignup } from './hooks';
 import {
@@ -15,10 +15,9 @@ import {
 } from './schema';
 
 const fieldVariants: Variants = {
-	hidden: { opacity: 0, y: 6 },
+	hidden: { opacity: 0 },
 	visible: () => ({
 		opacity: 1,
-		y: 0,
 		transition: {
 			duration: 0.16,
 			delay: 0.08,
@@ -28,17 +27,17 @@ const fieldVariants: Variants = {
 };
 
 const stepVariants: Variants = {
-	enter: { opacity: 0, x: 20 },
-	center: { opacity: 1, x: 0, transition: { duration: 0.2, ease: [0.25, 1, 0.5, 1] } },
-	exit: { opacity: 0, x: -20, transition: { duration: 0.15 } },
+	enter: { opacity: 0 },
+	center: { opacity: 1, transition: { duration: 0.2, ease: [0.25, 1, 0.5, 1] } },
+	exit: { opacity: 0, transition: { duration: 0.15 } },
 };
 
 function OrDivider() {
 	return (
-		<div className="flex items-center gap-3 text-xs text-muted-foreground/40">
-			<div className="h-px flex-1 bg-border" />
-			<span className="text-muted-foreground/50">or</span>
-			<div className="h-px flex-1 bg-border" />
+		<div className="flex items-center gap-3 my-1">
+			<div className="h-px flex-1 bg-white-[0.06]" />
+			<span className="text-[11px] text-white/20 uppercase tracking-wider">or</span>
+			<div className="h-px flex-1 bg-white-[0.06]" />
 		</div>
 	);
 }
@@ -64,88 +63,45 @@ function EmailStep({
 	return (
 		<form onSubmit={handleSubmit(onSubmit)}>
 			<FieldGroup className="gap-4">
+				{/* Header */}
 				<motion.div
 					variants={fieldVariants}
 					initial="hidden"
 					animate="visible"
-					className="flex flex-col gap-1 mb-1"
+					className="flex flex-col gap-1.5 mb-2 text-center"
 				>
-					<h1 className="text-xl font-bold tracking-tight text-foreground">Create an account</h1>
-					<FieldDescription className="text-sm text-muted-foreground">
+					<h1 className="text-xl font-bold tracking-tight text-white">Create an account</h1>
+					<p className="text-sm text-white/35">
 						Already have an account?{' '}
 						<Link
 							to="/login"
-							className="text-primary font-medium underline underline-offset-4 hover:opacity-80 transition-opacity"
+							className="text-primary font-medium hover:underline underline-offset-4 transition-colors"
 						>
 							Log in
 						</Link>
-					</FieldDescription>
+					</p>
 				</motion.div>
 
 				{serverError && (
 					<motion.div
 						initial={{ opacity: 0, y: -4 }}
 						animate={{ opacity: 1, y: 0 }}
-						className="rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive"
+						className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2.5 text-sm text-destructive"
 					>
 						{serverError}
 					</motion.div>
 				)}
 
+				{/* Social auth — side by side */}
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
-					<Field>
-						<FieldLabel htmlFor="signup-name" className="text-xs font-medium">
-							Full name
-						</FieldLabel>
-						<Input
-							id="signup-name"
-							type="text"
-							placeholder="John Doe"
-							disabled={isPending}
-							aria-invalid={!!errors.name}
-							{...register('name')}
-						/>
-						{errors.name && <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>}
-					</Field>
-				</motion.div>
-
-				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
-					<Field>
-						<FieldLabel htmlFor="signup-email" className="text-xs font-medium">
-							Email
-						</FieldLabel>
-						<Input
-							id="signup-email"
-							type="email"
-							placeholder="you@company.com"
-							disabled={isPending}
-							aria-invalid={!!errors.email}
-							{...register('email')}
-						/>
-						{errors.email && (
-							<p className="mt-1 text-xs text-destructive">{errors.email.message}</p>
-						)}
-					</Field>
-				</motion.div>
-
-				<motion.div variants={fieldVariants} initial="hidden" animate="visible" className="pt-1">
-					<Field>
-						<motion.div whileTap={{ scale: isPending ? 1 : 0.97 }}>
-							<Button type="submit" className="w-full font-medium" disabled={isPending}>
-								{isPending ? 'Sending code…' : 'Continue'}
-							</Button>
-						</motion.div>
-					</Field>
-				</motion.div>
-
-				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
-					<OrDivider />
-				</motion.div>
-
-				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
-					<Field>
+					<div className="grid grid-cols-2 gap-2.5">
 						<motion.div whileTap={{ scale: 0.97 }}>
-							<Button variant="outline" type="button" className="w-full" disabled={isPending}>
+							<Button
+								variant="outline"
+								type="button"
+								className="w-full gap-2 text-white/60 border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:text-white"
+								disabled={isPending}
+							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 24 24"
@@ -158,7 +114,82 @@ function EmailStep({
 										fill="currentColor"
 									/>
 								</svg>
-								Continue with Google
+								Google
+							</Button>
+						</motion.div>
+						<motion.div whileTap={{ scale: 0.97 }}>
+							<Button
+								variant="outline"
+								type="button"
+								className="w-full gap-2 text-white/60 border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:text-white"
+								disabled={isPending}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+									className="size-4 shrink-0"
+								>
+									<title>GitHub</title>
+									<path
+										d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"
+										fill="currentColor"
+									/>
+								</svg>
+								GitHub
+							</Button>
+						</motion.div>
+					</div>
+				</motion.div>
+
+				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<OrDivider />
+				</motion.div>
+
+				{/* Name */}
+				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<Field>
+						<FieldLabel htmlFor="signup-name" className="text-xs font-medium text-white/50">
+							Full name
+						</FieldLabel>
+						<Input
+							id="signup-name"
+							type="text"
+							placeholder="John Black"
+							disabled={isPending}
+							aria-invalid={!!errors.name}
+							{...register('name')}
+						/>
+						{errors.name && <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>}
+					</Field>
+				</motion.div>
+
+				{/* Email */}
+				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<Field>
+						<FieldLabel htmlFor="signup-email" className="text-xs font-medium text-white/50">
+							Email
+						</FieldLabel>
+						<Input
+							id="signup-email"
+							type="email"
+							placeholder="john.black@example.com"
+							disabled={isPending}
+							aria-invalid={!!errors.email}
+							{...register('email')}
+						/>
+						{errors.email && (
+							<p className="mt-1 text-xs text-destructive">{errors.email.message}</p>
+						)}
+					</Field>
+				</motion.div>
+
+				{/* Submit */}
+				<motion.div variants={fieldVariants} initial="hidden" animate="visible" className="pt-1">
+					<Field>
+						<motion.div whileTap={{ scale: isPending ? 1 : 0.97 }}>
+							<Button type="submit" className="w-full font-semibold" disabled={isPending}>
+								{isPending ? 'Sending code…' : 'Continue'}
 							</Button>
 						</motion.div>
 					</Field>
@@ -197,19 +228,19 @@ function OtpStep({
 					variants={fieldVariants}
 					initial="hidden"
 					animate="visible"
-					className="flex flex-col gap-1 mb-1"
+					className="flex flex-col gap-1.5 mb-2 text-center"
 				>
-					<h1 className="text-xl font-bold tracking-tight text-foreground">Check your email</h1>
-					<FieldDescription className="text-sm text-muted-foreground">
+					<h1 className="text-xl font-bold tracking-tight text-white">Check your email</h1>
+					<p className="text-sm text-white/35">
 						We sent a 6-digit code to your email. Enter it below to continue.
-					</FieldDescription>
+					</p>
 				</motion.div>
 
 				{serverError && (
 					<motion.div
 						initial={{ opacity: 0, y: -4 }}
 						animate={{ opacity: 1, y: 0 }}
-						className="rounded-md bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive"
+						className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2.5 text-sm text-destructive"
 					>
 						{serverError}
 					</motion.div>
@@ -217,7 +248,7 @@ function OtpStep({
 
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
 					<Field>
-						<FieldLabel htmlFor="signup-otp" className="text-xs font-medium">
+						<FieldLabel htmlFor="signup-otp" className="text-xs font-medium text-white/50">
 							Verification code
 						</FieldLabel>
 						<Input
@@ -239,7 +270,7 @@ function OtpStep({
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible" className="pt-1">
 					<Field>
 						<motion.div whileTap={{ scale: isPending ? 1 : 0.97 }}>
-							<Button type="submit" className="w-full font-medium" disabled={isPending}>
+							<Button type="submit" className="w-full font-semibold" disabled={isPending}>
 								{isPending ? 'Verifying…' : 'Verify & sign in'}
 							</Button>
 						</motion.div>
@@ -247,13 +278,13 @@ function OtpStep({
 				</motion.div>
 
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
-					<p className="text-center text-xs text-muted-foreground">
+					<p className="text-center text-xs text-white/30">
 						Didn&apos;t get the code?{' '}
 						<button
 							type="button"
 							onClick={onResend}
 							disabled={isPending || resendCooldown > 0}
-							className="text-primary font-medium underline underline-offset-4 hover:opacity-80 transition-opacity disabled:opacity-50"
+							className="text-primary font-medium hover:underline underline-offset-4 transition-colors disabled:opacity-50"
 						>
 							{resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend'}
 						</button>
@@ -276,7 +307,7 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 	} = useSignup();
 
 	return (
-		<div className={cn('flex flex-col gap-4', className)} {...props}>
+		<div className={cn('flex flex-col gap-5', className)} {...props}>
 			<AnimatePresence mode="wait">
 				{step === 'email' ? (
 					<motion.div
@@ -308,18 +339,18 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 			</AnimatePresence>
 
 			<motion.div variants={fieldVariants} initial="hidden" animate="visible">
-				<p className="text-center text-xs text-muted-foreground/50 leading-relaxed">
+				<p className="text-center text-[11px] text-white/20 leading-relaxed">
 					By continuing, you agree to our{' '}
 					<a
 						href="/terms"
-						className="underline underline-offset-4 hover:text-muted-foreground transition-colors"
+						className="underline underline-offset-4 hover:text-white/40 transition-colors"
 					>
 						Terms
 					</a>{' '}
 					and{' '}
 					<a
 						href="/privacy"
-						className="underline underline-offset-4 hover:text-muted-foreground transition-colors"
+						className="underline underline-offset-4 hover:text-white/40 transition-colors"
 					>
 						Privacy Policy
 					</a>

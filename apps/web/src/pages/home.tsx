@@ -2,8 +2,9 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
+import { useAppConfig } from '@/lib/app-config';
 
-/* ─── Constants ─── */
+/* ─── Animation helpers ─── */
 const ease = [0.25, 1, 0.5, 1] as const;
 const fadeUp = (delay: number) => ({
 	initial: { opacity: 0, y: 20 } as const,
@@ -11,8 +12,7 @@ const fadeUp = (delay: number) => ({
 	transition: { duration: 0.6, delay, ease } as const,
 });
 
-/* ─────────────────────────── Hero code snippet ─────────────────────────── */
-/* A compact, live-feeling terminal showing a Torq workflow being triggered */
+/* ─────────────────────────── Hero terminal ─────────────────────────── */
 const codeLines = [
 	{ text: '$ torq run deploy-pipeline', color: 'text-white/70' },
 	{ text: '', color: '' },
@@ -36,21 +36,16 @@ function HeroTerminal() {
 
 	return (
 		<div className="relative w-full max-w-md">
-			{/* Soft glow behind */}
 			<div className="absolute -inset-6 rounded-3xl bg-primary/[0.05] blur-2xl" />
-
 			<div className="relative rounded-xl border border-white/[0.07] bg-[oklch(0.10_0.005_285)] overflow-hidden shadow-2xl shadow-black/40">
-				{/* Title bar */}
 				<div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.06]">
 					<div className="flex gap-1.5">
-						<div className="size-2.5 rounded-full bg-white/[0.08]" />
-						<div className="size-2.5 rounded-full bg-white/[0.08]" />
-						<div className="size-2.5 rounded-full bg-white/[0.08]" />
+						<div className="size-2.5 rounded-full bg-white/10" />
+						<div className="size-2.5 rounded-full bg-white/10" />
+						<div className="size-2.5 rounded-full bg-white/10" />
 					</div>
 					<span className="flex-1 text-center text-[10px] text-white/20 font-medium">terminal</span>
 				</div>
-
-				{/* Code body */}
 				<div className="px-4 py-3.5 font-mono text-[12px] leading-[1.7] min-h-[180px]">
 					{codeLines.map((line, i) => (
 						<div
@@ -65,7 +60,6 @@ function HeroTerminal() {
 							{line.text || '\u00A0'}
 						</div>
 					))}
-					{/* Blinking cursor */}
 					{visibleLines >= codeLines.length && (
 						<span className="inline-block w-1.5 h-4 bg-primary/60 animate-pulse rounded-sm ml-0.5" />
 					)}
@@ -91,7 +85,7 @@ const features = [
 				<circle cx="10" cy="10" r="2" stroke="currentColor" strokeWidth="1.5" />
 			</svg>
 		),
-		span: 'col-span-2',
+		span: 'md:col-span-2',
 	},
 	{
 		title: 'Live Logs',
@@ -106,7 +100,7 @@ const features = [
 				/>
 			</svg>
 		),
-		span: 'col-span-1',
+		span: 'md:col-span-1',
 	},
 	{
 		title: 'Run History',
@@ -117,7 +111,7 @@ const features = [
 				<path d="M10 6v4l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
 			</svg>
 		),
-		span: 'col-span-1',
+		span: 'md:col-span-1',
 	},
 	{
 		title: 'Artifacts',
@@ -139,7 +133,7 @@ const features = [
 				/>
 			</svg>
 		),
-		span: 'col-span-1',
+		span: 'md:col-span-1',
 	},
 	{
 		title: 'Self-Host or Cloud',
@@ -152,13 +146,13 @@ const features = [
 				<circle cx="6" cy="13.5" r="1" fill="currentColor" />
 			</svg>
 		),
-		span: 'col-span-2',
+		span: 'md:col-span-2',
 	},
 ];
 
 function FeatureGrid() {
 	return (
-		<section className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-16 py-24">
+		<section className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-12 py-24">
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				whileInView={{ opacity: 1, y: 0 }}
@@ -182,7 +176,7 @@ function FeatureGrid() {
 						whileInView={{ opacity: 1, y: 0 }}
 						viewport={{ once: true, margin: '-60px' }}
 						transition={{ duration: 0.5, delay: i * 0.07, ease }}
-						className={`group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:border-white/[0.12] hover:bg-white/[0.03] md:${f.span}`}
+						className={`group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:border-white/[0.12] hover:bg-white/[0.03] ${f.span}`}
 					>
 						<div className="flex items-center gap-3 mb-3">
 							<div className="flex items-center justify-center size-9 rounded-lg bg-primary/[0.08] border border-primary/[0.15] text-primary transition-colors group-hover:bg-primary/[0.12]">
@@ -200,6 +194,8 @@ function FeatureGrid() {
 
 /* ─────────────────────────── Page ─────────────────────────── */
 export function HomePage() {
+	const { authEnabled } = useAppConfig();
+
 	return (
 		<div
 			className="relative min-h-svh overflow-hidden"
@@ -220,51 +216,39 @@ export function HomePage() {
 
 			{/* ── Nav ── */}
 			<motion.nav
-				initial={{ opacity: 0, y: -12 }}
+				initial={{ opacity: 0, y: -10 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5, ease }}
-				className="relative z-20 flex items-center justify-between px-6 py-5 md:px-16"
+				transition={{ duration: 0.4, ease }}
+				className="relative z-20 flex items-center justify-between px-6 py-4 md:px-12"
 			>
-				<Link to="/" className="flex items-baseline select-none group">
-					<span className="font-black tracking-tighter text-white text-[22px]">Tor</span>
-					<span className="font-black tracking-tighter text-primary text-[22px]">q</span>
+				{/* Logo — always white, always left */}
+				<Link to="/" className="select-none">
+					<span className="text-xl font-black tracking-tighter text-white">torq</span>
 				</Link>
 
-				<div className="flex items-center gap-2">
-					<Link to="/login">
-						<Button
-							variant="ghost"
-							size="sm"
-							className="text-white/50 hover:text-white hover:bg-white/[0.06] text-[13px] font-medium rounded-lg"
-						>
-							Log in
-						</Button>
+				{/* Right side — minimal: just login or profile */}
+				{authEnabled && (
+					<Link
+						to="/login"
+						className="text-[13px] font-medium text-white/40 hover:text-white transition-colors"
+					>
+						Log in
 					</Link>
-					<Link to="/signup">
-						<motion.div whileTap={{ scale: 0.97 }}>
-							<Button
-								size="sm"
-								className="text-[13px] font-semibold rounded-lg shadow-[0_0_20px_-4px_oklch(0.60_0.13_163_/_0.4)]"
-							>
-								Get Started
-							</Button>
-						</motion.div>
-					</Link>
-				</div>
+				)}
 			</motion.nav>
 
-			{/* ── Hero: text left + terminal right ── */}
-			<section className="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-16 px-6 md:px-16 pt-16 md:pt-28 pb-12 max-w-6xl mx-auto">
-				{/* Left — text */}
-				<div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
-					<motion.div {...fadeUp(0.05)} className="mb-6">
+			{/* ── Hero ── */}
+			<section className="relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 px-6 md:px-12 pt-20 md:pt-32 pb-16 max-w-6xl mx-auto">
+				{/* Left — copy */}
+				<div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left max-w-xl">
+					<motion.div {...fadeUp(0.05)} className="mb-5">
 						<div className="inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-3.5 py-1.5">
-							<span className="relative flex size-2">
+							<span className="relative flex size-1.5">
 								<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-								<span className="relative inline-flex size-2 rounded-full bg-primary" />
+								<span className="relative inline-flex size-1.5 rounded-full bg-primary" />
 							</span>
-							<span className="text-[11px] font-medium tracking-wide text-white/40 uppercase">
-								Now in Beta
+							<span className="text-[11px] font-medium tracking-wide text-white/35 uppercase">
+								Beta
 							</span>
 						</div>
 					</motion.div>
@@ -287,12 +271,12 @@ export function HomePage() {
 						{...fadeUp(0.28)}
 						className="mt-5 text-[15px] md:text-base text-white/35 leading-relaxed max-w-md"
 					>
-						Design, trigger, and monitor CI/CD pipelines from a single dashboard. Self-host with
-						Torq Core, or use Torq Cloud.
+						Design, trigger, and monitor CI/CD pipelines from a&nbsp;single dashboard. Self-host or
+						use the cloud.
 					</motion.p>
 
 					<motion.div {...fadeUp(0.4)} className="mt-8 flex flex-wrap items-center gap-3">
-						<Link to="/signup">
+						<Link to={authEnabled ? '/signup' : '/dashboard'}>
 							<motion.div
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.97 }}
@@ -302,11 +286,11 @@ export function HomePage() {
 									size="lg"
 									className="font-semibold text-sm px-7 h-11 rounded-xl shadow-[0_0_30px_-6px_oklch(0.60_0.13_163_/_0.5)]"
 								>
-									Start building — free
+									{authEnabled ? 'Start for free' : 'Open Dashboard'}
 								</Button>
 							</motion.div>
 						</Link>
-						<Link to="/login">
+						<a href="https://github.com" target="_blank" rel="noreferrer">
 							<motion.div
 								whileHover={{ scale: 1.02 }}
 								whileTap={{ scale: 0.97 }}
@@ -315,27 +299,27 @@ export function HomePage() {
 								<Button
 									variant="outline"
 									size="lg"
-									className="font-medium text-sm px-7 h-11 rounded-xl border-white/[0.08] text-white/60 bg-white/[0.03] hover:text-white hover:bg-white/[0.06] hover:border-white/[0.15]"
+									className="font-medium text-sm px-7 h-11 rounded-xl border-white/10 text-white/50 bg-transparent hover:text-white hover:bg-white/[0.04] hover:border-white/20"
 								>
 									Documentation
 								</Button>
 							</motion.div>
-						</Link>
+						</a>
 					</motion.div>
 				</div>
 
-				{/* Right — live terminal */}
+				{/* Right — terminal */}
 				<motion.div {...fadeUp(0.3)} className="flex-shrink-0 w-full lg:w-auto">
 					<HeroTerminal />
 				</motion.div>
 			</section>
 
-			{/* ── Divider line ── */}
-			<div className="relative z-10 max-w-5xl mx-auto px-6 md:px-16">
+			{/* ── Divider ── */}
+			<div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12">
 				<div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
 			</div>
 
-			{/* ── Feature grid ── */}
+			{/* ── Features ── */}
 			<FeatureGrid />
 
 			{/* ── Footer ── */}

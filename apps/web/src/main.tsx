@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
+import { AppConfigProvider } from '@/lib/app-config';
 
 // Dark mode by default
 document.documentElement.classList.add('dark');
@@ -11,6 +12,8 @@ if (!rootElement) throw new Error('Root element not found');
 
 createRoot(rootElement).render(
 	<StrictMode>
-		<App />
+		<AppConfigProvider>
+			<App />
+		</AppConfigProvider>
 	</StrictMode>,
 );

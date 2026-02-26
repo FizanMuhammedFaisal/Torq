@@ -171,29 +171,32 @@ Tailwind's default 4px base unit. Key values:
 ## 5. Auth Pages
 
 ### Layout
-Split-panel, 45/55:
+Full-screen dark, centered form — inspired by Resend:
 
 ```
-[ Brand panel (dark)  ] [ Form panel (light) ]
-  Wordmark                Title + subtitle
-  Animated tagline        Fields
-  Navigation dots         CTA button
-                          Social auth
-                          Legal
+[ Full dark background            ]
+         torq (logo → home)
+         
+         Form title
+         Fields
+         CTA button
+         Social auth
+         Legal
 ```
 
-Mobile: brand panel collapses to a small header wordmark above the form.
+### Background
+- Same near-black as landing: `oklch(0.08 0.005 285)`
+- Subtle primary glow behind form: radial gradient, 6% opacity, `blur-[60px]`
+- Logo links back to `/` home
 
-### Brand Panel
-- Background: `var(--foreground)`
-- Grid overlay: 1px lines, 40px spacing, 4% white opacity
-- Glow: `var(--primary)` radial gradient, 20% opacity, `blur-[120px]`
-- Taglines rotate every 4s with `AnimatePresence` fade + slide
+### Form Area
+- Max-width: `380px`, centered horizontally
+- No card or container — form floats directly on the dark background
+- Entrance: `y: 16 → 0`, `opacity: 0 → 1`, 300ms
+- Route transitions animate with `AnimatePresence mode="wait"`
 
-### Form Panel
-- Background: `var(--background)`
-- Form card: no explicit card — the panel IS the surface
-- Entrance: `y: 24 → 0`, `opacity: 0 → 1`, 500ms, 100ms delay
+### Mobile
+- Same layout, just tighter padding (`px-6` instead of `px-12`)
 
 ---
 

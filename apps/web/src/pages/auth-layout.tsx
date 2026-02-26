@@ -1,119 +1,75 @@
-import * as React from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 
-const taglines = [
-	{ text: 'Automate any workflow in minutes, not months.', tag: 'Built for speed' },
-	{ text: 'Visual pipelines that actually make sense.', tag: 'Clarity first' },
-	{ text: 'Run, monitor, and iterate — all in one place.', tag: 'End-to-end control' },
-];
-
-function BrandPanel() {
-	const [index, setIndex] = React.useState(0);
-
-	React.useEffect(() => {
-		const t = setInterval(() => setIndex((i) => (i + 1) % taglines.length), 4000);
-		return () => clearInterval(t);
-	}, []);
-
-	return (
-		<div
-			className="relative hidden lg:flex lg:w-[45%] flex-col justify-center p-12 overflow-hidden"
-			style={{ background: 'oklch(0.10 0.005 285)' }}
-		>
-			{/* Grid */}
-			<div
-				className="pointer-events-none absolute inset-0"
-				style={{
-					backgroundImage:
-						'linear-gradient(to right,rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,0.04) 1px,transparent 1px)',
-					backgroundSize: '40px 40px',
-				}}
-			/>
-			{/* Glow — per DESIGN.md: 20% opacity, blur-120 */}
-			<div className="pointer-events-none absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 size-[480px] rounded-full bg-primary opacity-[0.20] blur-[120px]" />
-
-			<div className="relative z-10 flex flex-col gap-8 max-w-md">
-				{/* Wordmark */}
-				<div>
-					<div className="flex items-end leading-none select-none">
-						<span
-							className="text-white font-black tracking-tight"
-							style={{ fontSize: 'clamp(48px, 5.5vw, 72px)' }}
-						>
-							Tor
-						</span>
-						<span
-							className="text-primary font-black tracking-tight"
-							style={{ fontSize: 'clamp(48px, 5.5vw, 72px)' }}
-						>
-							q
-						</span>
-					</div>
-					<p className="mt-1.5 text-xs font-medium tracking-[0.18em] text-white/30 uppercase">
-						Workflow Execution Platform
-					</p>
-				</div>
-
-				{/* Tagline carousel */}
-				<div>
-					<AnimatePresence mode="wait">
-						<motion.div
-							key={index}
-							initial={{ opacity: 0, y: 8 }}
-							animate={{ opacity: 1, y: 0 }}
-							exit={{ opacity: 0, y: -8 }}
-							transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
-						>
-							<blockquote className="text-lg font-medium text-white/70 leading-relaxed">
-								&ldquo;{taglines[index].text}&rdquo;
-							</blockquote>
-							<p className="mt-2 text-xs font-semibold tracking-widest text-white/25 uppercase">
-								{taglines[index].tag}
-							</p>
-						</motion.div>
-					</AnimatePresence>
-					<div className="mt-4 flex items-center gap-1.5">
-						{taglines.map((tl) => (
-							<button
-								type="button"
-								key={tl.tag}
-								onClick={() => setIndex(taglines.indexOf(tl))}
-								aria-label={tl.tag}
-								className="h-1 rounded-full transition-all duration-300 focus-visible:outline-none"
-								style={{
-									width: taglines[index].tag === tl.tag ? 18 : 5,
-									background:
-										taglines[index].tag === tl.tag
-											? 'var(--color-primary)'
-											: 'rgba(255,255,255,0.15)',
-								}}
-							/>
-						))}
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-}
+const ease = [0.25, 1, 0.5, 1] as const;
 
 export function AuthLayout() {
 	const location = useLocation();
 
 	return (
-		<div className="flex min-h-svh">
-			<BrandPanel />
+		<div
+			className="relative flex min-h-svh flex-col items-center"
+			style={{ background: 'oklch(0.08 0.005 285)' }}
+		>
+			{/* Ambient glow */}
+			<div
+				className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[10%]"
+				style={{
+					width: '90vw',
+					maxWidth: 900,
+					height: '50vh',
+					background:
+						'radial-gradient(ellipse at center, oklch(0.60 0.13 163 / 0.06) 0%, transparent 60%)',
+					filter: 'blur(60px)',
+				}}
+			/>
 
-			{/* Form panel — per DESIGN.md §5: bg-background */}
-			<div className="flex flex-1 flex-col items-center justify-center p-6 md:p-12 bg-background">
+			{/* Top bar — back link */}
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				transition={{ duration: 0.4, delay: 0.1 }}
+				className="relative z-10 w-full px-6 pt-6 md:px-10 md:pt-8"
+			>
+				<Link
+					to="/"
+					className="inline-flex items-center gap-1.5 text-[13px] text-white/30 hover:text-white/60 transition-colors"
+				>
+					<svg className="size-4" viewBox="0 0 16 16" fill="none">
+						<path
+							d="M10 12L6 8l4-4"
+							stroke="currentColor"
+							strokeWidth="1.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						/>
+					</svg>
+					Home
+				</Link>
+			</motion.div>
+
+			{/* Center area */}
+			<div className="relative z-10 flex flex-1 flex-col items-center justify-center w-full px-6 py-12">
+				{/* Logo */}
+				<motion.div
+					initial={{ opacity: 0, y: -8 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.5, ease }}
+					className="mb-10"
+				>
+					<Link to="/" className="select-none">
+						<span className="text-3xl font-black tracking-tight text-white">Torq</span>
+					</Link>
+				</motion.div>
+
 				<AnimatePresence mode="wait">
 					<motion.div
 						key={location.pathname}
-						initial={{ opacity: 0, y: 10 }}
+						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: -10 }}
-						transition={{ duration: 0.15, ease: [0.25, 1, 0.5, 1] }}
-						className="w-full max-w-[380px]"
+						exit={{ opacity: 0, y: -8 }}
+						transition={{ duration: 0.3, ease }}
+						className="w-full max-w-[380px] auth-forms"
 					>
 						<Outlet />
 					</motion.div>

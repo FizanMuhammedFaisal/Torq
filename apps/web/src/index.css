@@ -127,3 +127,26 @@
     @apply font-sans;
     }
 }
+
+/* ─── Auth form overrides ─── */
+.auth-forms [data-slot="input"] {
+  height: 2.75rem;
+  background: oklch(1 0 0 / 0.06);
+  border-color: oklch(1 0 0 / 0.08);
+  color: oklch(0.95 0 0);
+  font-size: 0.875rem;
+}
+
+.auth-forms [data-slot="input"]::placeholder {
+  color: oklch(1 0 0 / 0.25);
+}
+
+.auth-forms [data-slot="input"]:focus-visible {
+  border-color: oklch(0.60 0.13 163 / 0.5);
+  box-shadow: 0 0 0 3px oklch(0.60 0.13 163 / 0.1);
+}
+
+.auth-forms [data-slot="button"] {
+
+  height: 2.75rem;
+}
