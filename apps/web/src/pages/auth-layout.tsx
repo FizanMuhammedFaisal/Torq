@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from 'motion/react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'motion/react';
 
 const ease = [0.25, 1, 0.5, 1] as const;
 
@@ -58,7 +58,9 @@ export function AuthLayout() {
 					className="mb-10"
 				>
 					<Link to="/" className="select-none">
-						<span className="text-3xl font-black tracking-tight text-white">Torq</span>
+						<span className="text-3xl font-black tracking-tight text-white">
+							Torq
+						</span>
 					</Link>
 				</motion.div>
 

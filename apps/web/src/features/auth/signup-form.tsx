@@ -1,17 +1,17 @@
-import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { motion, AnimatePresence, type Variants } from 'motion/react';
-import { cn } from '@/lib/utils';
+import { AnimatePresence, motion, type Variants } from 'motion/react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import { useSignup } from './hooks';
 import {
-	signupEmailSchema,
-	signupOtpSchema,
 	type SignupEmailInput,
 	type SignupOtpInput,
+	signupEmailSchema,
+	signupOtpSchema,
 } from './schema';
 
 const fieldVariants: Variants = {
@@ -28,7 +28,10 @@ const fieldVariants: Variants = {
 
 const stepVariants: Variants = {
 	enter: { opacity: 0 },
-	center: { opacity: 1, transition: { duration: 0.2, ease: [0.25, 1, 0.5, 1] } },
+	center: {
+		opacity: 1,
+		transition: { duration: 0.2, ease: [0.25, 1, 0.5, 1] },
+	},
 	exit: { opacity: 0, transition: { duration: 0.15 } },
 };
 
@@ -36,7 +39,9 @@ function OrDivider() {
 	return (
 		<div className="flex items-center gap-3 my-1">
 			<div className="h-px flex-1 bg-white-[0.06]" />
-			<span className="text-[11px] text-white/20 uppercase tracking-wider">or</span>
+			<span className="text-[11px] text-white/20 uppercase tracking-wider">
+				or
+			</span>
 			<div className="h-px flex-1 bg-white-[0.06]" />
 		</div>
 	);
@@ -70,7 +75,9 @@ function EmailStep({
 					animate="visible"
 					className="flex flex-col gap-1.5 mb-2 text-center"
 				>
-					<h1 className="text-xl font-bold tracking-tight text-white">Create an account</h1>
+					<h1 className="text-xl font-bold tracking-tight text-white">
+						Create an account
+					</h1>
 					<p className="text-sm text-white/35">
 						Already have an account?{' '}
 						<Link
@@ -149,7 +156,10 @@ function EmailStep({
 				{/* Name */}
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
 					<Field>
-						<FieldLabel htmlFor="signup-name" className="text-xs font-medium text-white/50">
+						<FieldLabel
+							htmlFor="signup-name"
+							className="text-xs font-medium text-white/50"
+						>
 							Full name
 						</FieldLabel>
 						<Input
@@ -160,14 +170,21 @@ function EmailStep({
 							aria-invalid={!!errors.name}
 							{...register('name')}
 						/>
-						{errors.name && <p className="mt-1 text-xs text-destructive">{errors.name.message}</p>}
+						{errors.name && (
+							<p className="mt-1 text-xs text-destructive">
+								{errors.name.message}
+							</p>
+						)}
 					</Field>
 				</motion.div>
 
 				{/* Email */}
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
 					<Field>
-						<FieldLabel htmlFor="signup-email" className="text-xs font-medium text-white/50">
+						<FieldLabel
+							htmlFor="signup-email"
+							className="text-xs font-medium text-white/50"
+						>
 							Email
 						</FieldLabel>
 						<Input
@@ -179,16 +196,27 @@ function EmailStep({
 							{...register('email')}
 						/>
 						{errors.email && (
-							<p className="mt-1 text-xs text-destructive">{errors.email.message}</p>
+							<p className="mt-1 text-xs text-destructive">
+								{errors.email.message}
+							</p>
 						)}
 					</Field>
 				</motion.div>
 
 				{/* Submit */}
-				<motion.div variants={fieldVariants} initial="hidden" animate="visible" className="pt-1">
+				<motion.div
+					variants={fieldVariants}
+					initial="hidden"
+					animate="visible"
+					className="pt-1"
+				>
 					<Field>
 						<motion.div whileTap={{ scale: isPending ? 1 : 0.97 }}>
-							<Button type="submit" className="w-full font-semibold" disabled={isPending}>
+							<Button
+								type="submit"
+								className="w-full font-semibold"
+								disabled={isPending}
+							>
 								{isPending ? 'Sending code…' : 'Continue'}
 							</Button>
 						</motion.div>
@@ -230,7 +258,9 @@ function OtpStep({
 					animate="visible"
 					className="flex flex-col gap-1.5 mb-2 text-center"
 				>
-					<h1 className="text-xl font-bold tracking-tight text-white">Check your email</h1>
+					<h1 className="text-xl font-bold tracking-tight text-white">
+						Check your email
+					</h1>
 					<p className="text-sm text-white/35">
 						We sent a 6-digit code to your email. Enter it below to continue.
 					</p>
@@ -248,7 +278,10 @@ function OtpStep({
 
 				<motion.div variants={fieldVariants} initial="hidden" animate="visible">
 					<Field>
-						<FieldLabel htmlFor="signup-otp" className="text-xs font-medium text-white/50">
+						<FieldLabel
+							htmlFor="signup-otp"
+							className="text-xs font-medium text-white/50"
+						>
 							Verification code
 						</FieldLabel>
 						<Input
@@ -263,14 +296,27 @@ function OtpStep({
 							className="text-center text-lg tracking-[0.3em] font-mono"
 							{...register('otp')}
 						/>
-						{errors.otp && <p className="mt-1 text-xs text-destructive">{errors.otp.message}</p>}
+						{errors.otp && (
+							<p className="mt-1 text-xs text-destructive">
+								{errors.otp.message}
+							</p>
+						)}
 					</Field>
 				</motion.div>
 
-				<motion.div variants={fieldVariants} initial="hidden" animate="visible" className="pt-1">
+				<motion.div
+					variants={fieldVariants}
+					initial="hidden"
+					animate="visible"
+					className="pt-1"
+				>
 					<Field>
 						<motion.div whileTap={{ scale: isPending ? 1 : 0.97 }}>
-							<Button type="submit" className="w-full font-semibold" disabled={isPending}>
+							<Button
+								type="submit"
+								className="w-full font-semibold"
+								disabled={isPending}
+							>
 								{isPending ? 'Verifying…' : 'Verify & sign in'}
 							</Button>
 						</motion.div>
@@ -295,7 +341,10 @@ function OtpStep({
 	);
 }
 
-export function SignupForm({ className, ...props }: React.ComponentProps<'div'>) {
+export function SignupForm({
+	className,
+	...props
+}: React.ComponentProps<'div'>) {
 	const {
 		step,
 		sendOtp,
@@ -317,7 +366,11 @@ export function SignupForm({ className, ...props }: React.ComponentProps<'div'>)
 						animate="center"
 						exit="exit"
 					>
-						<EmailStep isPending={isPending} serverError={serverError} onSubmit={sendOtp} />
+						<EmailStep
+							isPending={isPending}
+							serverError={serverError}
+							onSubmit={sendOtp}
+						/>
 					</motion.div>
 				) : (
 					<motion.div

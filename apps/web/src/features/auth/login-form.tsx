@@ -1,13 +1,13 @@
-import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, type Variants } from 'motion/react';
-import { cn } from '@/lib/utils';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import { useLogin } from './hooks';
-import { loginSchema, type LoginInput } from './schema';
+import { type LoginInput, loginSchema } from './schema';
 
 const fieldVariants: Variants = {
 	hidden: { opacity: 0, y: 6 },
@@ -26,13 +26,18 @@ function OrDivider() {
 	return (
 		<div className="flex items-center gap-3 my-1">
 			<div className="h-px flex-1 bg-white/[0.06]" />
-			<span className="text-[11px] text-white/20 uppercase tracking-wider">or</span>
+			<span className="text-[11px] text-white/20 uppercase tracking-wider">
+				or
+			</span>
 			<div className="h-px flex-1 bg-white/[0.06]" />
 		</div>
 	);
 }
 
-export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
+export function LoginForm({
+	className,
+	...props
+}: React.ComponentProps<'div'>) {
 	const { mutate, isPending, error: serverError } = useLogin();
 
 	const {
@@ -57,7 +62,9 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 						animate="visible"
 						className="flex flex-col gap-1.5 mb-2 text-center"
 					>
-						<h1 className="text-xl font-bold tracking-tight text-white">Welcome back</h1>
+						<h1 className="text-xl font-bold tracking-tight text-white">
+							Welcome back
+						</h1>
 						<p className="text-sm text-white/35">
 							Don&apos;t have an account?{' '}
 							<Link
@@ -80,7 +87,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 					)}
 
 					{/* Social auth — side by side like Resend */}
-					<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<motion.div
+						variants={fieldVariants}
+						initial="hidden"
+						animate="visible"
+					>
 						<div className="grid grid-cols-2 gap-2.5">
 							<motion.div whileTap={{ scale: 0.97 }}>
 								<Button
@@ -129,35 +140,55 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 						</div>
 					</motion.div>
 
-					<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<motion.div
+						variants={fieldVariants}
+						initial="hidden"
+						animate="visible"
+					>
 						<OrDivider />
 					</motion.div>
 
 					{/* Email */}
-					<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<motion.div
+						variants={fieldVariants}
+						initial="hidden"
+						animate="visible"
+					>
 						<Field>
-							<FieldLabel htmlFor="login-email" className="text-xs font-medium text-white/50">
+							<FieldLabel
+								htmlFor="login-email"
+								className="text-xs font-medium text-white/50"
+							>
 								Email
 							</FieldLabel>
 							<Input
 								id="login-email"
 								type="email"
-								placeholder="alan.turing@example.com"
+								placeholder="john.black@example.com"
 								disabled={isPending}
 								aria-invalid={!!errors.email}
 								{...register('email')}
 							/>
 							{errors.email && (
-								<p className="mt-1 text-xs text-destructive">{errors.email.message}</p>
+								<p className="mt-1 text-xs text-destructive">
+									{errors.email.message}
+								</p>
 							)}
 						</Field>
 					</motion.div>
 
 					{/* Password */}
-					<motion.div variants={fieldVariants} initial="hidden" animate="visible">
+					<motion.div
+						variants={fieldVariants}
+						initial="hidden"
+						animate="visible"
+					>
 						<Field>
 							<div className="flex items-center justify-between">
-								<FieldLabel htmlFor="login-password" className="text-xs font-medium text-white/50">
+								<FieldLabel
+									htmlFor="login-password"
+									className="text-xs font-medium text-white/50"
+								>
 									Password
 								</FieldLabel>
 								<a
@@ -176,16 +207,27 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
 								{...register('password')}
 							/>
 							{errors.password && (
-								<p className="mt-1 text-xs text-destructive">{errors.password.message}</p>
+								<p className="mt-1 text-xs text-destructive">
+									{errors.password.message}
+								</p>
 							)}
 						</Field>
 					</motion.div>
 
 					{/* Submit */}
-					<motion.div variants={fieldVariants} initial="hidden" animate="visible" className="pt-1">
+					<motion.div
+						variants={fieldVariants}
+						initial="hidden"
+						animate="visible"
+						className="pt-1"
+					>
 						<Field>
 							<motion.div whileTap={{ scale: isPending ? 1 : 0.97 }}>
-								<Button type="submit" className="w-full font-semibold" disabled={isPending}>
+								<Button
+									type="submit"
+									className="w-full font-semibold"
+									disabled={isPending}
+								>
 									{isPending ? 'Signing in…' : 'Sign in'}
 								</Button>
 							</motion.div>

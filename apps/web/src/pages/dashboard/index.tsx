@@ -1,437 +1,263 @@
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import {
+	Alert02Icon,
+	ArrowRight01Icon,
+	CheckListIcon,
+	File02Icon,
+	Loading03Icon,
+	PlusSignIcon,
+	RefreshIcon,
+} from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-
-/* ── Types ──────────────────────────────────────────────────── */
-
-type WorkflowStatus = 'idle' | 'queued' | 'running' | 'success' | 'failed';
-
-interface Workflow {
-	id: string;
-	name: string;
-	description: string;
-	status: WorkflowStatus;
-	lastRun?: string;
-	duration?: string;
-	steps: { name: string; status: WorkflowStatus }[];
-}
-
-/* ── Mock Data ──────────────────────────────────────────────── */
-
-const MOCK_WORKFLOWS: Workflow[] = [
-	{
-		id: 'wf-1',
-		name: 'CI / Build & Test',
-		description: 'Install dependencies, lint, type-check, and run unit tests',
-		status: 'idle',
-		lastRun: '12 min ago',
-		duration: '2m 34s',
-		steps: [
-			{ name: 'Install deps', status: 'idle' },
-			{ name: 'Lint', status: 'idle' },
-			{ name: 'Type check', status: 'idle' },
-			{ name: 'Unit tests', status: 'idle' },
-		],
-	},
-	{
-		id: 'wf-2',
-		name: 'Deploy to Staging',
-		description: 'Build Docker image, push to registry, deploy to staging cluster',
-		status: 'idle',
-		lastRun: '1 hr ago',
-		duration: '5m 12s',
-		steps: [
-			{ name: 'Build image', status: 'idle' },
-			{ name: 'Push to registry', status: 'idle' },
-			{ name: 'Deploy', status: 'idle' },
-			{ name: 'Health check', status: 'idle' },
-		],
-	},
-	{
-		id: 'wf-3',
-		name: 'Database Migration',
-		description: 'Run pending migrations and seed test data',
-		status: 'idle',
-		lastRun: '3 days ago',
-		duration: '45s',
-		steps: [
-			{ name: 'Backup', status: 'idle' },
-			{ name: 'Run migrations', status: 'idle' },
-			{ name: 'Seed data', status: 'idle' },
-		],
-	},
-	{
-		id: 'wf-4',
-		name: 'Nightly E2E Suite',
-		description: 'Full end-to-end tests against staging environment',
-		status: 'idle',
-		lastRun: 'Yesterday',
-		duration: '14m 08s',
-		steps: [
-			{ name: 'Spin up env', status: 'idle' },
-			{ name: 'Auth tests', status: 'idle' },
-			{ name: 'API tests', status: 'idle' },
-			{ name: 'UI tests', status: 'idle' },
-			{ name: 'Teardown', status: 'idle' },
-		],
-	},
-];
-
-/* ── Helpers ────────────────────────────────────────────────── */
-
-const statusConfig: Record<WorkflowStatus, { label: string; color: string; dot: string }> = {
-	idle: { label: 'Idle', color: 'bg-muted text-muted-foreground', dot: 'bg-muted-foreground/50' },
-	queued: { label: 'Queued', color: 'bg-yellow-500/10 text-yellow-500', dot: 'bg-yellow-500' },
-	running: { label: 'Running', color: 'bg-blue-500/10 text-blue-500', dot: 'bg-blue-500' },
-	success: { label: 'Success', color: 'bg-primary/10 text-primary', dot: 'bg-primary' },
-	failed: { label: 'Failed', color: 'bg-destructive/10 text-destructive', dot: 'bg-destructive' },
-};
-
-function StatusBadge({ status }: { status: WorkflowStatus }) {
-	const cfg = statusConfig[status];
-	return (
-		<Badge variant="outline" className={`gap-1.5 border-0 ${cfg.color}`}>
-			<span
-				className={`size-1.5 rounded-full ${cfg.dot} ${status === 'running' ? 'animate-pulse' : ''}`}
-			/>
-			{cfg.label}
-		</Badge>
-	);
-}
-
-/* ── Simulate a run ─────────────────────────────────────────── */
-
-function simulateRun(wf: Workflow, onUpdate: (w: Workflow) => void) {
-	const steps = wf.steps.map((s) => ({ ...s, status: 'queued' as WorkflowStatus }));
-	let current: Workflow = { ...wf, status: 'running', steps };
-	onUpdate(current);
-
-	let i = 0;
-	const interval = setInterval(() => {
-		if (i < steps.length) {
-			steps[i].status = 'running';
-			current = { ...current, steps: [...steps] };
-			onUpdate(current);
-
-			setTimeout(
-				() => {
-					const pass = Math.random() > 0.1; // 90% pass rate
-					steps[i].status = pass ? 'success' : 'failed';
-					current = { ...current, steps: [...steps] };
-
-					if (!pass) {
-						current.status = 'failed';
-						clearInterval(interval);
-					}
-
-					onUpdate(current);
-					i++;
-
-					if (i === steps.length && current.status !== 'failed') {
-						current = { ...current, status: 'success', lastRun: 'Just now' };
-						onUpdate(current);
-						clearInterval(interval);
-					}
-				},
-				800 + Math.random() * 1200,
-			);
-		}
-	}, 1400);
-
-	return () => clearInterval(interval);
-}
-
-/* ── Page Component ─────────────────────────────────────────── */
+import { useWorkflows } from '@/features/workflows/api/use-workflows';
+import { statusConfig } from '@/features/workflows/config';
 
 export function DashboardPage() {
-	const [workflows, setWorkflows] = useState<Workflow[]>(MOCK_WORKFLOWS);
-	const [selected, setSelected] = useState<string | null>(null);
+	const navigate = useNavigate();
+	const context = useOutletContext<{ isCollapsed?: boolean }>();
+	const isCollapsed = context?.isCollapsed ?? true;
 
-	const updateWorkflow = (updated: Workflow) => {
-		setWorkflows((prev) => prev.map((w) => (w.id === updated.id ? updated : w)));
-	};
+	const { workflows, metrics, isLoading, error, retry } = useWorkflows();
 
-	const runWorkflow = (id: string) => {
-		const wf = workflows.find((w) => w.id === id);
-		if (!wf || wf.status === 'running') return;
+	// Mocking Auth State
+	const isAuthEnabledAndLoggedIn = true;
+	const mockUserName = 'Fizan Muhammed Faisal';
 
-		// Reset to idle before running
-		const reset: Workflow = {
-			...wf,
-			status: 'idle',
-			steps: wf.steps.map((s) => ({ ...s, status: 'idle' as WorkflowStatus })),
-		};
-		updateWorkflow(reset);
-
-		setTimeout(() => simulateRun(reset, updateWorkflow), 100);
-	};
-
-	const selectedWf = workflows.find((w) => w.id === selected);
+	// Grab a few recent workflows for the abbreviated list (just picking the top 5 from mock)
+	const recentWorkflows = workflows.slice(0, 5);
 
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col h-full bg-[#0a0a0a]">
 			{/* Header */}
-			<div className="flex items-center justify-between px-6 lg:px-8 py-5 border-b border-border/50">
+			<div className="flex items-center justify-between px-6 lg:px-8 py-8 border-b border-white/[0.05] bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/[0.03] via-[#0c0c0c] to-[#0c0c0c]">
 				<div>
-					<h1 className="text-xl font-bold tracking-tight text-foreground">Workflows</h1>
-					<p className="text-sm text-muted-foreground mt-0.5">
-						Run and monitor your automation pipelines
+					<h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
+						Command Center
+					</h1>
+					<p className="text-[14px] text-white/40 mt-2 flex items-center gap-2 font-medium">
+						<span className="relative flex size-2.5 items-center justify-center">
+							<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-20"></span>
+							<span className="relative inline-flex size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+						</span>
+						Torq Engine via {isAuthEnabledAndLoggedIn ? mockUserName : 'Default Namespace'}
 					</p>
 				</div>
-				<Button size="sm" className="gap-1.5">
-					<PlusIcon className="size-3.5" />
-					New workflow
-				</Button>
-			</div>
-
-			<div className="flex flex-1 overflow-hidden">
-				{/* Workflow list */}
-				<div className="flex-1 overflow-y-auto p-6 lg:p-8">
-					<div className="grid gap-3">
-						{workflows.map((wf) => (
-							<motion.div
-								key={wf.id}
-								layout
-								initial={{ opacity: 0, y: 8 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.15, ease: [0.25, 1, 0.5, 1] }}
-							>
-								<Card
-									className={`group relative cursor-pointer transition-colors border-border/50 hover:border-border p-0 ${
-										selected === wf.id ? 'border-primary/30 bg-primary/[0.02]' : ''
-									}`}
-									onClick={() => setSelected(selected === wf.id ? null : wf.id)}
-								>
-									<div className="flex items-center gap-4 px-4 py-3.5">
-										{/* Status indicator line */}
-										<div
-											className={`w-0.5 h-10 rounded-full shrink-0 transition-colors ${
-												statusConfig[wf.status].dot
-											}`}
-										/>
-
-										<div className="flex-1 min-w-0">
-											<div className="flex items-center gap-2.5">
-												<h3 className="text-sm font-semibold text-foreground truncate">
-													{wf.name}
-												</h3>
-												<StatusBadge status={wf.status} />
-											</div>
-											<p className="text-xs text-muted-foreground mt-0.5 truncate">
-												{wf.description}
-											</p>
-										</div>
-
-										<div className="flex items-center gap-3 shrink-0">
-											{wf.lastRun && (
-												<span className="text-xs text-muted-foreground/60 hidden sm:block">
-													{wf.lastRun}
-												</span>
-											)}
-											<Button
-												size="sm"
-												variant={wf.status === 'running' ? 'outline' : 'default'}
-												className="gap-1.5 h-8 text-xs"
-												disabled={wf.status === 'running'}
-												onClick={(e) => {
-													e.stopPropagation();
-													runWorkflow(wf.id);
-												}}
-											>
-												{wf.status === 'running' ? (
-													<>
-														<LoadingSpinner className="size-3" />
-														Running…
-													</>
-												) : (
-													<>
-														<PlayIcon className="size-3" />
-														Run
-													</>
-												)}
-											</Button>
-										</div>
-									</div>
-								</Card>
-							</motion.div>
-						))}
-					</div>
-				</div>
-
-				{/* Detail panel */}
 				<AnimatePresence>
-					{selectedWf && (
-						<motion.aside
-							initial={{ width: 0, opacity: 0 }}
-							animate={{ width: 360, opacity: 1 }}
-							exit={{ width: 0, opacity: 0 }}
-							transition={{ duration: 0.2, ease: [0.25, 1, 0.5, 1] }}
-							className="border-l border-border/50 overflow-hidden hidden lg:block"
+					{isCollapsed && (
+						<motion.div
+							initial={{ opacity: 0, filter: 'blur(8px)', scale: 0.95 }}
+							animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+							exit={{ opacity: 0, filter: 'blur(8px)', scale: 0.95 }}
+							transition={{ duration: 0.2 }}
 						>
-							<div className="w-[360px] p-6 h-full overflow-y-auto">
-								<div className="flex items-center justify-between mb-1">
-									<h2 className="text-sm font-bold text-foreground">{selectedWf.name}</h2>
-									<StatusBadge status={selectedWf.status} />
-								</div>
-								<p className="text-xs text-muted-foreground mb-5">{selectedWf.description}</p>
-
-								{selectedWf.duration && (
-									<div className="flex items-center gap-4 mb-5 text-xs text-muted-foreground">
-										<span>
-											<strong className="text-foreground font-medium">Last run:</strong>{' '}
-											{selectedWf.lastRun}
-										</span>
-										<span>
-											<strong className="text-foreground font-medium">Duration:</strong>{' '}
-											{selectedWf.duration}
-										</span>
-									</div>
-								)}
-
-								<Separator className="opacity-30 mb-5" />
-
-								<h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-									Steps
-								</h3>
-
-								<div className="flex flex-col gap-0">
-									{selectedWf.steps.map((step, i) => (
-										<div key={step.name} className="flex items-center gap-3">
-											{/* Vertical connector */}
-											<div className="flex flex-col items-center">
-												<StepDot status={step.status} />
-												{i < selectedWf.steps.length - 1 && (
-													<div className="w-px h-6 bg-border/50" />
-												)}
-											</div>
-											<span
-												className={`text-sm py-1 ${
-													step.status === 'running'
-														? 'text-blue-400 font-medium'
-														: step.status === 'success'
-															? 'text-primary'
-															: step.status === 'failed'
-																? 'text-destructive'
-																: 'text-muted-foreground'
-												}`}
-											>
-												{step.name}
-											</span>
-										</div>
-									))}
-								</div>
-
-								<div className="mt-6">
-									<Button
-										className="w-full gap-1.5"
-										disabled={selectedWf.status === 'running'}
-										onClick={() => runWorkflow(selectedWf.id)}
-									>
-										{selectedWf.status === 'running' ? (
-											<>
-												<LoadingSpinner className="size-3.5" />
-												Running…
-											</>
-										) : (
-											<>
-												<PlayIcon className="size-3.5" />
-												Run workflow
-											</>
-										)}
-									</Button>
-								</div>
-							</div>
-						</motion.aside>
+							<Button className="gap-2 rounded-full px-5 text-[13px] font-bold h-9 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.3)] bg-emerald-400 text-emerald-950 hover:bg-emerald-500 border-0">
+								<HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
+								New Workflow
+							</Button>
+						</motion.div>
 					)}
 				</AnimatePresence>
 			</div>
-		</div>
-	);
-}
 
-/* ── Step Dot ───────────────────────────────────────────────── */
+			<div className="flex-1 overflow-y-auto w-full p-6 lg:p-8">
+				<div className="w-full max-w-7xl mx-auto space-y-8">
+					{/* ── Large Metric Cards ── */}
+					<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.02] p-6 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+							<div className="absolute top-0 right-0 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+							<div>
+								<h3 className="text-[13px] font-medium text-emerald-400/80 uppercase tracking-widest mb-1">
+									Total Workflows
+								</h3>
+							</div>
+							<p className="text-[42px] font-mono font-medium text-white tracking-tight relative z-10 leading-none mt-2">
+								{isLoading ? (
+									<span className="text-white/20 animate-pulse">--</span>
+								) : (
+									metrics.total.toLocaleString()
+								)}
+							</p>
+						</div>
 
-function StepDot({ status }: { status: WorkflowStatus }) {
-	const base = 'size-3 rounded-full border-2 transition-colors';
-	switch (status) {
-		case 'success':
-			return (
-				<div className={`${base} border-primary bg-primary`}>
-					<svg viewBox="0 0 12 12" className="size-full text-primary-foreground">
-						<path
-							d="M3.5 6.5L5 8l3.5-4"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth={2}
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						/>
-					</svg>
+						<div className="rounded-xl border border-blue-500/30 bg-blue-500/[0.03] p-6 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+							<div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/15 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+							<div>
+								<h3 className="text-[13px] font-medium text-blue-400/90 uppercase tracking-widest mb-1">
+									Running
+								</h3>
+							</div>
+							<p className="text-[42px] font-mono font-medium text-white tracking-tight relative z-10 leading-none mt-2">
+								{isLoading ? (
+									<span className="text-white/20 animate-pulse">--</span>
+								) : (
+									metrics.running
+								)}
+							</p>
+						</div>
+
+						<div className="rounded-xl border border-red-500/30 bg-red-500/[0.03] p-6 shadow-sm relative overflow-hidden flex flex-col justify-between min-h-[140px]">
+							<div className="absolute top-0 right-0 w-40 h-40 bg-red-500/15 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+							<div>
+								<h3 className="text-[13px] font-medium text-red-400/90 uppercase tracking-widest mb-1">
+									Recent Failures
+								</h3>
+							</div>
+							<p className="text-[42px] font-mono font-medium text-white tracking-tight relative z-10 leading-none mt-2">
+								{isLoading ? (
+									<span className="text-white/20 animate-pulse">--</span>
+								) : (
+									metrics.failed
+								)}
+							</p>
+						</div>
+					</div>
+
+					{/* ── Recent Activity List ── */}
+					<div className="pt-6">
+						<div className="flex items-center justify-between mb-5">
+							<div className="flex items-center gap-2">
+								<div className="size-6 rounded-md bg-white/[0.03] border border-white/[0.05] flex items-center justify-center">
+									<HugeiconsIcon icon={CheckListIcon} className="size-3.5 text-white/60" />
+								</div>
+								<h2 className="text-[16px] font-semibold text-white/90 tracking-tight">
+									Recent Executions
+								</h2>
+							</div>
+							<Button
+								variant="outline"
+								className="gap-2 h-9 rounded-full px-4 border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] text-[13px] font-medium transition-all hover:pr-3"
+								onClick={() => navigate('/dashboard/workflows')}
+							>
+								View All
+								<HugeiconsIcon icon={ArrowRight01Icon} className="size-3.5 opacity-70" />
+							</Button>
+						</div>
+
+						{error ? (
+							<div className="border border-red-500/20 bg-red-500/[0.02] rounded-2xl p-8 flex flex-col items-center justify-center text-center mt-2 shadow-sm">
+								<div className="size-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+									<HugeiconsIcon icon={Alert02Icon} className="size-6 text-red-400" />
+								</div>
+								<h3 className="text-[16px] font-semibold text-white/90 mb-1">
+									Failed to load executions
+								</h3>
+								<p className="text-[14px] text-white/50 max-w-sm mb-6">{error.message}</p>
+								<Button
+									onClick={retry}
+									variant="outline"
+									className="gap-2 h-9 rounded-full px-5 border-white/[0.08] hover:bg-white/[0.04]"
+								>
+									<HugeiconsIcon icon={RefreshIcon} className="size-3.5" />
+									Try Again
+								</Button>
+							</div>
+						) : isLoading ? (
+							<div className="border border-white/[0.06] rounded-2xl overflow-hidden bg-[#101010]/80 backdrop-blur-xl shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+								<div className="flex flex-col divide-y divide-white/[0.04]">
+									{[1, 2, 3].map((i) => (
+										<div
+											key={i}
+											className="flex flex-col sm:flex-row sm:items-center gap-6 px-8 py-6"
+										>
+											<div className="w-[120px] h-6 bg-white/[0.03] rounded-full animate-pulse" />
+											<div className="flex-1 flex flex-col gap-2">
+												<div className="w-48 h-4 bg-white/[0.04] rounded animate-pulse" />
+												<div className="w-64 h-3 bg-white/[0.02] rounded animate-pulse" />
+											</div>
+											<div className="w-24 h-4 bg-white/[0.03] rounded animate-pulse" />
+										</div>
+									))}
+								</div>
+							</div>
+						) : recentWorkflows.length === 0 ? (
+							<div className="border border-dashed border-white/[0.1] bg-white/[0.01] rounded-2xl p-12 flex flex-col items-center justify-center text-center mt-2">
+								<div className="size-12 rounded-full bg-white/[0.03] flex items-center justify-center mb-4 border border-white/[0.05]">
+									<HugeiconsIcon icon={File02Icon} className="size-5 text-white/40" />
+								</div>
+								<h3 className="text-[16px] font-semibold text-white/90 mb-1.5">
+									No recent executions
+								</h3>
+								<p className="text-[14px] text-white/40 max-w-sm mb-6">
+									You don't have any workflow runs in this namespace yet. Create and run a workflow
+									to see activity here.
+								</p>
+								<Button
+									onClick={() => navigate('/dashboard/workflows/new')}
+									className="gap-2 h-9 rounded-full px-5 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+								>
+									Create Workflow
+								</Button>
+							</div>
+						) : (
+							<div className="border border-white/[0.06] rounded-2xl overflow-hidden bg-[#101010]/80 backdrop-blur-xl shadow-[0_8px_32px_-12px_rgba(0,0,0,0.5)]">
+								<div className="flex flex-col divide-y divide-white/[0.04]">
+									{recentWorkflows.map((wf) => {
+										const cfg = statusConfig[wf.status];
+										return (
+											<div
+												key={wf.id}
+												onClick={() => navigate(`/dashboard/workflows/${wf.id}`)}
+												className="group flex flex-col sm:flex-row sm:items-center gap-6 px-8 py-6 hover:bg-white/[0.03] transition-colors cursor-pointer relative overflow-hidden"
+											>
+												{/* Subtle hover gradient */}
+												<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02),transparent)] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+												{/* Status badge */}
+												<div className="shrink-0 w-[120px] flex items-center relative z-10">
+													<div
+														className="flex items-center gap-2 rounded-full px-2.5 py-1 text-[11.5px] font-bold tracking-wide uppercase border backdrop-blur-md"
+														style={{
+															color: cfg.color,
+															backgroundColor: `${cfg.color}15`,
+															borderColor: `${cfg.color}30`,
+														}}
+													>
+														<div className="relative flex items-center justify-center size-1.5 shrink-0">
+															{wf.status === 'running' && (
+																<span
+																	className="absolute size-full rounded-full animate-ping opacity-60"
+																	style={{ backgroundColor: cfg.color }}
+																/>
+															)}
+															<span
+																className="relative size-full rounded-full"
+																style={{ backgroundColor: cfg.color }}
+															/>
+														</div>
+														{cfg.label}
+													</div>
+												</div>
+
+												{/* Workflow Name & Description */}
+												<div className="flex-1 min-w-0 relative z-10 flex flex-col gap-1.5">
+													<span className="text-[15.5px] font-semibold text-white/95 truncate group-hover:text-white transition-colors">
+														{wf.name}
+													</span>
+													<span className="text-[13.5px] text-white/40 truncate pr-4">
+														{wf.description}
+													</span>
+												</div>
+
+												{/* Time & Duration */}
+												<div className="shrink-0 flex items-center justify-end min-w-[120px] gap-3 relative z-10 mt-2 sm:mt-0">
+													<span className="text-[13px] font-medium text-white/70">
+														{wf.lastRun || '—'}
+													</span>
+													<span className="text-[12px] font-mono text-white/30 bg-white/[0.03] px-1.5 py-0.5 rounded-md">
+														{wf.duration || '0s'}
+													</span>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							</div>
+						)}
+					</div>
 				</div>
-			);
-		case 'failed':
-			return <div className={`${base} border-destructive bg-destructive`} />;
-		case 'running':
-			return <div className={`${base} border-blue-500 bg-blue-500 animate-pulse`} />;
-		case 'queued':
-			return <div className={`${base} border-yellow-500/50 bg-transparent`} />;
-		default:
-			return <div className={`${base} border-border bg-transparent`} />;
-	}
-}
-
-/* ── Inline Icons ───────────────────────────────────────────── */
-
-function PlayIcon({ className }: { className?: string }) {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			fill="currentColor"
-			className={className}
-		>
-			<polygon points="6 3 20 12 6 21 6 3" />
-		</svg>
-	);
-}
-
-function PlusIcon({ className }: { className?: string }) {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth={2.5}
-			strokeLinecap="round"
-			className={className}
-		>
-			<line x1="12" y1="5" x2="12" y2="19" />
-			<line x1="5" y1="12" x2="19" y2="12" />
-		</svg>
-	);
-}
-
-function LoadingSpinner({ className }: { className?: string }) {
-	return (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			fill="none"
-			className={`animate-spin ${className}`}
-		>
-			<circle
-				cx="12"
-				cy="12"
-				r="10"
-				stroke="currentColor"
-				strokeWidth={3}
-				strokeDasharray="60 30"
-				strokeLinecap="round"
-			/>
-		</svg>
+			</div>
+		</div>
 	);
 }

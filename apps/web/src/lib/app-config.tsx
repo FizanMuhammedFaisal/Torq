@@ -13,7 +13,11 @@ const appConfig: AppConfig = {
 };
 
 export function AppConfigProvider({ children }: { children: React.ReactNode }) {
-	return <AppConfigContext.Provider value={appConfig}>{children}</AppConfigContext.Provider>;
+	return (
+		<AppConfigContext.Provider value={appConfig}>
+			{children}
+		</AppConfigContext.Provider>
+	);
 }
 
 export function useAppConfig() {

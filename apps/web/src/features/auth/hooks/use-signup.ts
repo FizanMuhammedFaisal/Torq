@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@/lib/auth';
 import type { SignupEmailInput } from '../schema';
@@ -105,5 +105,13 @@ export function useSignup(): UseSignupReturn {
 		setResendCooldown(60);
 	}, [resendCooldown]);
 
-	return { step, sendOtp, verifyOtp, resendOtp, resendCooldown, isPending, error };
+	return {
+		step,
+		sendOtp,
+		verifyOtp,
+		resendOtp,
+		resendCooldown,
+		isPending,
+		error,
+	};
 }

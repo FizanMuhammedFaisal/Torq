@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import App from './App.tsx';
 import { AppConfigProvider } from '@/lib/app-config';
+import App from './App.tsx';
 
 // Dark mode by default
 document.documentElement.classList.add('dark');

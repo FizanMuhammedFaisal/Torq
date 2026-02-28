@@ -1,6 +1,6 @@
+import { motion } from 'motion/react';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { useAppConfig } from '@/lib/app-config';
 
@@ -44,7 +44,9 @@ function HeroTerminal() {
 						<div className="size-2.5 rounded-full bg-white/10" />
 						<div className="size-2.5 rounded-full bg-white/10" />
 					</div>
-					<span className="flex-1 text-center text-[10px] text-white/20 font-medium">terminal</span>
+					<span className="flex-1 text-center text-[10px] text-white/20 font-medium">
+						terminal
+					</span>
 				</div>
 				<div className="px-4 py-3.5 font-mono text-[12px] leading-[1.7] min-h-[180px]">
 					{codeLines.map((line, i) => (
@@ -108,7 +110,12 @@ const features = [
 		icon: (
 			<svg className="size-5" viewBox="0 0 20 20" fill="none">
 				<circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="1.5" />
-				<path d="M10 6v4l3 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+				<path
+					d="M10 6v4l3 2"
+					stroke="currentColor"
+					strokeWidth="1.5"
+					strokeLinecap="round"
+				/>
 			</svg>
 		),
 		span: 'md:col-span-1',
@@ -140,8 +147,24 @@ const features = [
 		desc: 'Run Torq Core on your own infra with the same dashboard, or use Torq Cloud with multi-tenant auth out of the box.',
 		icon: (
 			<svg className="size-5" viewBox="0 0 20 20" fill="none">
-				<rect x="3" y="4" width="14" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
-				<rect x="3" y="11" width="14" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+				<rect
+					x="3"
+					y="4"
+					width="14"
+					height="5"
+					rx="1"
+					stroke="currentColor"
+					strokeWidth="1.5"
+				/>
+				<rect
+					x="3"
+					y="11"
+					width="14"
+					height="5"
+					rx="1"
+					stroke="currentColor"
+					strokeWidth="1.5"
+				/>
 				<circle cx="6" cy="6.5" r="1" fill="currentColor" />
 				<circle cx="6" cy="13.5" r="1" fill="currentColor" />
 			</svg>
@@ -182,9 +205,13 @@ function FeatureGrid() {
 							<div className="flex items-center justify-center size-9 rounded-lg bg-primary/[0.08] border border-primary/[0.15] text-primary transition-colors group-hover:bg-primary/[0.12]">
 								{f.icon}
 							</div>
-							<h3 className="text-[15px] font-semibold text-white/80">{f.title}</h3>
+							<h3 className="text-[15px] font-semibold text-white/80">
+								{f.title}
+							</h3>
 						</div>
-						<p className="text-[13px] text-white/30 leading-relaxed">{f.desc}</p>
+						<p className="text-[13px] text-white/30 leading-relaxed">
+							{f.desc}
+						</p>
 					</motion.div>
 				))}
 			</div>
@@ -223,7 +250,9 @@ export function HomePage() {
 			>
 				{/* Logo — always white, always left */}
 				<Link to="/" className="select-none">
-					<span className="text-xl font-black tracking-tighter text-white">torq</span>
+					<span className="text-xl font-black tracking-tighter text-white">
+						torq
+					</span>
 				</Link>
 
 				{/* Right side — minimal: just login or profile */}
@@ -271,11 +300,14 @@ export function HomePage() {
 						{...fadeUp(0.28)}
 						className="mt-5 text-[15px] md:text-base text-white/35 leading-relaxed max-w-md"
 					>
-						Design, trigger, and monitor CI/CD pipelines from a&nbsp;single dashboard. Self-host or
-						use the cloud.
+						Design, trigger, and monitor CI/CD pipelines from a&nbsp;single
+						dashboard. Self-host or use the cloud.
 					</motion.p>
 
-					<motion.div {...fadeUp(0.4)} className="mt-8 flex flex-wrap items-center gap-3">
+					<motion.div
+						{...fadeUp(0.4)}
+						className="mt-8 flex flex-wrap items-center gap-3"
+					>
 						<Link to={authEnabled ? '/signup' : '/dashboard'}>
 							<motion.div
 								whileHover={{ scale: 1.02 }}
@@ -325,7 +357,8 @@ export function HomePage() {
 			{/* ── Footer ── */}
 			<footer className="relative z-10 flex items-center justify-center pb-10 px-6">
 				<p className="text-[11px] text-white/15 tracking-wide">
-					&copy; {new Date().getFullYear()} Torq &middot; Workflow Execution Platform
+					&copy; {new Date().getFullYear()} Torq &middot; Workflow Execution
+					Platform
 				</p>
 			</footer>
 		</div>
