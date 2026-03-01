@@ -165,7 +165,7 @@ function MetricCard({
 	label: string;
 	value: string | number;
 	accent?: 'emerald' | 'blue' | 'red' | 'white';
-	icon?: React.ElementType;
+	icon?: any;
 	delay?: number;
 }) {
 	const gradients = {

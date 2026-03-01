@@ -152,15 +152,13 @@ export function DashboardLayout() {
 				<div className="px-4 mb-3">
 					<Button
 						className="w-full gap-2 justify-center font-medium"
-						onClick={() => navigate('/dashboard')}
+						onClick={() => navigate('/dashboard/workflows/create')}
 					>
 						<HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
 						Create Workflow
 					</Button>
 				</div>
-
 				<Separator className="opacity-20 mx-4" />
-
 				{/* Nav */}
 				<nav className="flex-1 flex flex-col gap-0.5 px-3 pt-3">
 					{navItems.map((item) => (
@@ -183,8 +181,29 @@ export function DashboardLayout() {
 				</nav>
 
 				{/* Bottom */}
-				<div className="p-4 mt-auto">
+				<div className="p-4 mt-auto space-y-2">
 					<Separator className="opacity-20 mb-3" />
+					<Button
+						variant="ghost"
+						size="sm"
+						className="w-full justify-start gap-2.5 text-muted-foreground hover:text-foreground"
+						onClick={() => navigate('/docs')}
+					>
+						<svg
+							className="size-4"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth={2}
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							<title>Docs</title>
+							<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+							<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+						</svg>
+						Documentation
+					</Button>
 					<Button
 						variant="ghost"
 						size="sm"

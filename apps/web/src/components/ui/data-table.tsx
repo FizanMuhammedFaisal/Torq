@@ -40,7 +40,6 @@ export function DataTable<TData, TValue>({
 	data,
 	searchKey,
 	searchQuery,
-	noResultsMessage = 'No results found',
 	noResultsSubtext = 'Try adjusting your filters.',
 	onRowClick,
 }: DataTableProps<TData, TValue>) {
