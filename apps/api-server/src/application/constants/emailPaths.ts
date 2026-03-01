@@ -9,4 +9,5 @@ export const EMAIL_TEMPLATE_PATHS = {
 		__dirname,
 		'../../infrastructure/services/mails/user-email-verification.html',
 	),
+	FORGET_PASSWORD: join(__dirname, '../../infrastructure/services/mails/user-forget-password.html'),
 };

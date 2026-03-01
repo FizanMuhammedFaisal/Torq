@@ -8,6 +8,7 @@ import { TOKENS } from './tokens';
 import { ResendEmailService } from '@/infrastructure/services/emailService';
 import { SignInOTPStrategy } from '@/application/usecases/email/strategies/signInOTPStrategy';
 import { EmailVerificationStrategy } from '@/application/usecases/email/strategies/emailVerificationStrategy';
+import { ForgetPasswordStrategy } from '@/application/usecases/email/strategies/forgetPasswordStrategy';
 import { SendOTPUseCase } from '@/application/usecases/email/sendOTP.usecase';
 
 // Register as singletons using Symbols
@@ -42,6 +43,11 @@ container.register(
 container.register(
 	TOKENS.EmailVerificationStrategy,
 	{ useClass: EmailVerificationStrategy },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.ForgetPasswordStrategy,
+	{ useClass: ForgetPasswordStrategy },
 	{ lifecycle: Lifecycle.Singleton },
 );
 container.register(

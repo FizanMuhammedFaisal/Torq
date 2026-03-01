@@ -7,20 +7,19 @@ import { TOKENS } from '@/config/di/tokens';
 import { inject, injectable } from 'tsyringe';
 @injectable()
 export class SendOTPUseCase implements ISendOTPEmail {
-	private strategies: Record<Exclude<OTPEmailType, 'forget-password'>, IOTPEmailStrategy>;
+	private strategies: Record<OTPEmailType, IOTPEmailStrategy>;
 	constructor(
 		@inject(TOKENS.SignInOTPStrategy) signInOTPStrategy: IOTPEmailStrategy,
 		@inject(TOKENS.EmailVerificationStrategy) emailVerificationStrategy: IOTPEmailStrategy,
+		@inject(TOKENS.ForgetPasswordStrategy) forgetPasswordStrategy: IOTPEmailStrategy,
 	) {
 		this.strategies = {
 			'sign-in': signInOTPStrategy,
 			'email-verification': emailVerificationStrategy,
+			'forget-password': forgetPasswordStrategy,
 		};
 	}
 	async execute(email: string, otp: string, type: OTPEmailType): Promise<void> {
-		if (type === 'forget-password') {
-			throw new Error('Not supported here');
-		}
 		const strategy = this.strategies[type];
 
 		if (!strategy) {

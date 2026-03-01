@@ -7,5 +7,6 @@ export const TOKENS = {
 	EmailService: Symbol.for('EmailService'),
 	SignInOTPStrategy: Symbol.for('SignInOTPStrategy'),
 	EmailVerificationStrategy: Symbol.for('EmailVerificationStrategy'),
+	ForgetPasswordStrategy: Symbol.for('ForgetPasswordStrategy'),
 	SendOTPEmail: Symbol.for('SendOTPEmail'),
 } as const;
