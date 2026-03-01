@@ -87,9 +87,7 @@ export function useRuns() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
 	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>(
-		'all',
-	);
+	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>('all');
 
 	const fetchRuns = useCallback(async () => {
 		try {
@@ -98,16 +96,7 @@ export function useRuns() {
 			// Simulate network latency
 			await new Promise((resolve) => setTimeout(resolve, 600));
 
-			// Multiply mock data to demonstrate scrolling and pagination
-			const extendedMocks = Array.from({ length: 5 }).flatMap((_, i) =>
-				MOCK_RUNS.map((run) => ({
-					...run,
-					id: `${run.id}-${i}`,
-					workflowName:
-						i === 0 ? run.workflowName : `${run.workflowName} (Copy ${i})`,
-				})),
-			);
-			setRuns(extendedMocks);
+			setRuns(MOCK_RUNS);
 		} catch (err) {
 			setError(err instanceof Error ? err : new Error('Failed to load runs'));
 		} finally {
@@ -119,11 +108,52 @@ export function useRuns() {
 		fetchRuns();
 	}, [fetchRuns]);
 
+	// Simulate WebSocket "Live" Feed
+	useEffect(() => {
+		if (isLoading) return;
+
+		let timeoutId: number;
+
+		const insertRandomExecution = () => {
+			const statuses: WorkflowStatus[] = ['running', 'queued', 'success', 'failed'];
+			const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+
+			const workflows = [
+				'CI / Build & Test',
+				'Nightly Database Backup',
+				'Deploy to Production',
+				'Send Weekly Newsletter',
+				'Sync Salesforce Data',
+			];
+			const randomWf = workflows[Math.floor(Math.random() * workflows.length)];
+
+			const newRun: Run = {
+				id: `run-${Date.now()}`,
+				workflowId: `wf-${Math.floor(Math.random() * 5) + 1}`,
+				workflowName: randomWf,
+				status: randomStatus,
+				trigger: 'system_webhook',
+				date: 'Just now',
+				duration: randomStatus === 'running' || randomStatus === 'queued' ? '—' : '12s',
+				namespace: 'engineering/core',
+				steps: Math.floor(Math.random() * 10) + 1,
+			};
+
+			setRuns((prev) => [newRun, ...prev].slice(0, 100)); // Keep a max of 100 in feed to not kill DOM
+
+			// Randomly enqueue the next execution between 3 and 10 seconds
+			timeoutId = window.setTimeout(insertRandomExecution, Math.random() * 7000 + 3000);
+		};
+
+		timeoutId = window.setTimeout(insertRandomExecution, 5000);
+
+		return () => clearTimeout(timeoutId);
+	}, [isLoading]);
+
 	// Filtering
 	const filteredRuns = useMemo(() => {
 		return runs.filter((run) => {
-			const matchesStatus =
-				statusFilter === 'all' || run.status === statusFilter;
+			const matchesStatus = statusFilter === 'all' || run.status === statusFilter;
 			return matchesStatus; // TanStack table handles the search natively via name
 		});
 	}, [runs, statusFilter]);
@@ -131,10 +161,10 @@ export function useRuns() {
 	// Metrics
 	const metrics = useMemo(() => {
 		return {
-			total: runs.length, // In a real app, this would be total historical executions (e.g. 1.2M)
-			active: runs.filter(
-				(r) => r.status === 'running' || r.status === 'queued',
-			).length,
+			// Offset by a large number to emulate global total runs, adding the actual array length
+			// as it grows so the counter rolls up on screen
+			total: 1420500 + runs.length,
+			active: runs.filter((r) => r.status === 'running' || r.status === 'queued').length,
 			failed24h: runs.filter((r) => r.status === 'failed').length, // Mocked as just standard failed for now
 		};
 	}, [runs]);

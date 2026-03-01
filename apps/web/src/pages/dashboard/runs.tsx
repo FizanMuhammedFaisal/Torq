@@ -26,6 +26,7 @@ import {
 import { type Run, useRuns } from '@/features/workflows/api/use-runs';
 import { statusConfig } from '@/features/workflows/config';
 import { useAppConfig } from '@/lib/app-config';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 /* ── Page ─── */
 
@@ -183,9 +184,19 @@ export function RunsPage() {
 			{/* Header with Metric Glance */}
 			<div className="flex flex-col gap-6 px-6 lg:px-8 py-6 border-b border-white/[0.05] bg-[#0c0c0c]">
 				<div>
-					<h1 className="text-2xl font-bold tracking-tight text-white mb-2">Live Feed</h1>
+					<div className="flex items-center gap-3 mb-2">
+						<h1 className="text-2xl font-bold tracking-tight text-white">Live Feed</h1>
+						<div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.05] px-2.5 py-1 backdrop-blur-md">
+							<span className="relative flex size-1.5 items-center justify-center">
+								<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+								<span className="relative inline-flex size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+							</span>
+							<span className="text-[10px] font-bold text-emerald-400 tracking-wide uppercase">
+								Connected
+							</span>
+						</div>
+					</div>
 					<p className="text-[13.5px] text-white/40 flex items-center gap-2 max-w-2xl">
-						<span className="inline-flex size-2 rounded-full bg-blue-500/80 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></span>
 						This view represents every chronological execution hitting the engine across all
 						workflows globally.
 					</p>
@@ -193,12 +204,16 @@ export function RunsPage() {
 
 				{/* Run Metrics */}
 				<div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-					<div className="flex-none w-40 flex flex-col p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
+					<div className="flex-none w-44 flex flex-col p-4 rounded-xl bg-white/[0.02] border border-white/[0.04] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)]">
 						<span className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-2">
 							All Time
 						</span>
-						<span className="text-2xl font-mono text-white/90 font-medium">
-							{isLoading ? <span className="animate-pulse opacity-20">---</span> : '1.4M'}
+						<span className="text-2xl font-mono text-white/90 font-medium h-[32px] flex items-center">
+							{isLoading ? (
+								<span className="animate-pulse opacity-20">---</span>
+							) : (
+								<AnimatedCounter value={metrics.total} />
+							)}
 						</span>
 					</div>
 
@@ -214,8 +229,12 @@ export function RunsPage() {
 								</span>
 							)}
 						</span>
-						<span className="text-2xl font-mono text-blue-400 font-medium z-10">
-							{isLoading ? <span className="animate-pulse opacity-20">---</span> : metrics.active}
+						<span className="text-2xl font-mono text-blue-400 font-medium z-10 h-[32px] flex items-center">
+							{isLoading ? (
+								<span className="animate-pulse opacity-20">---</span>
+							) : (
+								<AnimatedCounter value={metrics.active} />
+							)}
 						</span>
 					</div>
 
@@ -225,13 +244,13 @@ export function RunsPage() {
 						<span className="text-[11px] font-bold uppercase tracking-widest text-white/30 mb-2 z-10">
 							Recent Failures
 						</span>
-						<span className="text-2xl font-mono text-white/90 font-medium flex items-baseline gap-2 z-10">
+						<span className="text-2xl font-mono text-white/90 font-medium flex items-center gap-2 z-10 h-[32px]">
 							{isLoading ? (
 								<span className="animate-pulse opacity-20">---</span>
 							) : (
 								<>
-									{metrics.failed24h}
-									<span className="text-red-400 text-[13px] tracking-normal font-sans py-1">
+									<AnimatedCounter className="h-full" value={metrics.failed24h} />
+									<span className="text-red-400 text-[13px] tracking-normal font-sans py-1 mt-1">
 										in 24hrs
 									</span>
 								</>

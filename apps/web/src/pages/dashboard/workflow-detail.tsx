@@ -1,12 +1,19 @@
-import { Alert02Icon, Loading03Icon } from '@hugeicons/core-free-icons';
+import {
+	Alert02Icon,
+	Loading03Icon,
+	GridIcon,
+	GearsIcon,
+	File02Icon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { motion } from 'motion/react';
-import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useMemo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { type ValidationError, YamlEditor } from '@/components/yaml-editor';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 /* ── Types ─── */
 
@@ -146,90 +153,236 @@ const statusMap: Record<WorkflowStatus, { label: string; color: string }> = {
 const tabs = ['Overview', 'Editor', 'Runs', 'Metrics'] as const;
 type Tab = (typeof tabs)[number];
 
-/* ── Stat Card ─── */
+/* ── Metric Card ─── */
 
-function StatCard({
+function MetricCard({
 	label,
 	value,
 	accent,
+	icon: Icon,
+	delay = 0,
 }: {
 	label: string;
-	value: string;
-	accent?: string;
+	value: string | number;
+	accent?: 'emerald' | 'blue' | 'red' | 'white';
+	icon?: React.ElementType;
+	delay?: number;
 }) {
+	const gradients = {
+		emerald:
+			'from-emerald-500/[0.06] to-emerald-500/[0.01] border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(16,185,129,0.15)]',
+		blue: 'from-blue-500/[0.06] to-blue-500/[0.02] border-blue-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(59,130,246,0.15)]',
+		red: 'from-red-500/[0.06] to-red-500/[0.02] border-red-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(239,68,68,0.15)]',
+		white:
+			'from-white/[0.06] to-white/[0.01] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(255,255,255,0.05)]',
+	};
+
+	const bgThemes = {
+		emerald: 'bg-emerald-500',
+		blue: 'bg-blue-500',
+		red: 'bg-red-500',
+		white: 'bg-white',
+	};
+
 	return (
-		<div
-			className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5"
-			style={{ boxShadow: 'inset 0 1px 0 0 rgba(255,255,255,0.03)' }}
+		<motion.div
+			initial={{ opacity: 0, y: 10 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5, delay, ease: [0.25, 1, 0.5, 1] }}
+			className={`rounded-xl border bg-gradient-to-br ${gradients[accent || 'white']} p-5 relative overflow-hidden flex flex-col justify-between min-h-[120px] group backdrop-blur-xl`}
 		>
-			<p className="text-[11px] font-medium uppercase tracking-wider text-white/25 mb-2">
-				{label}
-			</p>
-			<p
-				className="text-xl font-bold tracking-tight"
-				style={{ color: accent || 'white' }}
-			>
-				{value}
-			</p>
-		</div>
+			<div
+				className={`absolute top-0 right-0 w-32 h-32 ${bgThemes[accent || 'white']}/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-700 group-hover:${bgThemes[accent || 'white']}/15 group-hover:blur-2xl`}
+			></div>
+
+			{Icon && (
+				<AnimatePresence>
+					<motion.div
+						className={`absolute -right-2 -bottom-2 pointer-events-none text-${accent || 'white'}-500`}
+						initial={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
+						animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+						transition={{ duration: 0.8, delay: delay + 0.2, ease: [0.25, 1, 0.5, 1] }}
+					>
+						<motion.div
+							className="opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500"
+							animate={{ y: [0, -5, 0], rotate: [0, 2, 0] }}
+							transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+						>
+							<HugeiconsIcon icon={Icon} className="w-24 h-24 drop-shadow-md" strokeWidth={1} />
+						</motion.div>
+					</motion.div>
+				</AnimatePresence>
+			)}
+
+			<div>
+				<h3
+					className={`text-[12px] font-medium text-${accent === 'white' ? 'white/50' : `${accent}-400/80`} uppercase tracking-widest mb-1 relative z-10`}
+				>
+					{label}
+				</h3>
+			</div>
+			<div className="text-[36px] font-mono font-bold tracking-tight relative z-10 mt-1 flex items-center text-white/95 drop-shadow-sm h-[36px]">
+				<AnimatedCounter value={value} />
+			</div>
+		</motion.div>
 	);
 }
 
 /* ── Tab: Overview ─── */
 
 function OverviewTab() {
-	const cfg = statusMap[MOCK_WORKFLOW.status];
+	const wf = MOCK_WORKFLOW;
+	const cfg = statusMap[wf.status];
 
 	return (
-		<div className="space-y-8">
-			{/* Stats */}
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-				<StatCard label="Status" value={cfg.label} accent={cfg.color} />
-				<StatCard label="Last Run" value={MOCK_WORKFLOW.lastRun} />
-				<StatCard label="Duration" value={MOCK_WORKFLOW.duration} />
-				<StatCard label="Total Runs" value={String(MOCK_WORKFLOW.totalRuns)} />
+		<div className="space-y-8 pb-12">
+			{/* Stats Grid */}
+			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+				<MetricCard
+					label="Total Runs"
+					value={MOCK_WORKFLOW.totalRuns}
+					accent="white"
+					icon={File02Icon}
+					delay={0.05}
+				/>
+				<MetricCard
+					label="Avg Duration"
+					value={MOCK_WORKFLOW.duration}
+					accent="blue"
+					icon={GearsIcon}
+					delay={0.1}
+				/>
+				<MetricCard
+					label="Last Run"
+					value={MOCK_WORKFLOW.lastRun}
+					accent="emerald"
+					icon={GridIcon}
+					delay={0.15}
+				/>
+				<MetricCard
+					label="Status"
+					value={cfg.label}
+					accent={wf.status === 'success' ? 'emerald' : 'red'}
+					delay={0.2}
+				/>
 			</div>
 
-			{/* Description */}
-			<div>
-				<h3 className="text-xs font-semibold uppercase tracking-wider text-white/25 mb-3">
-					About
-				</h3>
-				<p className="text-[15px] text-white/50 leading-relaxed">
-					{MOCK_WORKFLOW.description}
-				</p>
-			</div>
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+				{/* About Section */}
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.25 }}
+					className="lg:col-span-1 rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8 flex flex-col relative overflow-hidden"
+					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
+				>
+					<div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+					<div className="flex items-center gap-3 mb-6 relative z-10">
+						<div className="size-10 rounded-full bg-white/3 border border-white/5 flex items-center justify-center text-white/50">
+							<HugeiconsIcon icon={File02Icon} className="size-5" />
+						</div>
+						<h3 className="text-[16px] font-semibold text-white/90">About Workflow</h3>
+					</div>
+					<p className="text-[14px] text-white/50 leading-relaxed font-light mb-6 flex-1 relative z-10">
+						{wf.description}
+					</p>
 
-			{/* Recent runs */}
-			<div>
-				<h3 className="text-xs font-semibold uppercase tracking-wider text-white/25 mb-4">
-					Recent Runs
-				</h3>
-				<div className="space-y-2">
-					{MOCK_RUNS.slice(0, 3).map((run) => {
-						const rc = statusMap[run.status];
-						return (
-							<div
-								key={run.id}
-								className="flex items-center justify-between rounded-xl border border-white/[0.05] bg-white/[0.015] px-5 py-3.5"
-							>
-								<div className="flex items-center gap-3">
-									<span
-										className={`size-[7px] rounded-full ${run.status === 'running' ? 'animate-pulse' : ''}`}
-										style={{ background: rc.color }}
-									/>
-									<span className="text-[13px] font-medium text-white/70">
-										{run.trigger}
-									</span>
-								</div>
-								<div className="flex items-center gap-5 text-[12px] text-white/25">
-									<span className="font-mono">{run.duration}</span>
-									<span>{run.date}</span>
-								</div>
-							</div>
-						);
-					})}
-				</div>
+					<div className="pt-5 border-t border-white/4 flex items-center justify-between relative z-10">
+						<div className="text-[12px] text-white/30 tracking-wider uppercase font-semibold">
+							Project
+						</div>
+						<Badge variant="outline" className="border-white/10 text-white/50 bg-white/2">
+							Core Engineering
+						</Badge>
+					</div>
+				</motion.div>
+
+				{/* Recent Runs Section */}
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.3 }}
+					className="lg:col-span-2 rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8"
+					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
+				>
+					<div className="flex items-center justify-between mb-6">
+						<div>
+							<h3 className="text-[16px] font-semibold text-white/90">Latest Executions</h3>
+							<p className="text-[13px] text-white/40 mt-1">Most recent activity for this YAML</p>
+						</div>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-8 text-[12px] text-white/40 hover:text-white/80 rounded-full"
+						>
+							View all
+						</Button>
+					</div>
+
+					<div className="space-y-3">
+						{MOCK_RUNS.slice(0, 4).map((run, i) => {
+							const rc = statusMap[run.status];
+							const isSuccess = run.status === 'success';
+							return (
+								<motion.div
+									initial={{ opacity: 0, x: -10 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ duration: 0.4, delay: 0.35 + i * 0.05 }}
+									key={run.id}
+									className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-white/3 bg-white/1 hover:bg-white/3 transition-colors p-4 gap-4 relative overflow-hidden"
+								>
+									{isSuccess ? null : (
+										<div className="absolute inset-y-0 left-0 w-1 bg-red-500/50" />
+									)}
+									<div className="flex items-center gap-4">
+										<div
+											className={`size-10 rounded-full flex items-center justify-center border ${isSuccess ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}
+										>
+											<HugeiconsIcon icon={isSuccess ? GridIcon : Alert02Icon} className="size-5" />
+										</div>
+										<div>
+											<div className="flex items-center gap-2 mb-1">
+												<span className="text-[14px] font-semibold text-white/80">
+													{run.trigger}
+												</span>
+												<span
+													className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold ${isSuccess ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}
+												>
+													{rc.label}
+												</span>
+											</div>
+											<div className="text-[12px] text-white/30 flex items-center gap-3">
+												<span>
+													ID: <span className="font-mono text-white/40">{run.id}</span>
+												</span>
+												<span className="size-1 rounded-full bg-white/10" />
+												<span>{run.date}</span>
+											</div>
+										</div>
+									</div>
+									<div className="flex items-center gap-3 sm:pr-2">
+										<div className="flex flex-col items-end">
+											<span className="text-[14px] font-mono text-white/70">{run.duration}</span>
+											<span className="text-[11px] text-white/30">Duration</span>
+										</div>
+										<div className="size-8 rounded-full ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/40 flex items-center justify-center bg-white/5">
+											<svg className="size-4 -rotate-90" viewBox="0 0 16 16" fill="none">
+												<title>View run</title>
+												<path
+													d="M10 12L6 8l4-4"
+													stroke="currentColor"
+													strokeWidth="1.5"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												/>
+											</svg>
+										</div>
+									</div>
+								</motion.div>
+							);
+						})}
+					</div>
+				</motion.div>
 			</div>
 		</div>
 	);
@@ -270,9 +423,7 @@ function EditorTab() {
 							<span className="text-[13px] font-medium">Valid YAML</span>
 						</div>
 					)}
-					{!saved && (
-						<span className="text-[12px] text-white/20">• Unsaved changes</span>
-					)}
+					{!saved && <span className="text-[12px] text-white/20">• Unsaved changes</span>}
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -303,10 +454,7 @@ function EditorTab() {
 			{errors.length > 0 && (
 				<div className="rounded-xl bg-red-500/8 border border-red-500/15 px-4 py-3">
 					{errors.map((err) => (
-						<p
-							key={`${err.line}-${err.message}`}
-							className="text-[13px] text-red-400"
-						>
+						<p key={`${err.line}-${err.message}`} className="text-[13px] text-red-400">
 							Line {err.line + 1}: {err.message}
 						</p>
 					))}
@@ -337,8 +485,9 @@ function RunsTab() {
 
 				return (
 					<div key={run.id}>
-						<div
-							className={`flex items-center justify-between rounded-xl border px-5 py-4 cursor-pointer transition-all ${
+						<button
+							type="button"
+							className={`w-full text-left flex items-center justify-between rounded-xl border px-5 py-4 cursor-pointer transition-all ${
 								isExpanded
 									? 'border-white/[0.08] bg-white/[0.03]'
 									: 'border-white/[0.05] bg-white/[0.015] hover:bg-white/[0.025]'
@@ -350,13 +499,8 @@ function RunsTab() {
 									className={`size-[7px] rounded-full ${run.status === 'running' ? 'animate-pulse' : ''}`}
 									style={{ background: rc.color }}
 								/>
-								<span className="text-[14px] font-medium text-white/80">
-									{run.trigger}
-								</span>
-								<Badge
-									variant="outline"
-									className="text-[10px] border-white/[0.06] text-white/30"
-								>
+								<span className="text-[14px] font-medium text-white/80">{run.trigger}</span>
+								<Badge variant="outline" className="text-[10px] border-white/[0.06] text-white/30">
 									{rc.label}
 								</Badge>
 							</div>
@@ -378,7 +522,7 @@ function RunsTab() {
 									/>
 								</svg>
 							</div>
-						</div>
+						</button>
 
 						{isExpanded && (
 							<motion.div
@@ -391,22 +535,15 @@ function RunsTab() {
 								{run.steps.map((step) => {
 									const sc = statusMap[step.status];
 									return (
-										<div
-											key={step.name}
-											className="flex items-center justify-between"
-										>
+										<div key={step.name} className="flex items-center justify-between">
 											<div className="flex items-center gap-2.5">
 												<span
 													className="size-[5px] rounded-full"
 													style={{ background: sc.color }}
 												/>
-												<span className="text-[13px] text-white/50">
-													{step.name}
-												</span>
+												<span className="text-[13px] text-white/50">{step.name}</span>
 											</div>
-											<span className="text-[12px] text-white/20 font-mono">
-												{step.duration}
-											</span>
+											<span className="text-[12px] text-white/20 font-mono">{step.duration}</span>
 										</div>
 									);
 								})}
@@ -419,88 +556,251 @@ function RunsTab() {
 	);
 }
 
-/* ── Tab: Metrics ─── */
+/* ── Tab: Metrics (Apple/Google Inspired) ─── */
 
 function MetricsTab() {
 	const successRate = MOCK_WORKFLOW.successRate;
-	const failCount = Math.round(
-		MOCK_WORKFLOW.totalRuns * ((100 - successRate) / 100),
-	);
+
+	// Generate mock historical run data for the histogram
+	const history = useMemo(() => {
+		return Array.from({ length: 42 })
+			.map((_, i) => {
+				const isSuccess = Math.random() > (100 - successRate) / 100;
+				const baseSec = 150; // 2m 30s base
+				const durationSec = isSuccess
+					? baseSec + (Math.random() * 60 - 30)
+					: Math.random() * 45 + 10;
+				return {
+					id: `hist-${i}`,
+					status: isSuccess ? 'success' : 'failed',
+					durationSec,
+					label: `Run #${128 - i}`,
+				};
+			})
+			.reverse();
+	}, []);
+
+	const maxDuration = Math.max(...history.map((h) => h.durationSec));
 
 	return (
-		<div className="space-y-8">
-			{/* Stats */}
-			<div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-				<StatCard label="Total Runs" value={String(MOCK_WORKFLOW.totalRuns)} />
-				<StatCard
-					label="Success Rate"
-					value={`${successRate}%`}
-					accent="oklch(0.60 0.13 163)"
-				/>
-				<StatCard label="Avg Duration" value={MOCK_WORKFLOW.avgDuration} />
-				<StatCard
-					label="Failures (30d)"
-					value={String(failCount)}
-					accent="rgba(239,68,68,1)"
-				/>
-			</div>
-
-			{/* Success rate bar */}
-			<div>
-				<h3 className="text-xs font-semibold uppercase tracking-wider text-white/25 mb-4">
-					Success Rate
+		<div className="space-y-12 pb-12">
+			{/* Widget 1: Total Compute / "Screen Time" style */}
+			<motion.div
+				initial={{ opacity: 0, y: 10 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.6 }}
+				className="flex flex-col items-center justify-center text-center pt-4"
+			>
+				<h3 className="text-[13px] font-semibold tracking-widest uppercase text-white/40 mb-3 flex items-center gap-2">
+					<HugeiconsIcon icon={GearsIcon} className="size-4 text-blue-400" />
+					Total Compute Time
 				</h3>
-				<div className="flex items-center gap-4">
-					<div className="flex-1 h-2.5 rounded-full bg-white/[0.05] overflow-hidden">
-						<motion.div
-							initial={{ width: 0 }}
-							animate={{ width: `${successRate}%` }}
-							transition={{ duration: 1, ease: [0.25, 1, 0.5, 1] }}
-							className="h-full rounded-full"
-							style={{
-								background:
-									'linear-gradient(90deg, oklch(0.60 0.13 163), oklch(0.65 0.15 163))',
-							}}
-						/>
-					</div>
-					<span className="text-lg font-bold text-white w-14 text-right">
-						{successRate}%
+				<div className="flex items-baseline justify-center gap-2">
+					<span className="text-6xl sm:text-7xl font-light tracking-tighter text-white">48</span>
+					<span className="text-2xl sm:text-3xl font-medium text-white/40 mb-1">h</span>
+					<span className="text-6xl sm:text-7xl font-light tracking-tighter text-white ml-2">
+						12
 					</span>
+					<span className="text-2xl sm:text-3xl font-medium text-white/40 mb-1">m</span>
 				</div>
-			</div>
+				<p className="text-[14px] text-white/30 mt-4 max-w-sm">
+					Aggregated duration across <AnimatedCounter value={MOCK_WORKFLOW.totalRuns} /> total
+					executions since creation.
+				</p>
+			</motion.div>
 
-			{/* Recent failures */}
-			<div>
-				<h3 className="text-xs font-semibold uppercase tracking-wider text-white/25 mb-4">
-					Recent Failures
-				</h3>
-				{MOCK_RUNS.filter((r) => r.status === 'failed').length === 0 ? (
-					<p className="text-[14px] text-white/30">No recent failures 🎉</p>
-				) : (
-					<div className="space-y-2">
-						{MOCK_RUNS.filter((r) => r.status === 'failed').map((run) => {
-							const rc = statusMap[run.status];
+			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+				{/* Widget 2: Execution History Histogram (Battery/Usage Style) */}
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.1 }}
+					className="lg:col-span-2 rounded-3xl border border-white/[0.04] bg-[#0c0c0c] p-6 sm:p-8 flex flex-col"
+					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
+				>
+					<div className="flex items-center justify-between mb-8">
+						<div>
+							<h3 className="text-[16px] font-semibold text-white/90">Execution History</h3>
+							<p className="text-[13px] text-white/40 mt-1">Duration of the last 42 runs</p>
+						</div>
+						<div className="flex items-center gap-3 text-[12px] font-medium text-white/40">
+							<div className="flex items-center gap-1.5">
+								<span className="size-2.5 rounded-sm bg-emerald-500/80" /> Passed
+							</div>
+							<div className="flex items-center gap-1.5">
+								<span className="size-2.5 rounded-sm bg-red-500/80" /> Failed
+							</div>
+						</div>
+					</div>
+
+					<div className="flex-1 flex items-end justify-between gap-1.5 sm:gap-2 h-[180px] w-full pt-4 border-b border-white/[0.05] pb-2">
+						{history.map((run, i) => {
+							const heightPct = Math.max((run.durationSec / maxDuration) * 100, 4); // min 4% height
+							const isSuccess = run.status === 'success';
 							return (
 								<div
 									key={run.id}
-									className="flex items-center justify-between rounded-xl border border-red-500/10 bg-red-500/[0.03] px-5 py-3.5"
+									className="group relative flex-1 flex justify-center h-full items-end"
 								>
-									<div className="flex items-center gap-3">
-										<span
-											className="size-[7px] rounded-full"
-											style={{ background: rc.color }}
-										/>
-										<span className="text-[13px] font-medium text-white/70">
-											{run.trigger}
-										</span>
+									{/* Tooltip */}
+									<div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-[#1a1a1a] border border-white/10 text-white text-[11px] rounded-md px-2.5 py-1.5 pointer-events-none whitespace-nowrap z-10 shadow-xl">
+										<div className="font-semibold">{run.label}</div>
+										<div className={`text-${isSuccess ? 'emerald' : 'red'}-400`}>
+											{Math.round(run.durationSec)}s
+										</div>
 									</div>
-									<span className="text-[12px] text-white/25">{run.date}</span>
+									<motion.div
+										initial={{ height: 0 }}
+										animate={{ height: `${heightPct}%` }}
+										transition={{ duration: 0.7, delay: i * 0.01 + 0.2, ease: 'easeOut' }}
+										className={`w-full rounded-sm opacity-80 hover:opacity-100 transition-opacity cursor-crosshair ${
+											isSuccess
+												? 'bg-gradient-to-t from-emerald-600/60 to-emerald-400'
+												: 'bg-gradient-to-t from-red-600/80 to-red-400'
+										}`}
+									/>
 								</div>
 							);
 						})}
 					</div>
-				)}
+					<div className="flex justify-between text-[11px] text-white/30 pt-3 font-mono">
+						<span>Older</span>
+						<span>Recent</span>
+					</div>
+				</motion.div>
+
+				{/* Widget 3: Quality & Reliability Donut */}
+				<motion.div
+					initial={{ opacity: 0, y: 10 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.6, delay: 0.2 }}
+					className="rounded-3xl border border-white/[0.04] bg-[#0c0c0c] p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden"
+					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
+				>
+					<h3 className="text-[16px] font-semibold text-white/90 self-start w-full relative z-10">
+						Reliability
+					</h3>
+					<p className="text-[13px] text-white/40 self-start w-full mt-1 relative z-10">
+						Success vs Failure ratio
+					</p>
+
+					<div className="relative size-48 mt-6 flex items-center justify-center">
+						<svg className="size-full -rotate-90 transform" viewBox="0 0 100 100">
+							<title>Reliability Activity Ring</title>
+							{/* Background Track */}
+							<circle
+								cx="50"
+								cy="50"
+								r="40"
+								stroke="rgba(255,255,255,0.05)"
+								strokeWidth="12"
+								fill="none"
+							/>
+
+							{/* Success Value (Emerald) */}
+							<motion.circle
+								cx="50"
+								cy="50"
+								r="40"
+								stroke="url(#successGradient)"
+								strokeWidth="12"
+								fill="none"
+								strokeLinecap="round"
+								strokeDasharray="251.2" // 2 * pi * 40
+								initial={{ strokeDashoffset: 251.2 }}
+								animate={{ strokeDashoffset: 251.2 - (251.2 * successRate) / 100 }}
+								transition={{ duration: 1.5, delay: 0.4, ease: 'easeOut' }}
+							/>
+
+							<defs>
+								<linearGradient id="successGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+									<stop offset="0%" stopColor="#34d399" />
+									<stop offset="100%" stopColor="#059669" />
+								</linearGradient>
+							</defs>
+						</svg>
+						<div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+							<span className="text-3xl font-bold tracking-tight text-white mb-0.5">
+								<AnimatedCounter value={successRate} />%
+							</span>
+							<span className="text-[11px] font-medium text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-full">
+								Pass
+							</span>
+						</div>
+					</div>
+				</motion.div>
 			</div>
+
+			{/* Widget 4: YAML Version History / App Updates */}
+			<motion.div
+				initial={{ opacity: 0, y: 10 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.6, delay: 0.3 }}
+				className="rounded-3xl border border-white/[0.04] bg-[#0c0c0c] p-6 sm:p-8"
+				style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
+			>
+				<h3 className="text-[16px] font-semibold text-white/90 mb-1">Configuration History</h3>
+				<p className="text-[13px] text-white/40 mb-6">
+					Recent revisions of this workflow's YAML specification.
+				</p>
+
+				<div className="space-y-4">
+					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/[0.02] border border-emerald-500/20 relative overflow-hidden">
+						<div className="absolute -right-10 -bottom-10 size-32 bg-emerald-500/10 rounded-full blur-[40px] pointer-events-none" />
+						<div className="size-10 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 text-emerald-400">
+							<HugeiconsIcon icon={File02Icon} className="size-5" />
+						</div>
+						<div className="flex-1">
+							<div className="flex items-center gap-3 mb-1">
+								<h4 className="text-[15px] font-bold text-white">Version 3.0 (Active)</h4>
+								<span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
+									Current
+								</span>
+							</div>
+							<p className="text-[13px] text-white/50 mb-3">
+								Added parallel step execution for unit-tests and type-check to improve baseline
+								duration.
+							</p>
+							<div className="flex items-center gap-4 text-[12px] font-medium">
+								<span className="text-white/30">Modified 3 days ago</span>
+								<span className="text-white/40 border-l border-white/10 pl-4">24 Runs</span>
+							</div>
+						</div>
+					</div>
+
+					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/[0.03]">
+						<div className="size-10 shrink-0 rounded-full bg-white/[0.03] flex items-center justify-center border border-white/[0.05] text-white/40">
+							<span className="font-mono text-[12px] font-bold">V2</span>
+						</div>
+						<div className="flex-1">
+							<h4 className="text-[15px] font-semibold text-white/80 mb-1">Version 2.0</h4>
+							<p className="text-[13px] text-white/40 mb-3">
+								Implemented retry policy on npm install. Moved secrets to secure dynamic context.
+							</p>
+							<div className="flex items-center gap-4 text-[12px] font-medium">
+								<span className="text-white/30">Modified 2 weeks ago</span>
+								<span className="text-white/40 border-l border-white/10 pl-4">81 Runs</span>
+							</div>
+						</div>
+					</div>
+
+					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/[0.03]">
+						<div className="size-10 shrink-0 rounded-full bg-white/[0.03] flex items-center justify-center border border-white/[0.05] text-white/40">
+							<span className="font-mono text-[12px] font-bold">V1</span>
+						</div>
+						<div className="flex-1">
+							<h4 className="text-[15px] font-semibold text-white/60 mb-1">Version 1.0</h4>
+							<p className="text-[13px] text-white/30 mb-3">
+								Initial generic boilerplate generated by Torq CLI.
+							</p>
+							<div className="flex items-center gap-4 text-[12px] font-medium">
+								<span className="text-white/30">Created 2 months ago</span>
+								<span className="text-white/40 border-l border-white/10 pl-4">12 Runs</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</motion.div>
 		</div>
 	);
 }
@@ -538,9 +838,7 @@ export function WorkflowDetailPage() {
 					<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
 						<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
 					</div>
-					<h3 className="text-[18px] font-semibold text-white/90 mb-2">
-						Workflow Not Found
-					</h3>
+					<h3 className="text-[18px] font-semibold text-white/90 mb-2">Workflow Not Found</h3>
 					<p className="text-[14px] text-white/50 mb-8">{error.message}</p>
 					<Button
 						onClick={() => navigate('/dashboard/workflows')}
@@ -567,10 +865,7 @@ export function WorkflowDetailPage() {
 					</div>
 				</div>
 				<div className="flex-1 flex items-center justify-center">
-					<HugeiconsIcon
-						icon={Loading03Icon}
-						className="size-8 text-white/20 animate-spin"
-					/>
+					<HugeiconsIcon icon={Loading03Icon} className="size-8 text-white/20 animate-spin" />
 				</div>
 			</div>
 		);
@@ -602,25 +897,18 @@ export function WorkflowDetailPage() {
 						</button>
 						<div>
 							<div className="flex items-center gap-3">
-								<h1 className="text-2xl font-bold tracking-tight text-white">
-									{wf.name}
-								</h1>
+								<h1 className="text-2xl font-bold tracking-tight text-white">{wf.name}</h1>
 								<div className="flex items-center gap-1.5 rounded-full border border-white/[0.06] px-2.5 py-1">
 									<span
 										className={`size-[6px] rounded-full ${wf.status === 'running' ? 'animate-pulse' : ''}`}
 										style={{ background: cfg.color }}
 									/>
-									<span
-										className="text-[11px] font-medium"
-										style={{ color: cfg.color }}
-									>
+									<span className="text-[11px] font-medium" style={{ color: cfg.color }}>
 										{cfg.label}
 									</span>
 								</div>
 							</div>
-							<p className="text-[14px] text-white/30 mt-1.5">
-								{wf.description}
-							</p>
+							<p className="text-[14px] text-white/30 mt-1.5">{wf.description}</p>
 						</div>
 					</div>
 
@@ -651,9 +939,7 @@ export function WorkflowDetailPage() {
 							type="button"
 							onClick={() => setActiveTab(tab)}
 							className={`relative px-5 py-2 text-[13px] font-medium rounded-full transition-colors z-10 ${
-								activeTab === tab
-									? 'text-white'
-									: 'text-white/40 hover:text-white/70'
+								activeTab === tab ? 'text-white' : 'text-white/40 hover:text-white/70'
 							}`}
 						>
 							{activeTab === tab && (
