@@ -1,3 +1,4 @@
+export { ForgotPasswordForm } from './forgot-password-form';
 export { useLogin } from './hooks/use-login';
 export { useSignup } from './hooks/use-signup';
 export { LoginForm } from './login-form';

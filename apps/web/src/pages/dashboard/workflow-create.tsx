@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import {
 	CodeIcon,
@@ -13,6 +13,7 @@ import {
 	File01Icon,
 	Book02Icon,
 	ArrowExpand02Icon,
+	Cancel01Icon,
 } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +54,18 @@ export function WorkflowCreatePage() {
 	const [selectedTemplate, setSelectedTemplate] = useState('blank');
 	const [secrets, setSecrets] = useState([{ key: '', value: '' }]);
 	const [yamlCode, setYamlCode] = useState(TEMPLATES[0].code);
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	useEffect(() => {
+		if (isExpanded) {
+			document.body.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = '';
+		}
+		return () => {
+			document.body.style.overflow = '';
+		};
+	}, [isExpanded]);
 
 	const handleTemplateSelect = (id: string) => {
 		setSelectedTemplate(id);
@@ -297,6 +310,7 @@ export function WorkflowCreatePage() {
 								<Button
 									variant="outline"
 									size="sm"
+									onClick={() => setIsExpanded(true)}
 									className="h-8 rounded-full bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors text-[12px] px-3 font-medium"
 								>
 									<HugeiconsIcon icon={ArrowExpand02Icon} className="size-3 mr-1.5" />
@@ -336,6 +350,63 @@ export function WorkflowCreatePage() {
 					/>
 				</Button>
 			</motion.div>
+
+			{/* Fullscreen Editor Modal */}
+			<AnimatePresence>
+				{isExpanded && (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className="fixed inset-0 z-1000 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-8"
+					>
+						<motion.div
+							initial={{ scale: 0.95, opacity: 0, y: 20 }}
+							animate={{ scale: 1, opacity: 1, y: 0 }}
+							exit={{ scale: 0.95, opacity: 0, y: 20 }}
+							transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+							className="w-full h-full max-w-[1400px] bg-[#0c0c0c] border border-white/10 rounded-2xl shadow-[0_0_100px_rgba(16,185,129,0.1)] overflow-hidden flex flex-col"
+						>
+							<div className="h-14 border-b border-white/10 flex items-center justify-between px-4 bg-white/[0.02]">
+								<div className="flex items-center gap-3">
+									<div className="size-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500/70">
+										<HugeiconsIcon icon={CodeIcon} className="size-4" />
+									</div>
+									<h2 className="font-medium tracking-tight text-white/90">Workflow Definition</h2>
+								</div>
+
+								<div className="flex items-center gap-3">
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => window.open('/docs', '_blank')}
+										className="h-8 rounded-full bg-white/5 border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors text-[12px] px-3 font-medium"
+									>
+										<HugeiconsIcon icon={Book02Icon} className="size-3 mr-1.5" />
+										Docs
+									</Button>
+									<div className="w-[1px] h-4 bg-white/10 mx-1" />
+									<button
+										onClick={() => setIsExpanded(false)}
+										className="size-8 flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 hover:text-red-400 hover:border-red-500/30 transition-colors"
+									>
+										<HugeiconsIcon icon={Cancel01Icon} className="size-4" />
+									</button>
+								</div>
+							</div>
+
+							<div className="flex-1 relative bg-[#050505]">
+								<YamlEditor
+									value={yamlCode}
+									onChange={(val) => setYamlCode(val)}
+									height="100%"
+									className="absolute inset-0"
+								/>
+							</div>
+						</motion.div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 }

@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAppConfig } from '@/lib/app-config';
+import { CpuArchitecture } from '@/components/ui/cpu-architecture';
 
 /* ─── Animation helpers ─── */
 const ease = [0.25, 1, 0.5, 1] as const;
@@ -323,6 +324,48 @@ export function HomePage() {
 
 			{/* ── Features ── */}
 			<FeatureGrid />
+
+			{/* ── Divider ── */}
+			<div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12">
+				<div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+			</div>
+
+			{/* ── Engine Architecture Section ── */}
+			<section className="relative z-10 w-full max-w-5xl mx-auto px-6 md:px-12 py-24 flex flex-col items-center overflow-hidden">
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					whileInView={{ opacity: 1, y: 0 }}
+					viewport={{ once: true, margin: '-80px' }}
+					transition={{ duration: 0.6, ease }}
+					className="text-center mb-10"
+				>
+					<h2 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-b from-white to-white/50 bg-clip-text text-transparent">
+						Powered by Torq Engine
+					</h2>
+					<p className="mt-3 text-sm md:text-base text-white/30 max-w-md mx-auto">
+						Robust pipeline execution at the core.
+					</p>
+				</motion.div>
+
+				<motion.div
+					initial={{ opacity: 0, scale: 0.95 }}
+					whileInView={{ opacity: 1, scale: 1 }}
+					viewport={{ once: true, margin: '-80px' }}
+					transition={{ duration: 0.8, ease }}
+					className="relative w-full max-w-3xl aspect-[2/1] flex items-center justify-center mt-4"
+				>
+					{/* Glow behind the Engine */}
+					<div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full mix-blend-screen" />
+					<CpuArchitecture
+						className="w-full h-full text-primary/80 drop-shadow-[0_0_15px_oklch(0.60_0.13_163_/_0.5)] z-10"
+						animateLines={true}
+						animateMarkers={true}
+						animateText={true}
+						showCpuConnections={true}
+						text="TORQ ENGINE"
+					/>
+				</motion.div>
+			</section>
 
 			{/* ── Footer ── */}
 			<footer className="relative z-10 flex items-center justify-center pb-10 px-6">

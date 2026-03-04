@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/protected-route';
 
 import { AuthLayout } from '@/pages/auth-layout';
 import { DashboardPage } from '@/pages/dashboard/index';
@@ -10,6 +11,7 @@ import { WorkflowListPage } from '@/pages/dashboard/workflow-list';
 import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/login';
 import { SignupPage } from '@/pages/signup';
+import { ForgotPasswordPage } from '@/pages/forgot-password';
 import { DocsPage } from '@/pages/docs';
 import { WorkflowCreatePage } from '@/pages/dashboard/workflow-create';
 
@@ -21,10 +23,15 @@ const router = createBrowserRouter([
 		children: [
 			{ path: '/login', Component: LoginPage },
 			{ path: '/signup', Component: SignupPage },
+			{ path: '/forgot-password', Component: ForgotPasswordPage },
 		],
 	},
 	{
-		Component: DashboardLayout,
+		element: (
+			<ProtectedRoute>
+				<DashboardLayout />
+			</ProtectedRoute>
+		),
 		children: [
 			{ path: '/dashboard', Component: DashboardPage },
 			{ path: '/dashboard/workflows', Component: WorkflowListPage },
@@ -37,8 +44,10 @@ const router = createBrowserRouter([
 ]);
 
 import { Toaster } from '@/components/ui/toaster';
+import { useAppInit } from '@/hooks/use-app-init';
 
 export function App() {
+	useAppInit();
 	return (
 		<>
 			<RouterProvider router={router} />

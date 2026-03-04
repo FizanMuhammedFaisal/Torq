@@ -1,59 +1,25 @@
 import { yaml } from '@codemirror/lang-yaml';
 import CodeMirror, { EditorView, type ReactCodeMirrorProps } from '@uiw/react-codemirror';
+import { vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
 import jsYaml from 'js-yaml';
 import * as React from 'react';
 
-/* ─── Torq dark theme ─── */
-const torqTheme = EditorView.theme(
-	{
-		'&': {
-			backgroundColor: 'oklch(0.10 0.005 285)',
-			color: 'oklch(0.85 0 0)',
-			fontSize: '13px',
-			fontFamily: "'DM Sans', ui-monospace, 'SF Mono', Monaco, monospace",
-		},
-		'.cm-content': {
-			padding: '12px 0',
-			caretColor: 'oklch(0.70 0.15 162)',
-		},
-		'.cm-cursor': {
-			borderLeftColor: 'oklch(0.70 0.15 162)',
-		},
-		'&.cm-focused .cm-cursor': {
-			borderLeftColor: 'oklch(0.70 0.15 162)',
-		},
-		'.cm-gutters': {
-			backgroundColor: 'oklch(0.10 0.005 285)',
-			color: 'oklch(0.40 0 0)',
-			border: 'none',
-			paddingLeft: '8px',
-		},
-		'.cm-activeLineGutter': {
-			backgroundColor: 'oklch(0.14 0.005 285)',
-			color: 'oklch(0.60 0 0)',
-		},
-		'.cm-activeLine': {
-			backgroundColor: 'oklch(0.12 0.005 285)',
-		},
-		'.cm-selectionBackground': {
-			backgroundColor: 'oklch(0.60 0.13 163 / 0.15) !important',
-		},
-		'&.cm-focused .cm-selectionBackground': {
-			backgroundColor: 'oklch(0.60 0.13 163 / 0.2) !important',
-		},
-		'.cm-line': {
-			padding: '0 12px',
-		},
-		'.cm-foldPlaceholder': {
-			backgroundColor: 'oklch(0.20 0 0)',
-			border: 'none',
-			color: 'oklch(0.50 0 0)',
-		},
+const torqTheme = vscodeDarkInit({
+	settings: {
+		background: 'transparent',
+		backgroundImage: '',
+		foreground: '#e5e7eb',
+		caret: '#10b981',
+		selection: 'rgba(16, 185, 129, 0.2)',
+		selectionMatch: 'rgba(16, 185, 129, 0.3)',
+		lineHighlight: 'rgba(255, 255, 255, 0.03)',
+		gutterBackground: 'transparent',
+		gutterForeground: 'rgba(255, 255, 255, 0.3)',
+		gutterBorder: 'transparent',
+		fontFamily: "ui-monospace, 'SF Mono', Monaco, monospace",
 	},
-	{ dark: true },
-);
+});
 
-/* ─── Validation ─── */
 interface ValidationError {
 	line: number;
 	message: string;
@@ -90,6 +56,8 @@ export interface YamlEditorProps {
 	onValidation?: (errors: ValidationError[]) => void;
 	/** Additional className */
 	className?: string;
+	/** Hide title header */
+	hideHeader?: boolean;
 }
 
 export function YamlEditor({
@@ -99,6 +67,7 @@ export function YamlEditor({
 	height = '400px',
 	onValidation,
 	className,
+	hideHeader = false,
 }: YamlEditorProps) {
 	const handleChange = React.useCallback(
 		(val: string) => {
@@ -110,10 +79,10 @@ export function YamlEditor({
 	);
 
 	// Validate on mount
+	// biome-ignore lint/correctness/useExhaustiveDependencies: Validation strictly on mount
 	React.useEffect(() => {
 		const errors = validateYaml(value);
 		onValidation?.(errors);
-		// eslint-disable-line react-hooks/exhaustive-deps
 	}, []);
 
 	const extensions = React.useMemo(() => {
@@ -125,23 +94,27 @@ export function YamlEditor({
 	}, [readOnly]);
 
 	return (
-		<div className={`rounded-xl border border-white/[0.07] overflow-hidden ${className ?? ''}`}>
+		<div
+			className={`rounded-xl border border-white/7 overflow-hidden ${className ?? ''} bg-[#0a0a0a]`}
+		>
 			{/* Title bar */}
-			<div className="flex items-center gap-2 px-4 py-2 border-b border-white/[0.06] bg-[oklch(0.09_0.005_285)]">
-				<div className="flex gap-1.5">
-					<div className="size-2.5 rounded-full bg-white/10" />
-					<div className="size-2.5 rounded-full bg-white/10" />
-					<div className="size-2.5 rounded-full bg-white/10" />
-				</div>
-				<span className="flex-1 text-center text-[10px] text-white/20 font-medium">
-					workflow.yaml
-				</span>
-				{readOnly && (
-					<span className="text-[9px] text-white/15 uppercase tracking-wider font-medium">
-						read-only
+			{!hideHeader && (
+				<div className="flex items-center gap-2 px-4 py-2 border-b border-white/6 bg-[#0c0c0c]">
+					<div className="flex gap-1.5">
+						<div className="size-2.5 rounded-full bg-white/10" />
+						<div className="size-2.5 rounded-full bg-white/10" />
+						<div className="size-2.5 rounded-full bg-white/10" />
+					</div>
+					<span className="flex-1 text-center text-[10px] text-white/20 font-medium">
+						workflow.yaml
 					</span>
-				)}
-			</div>
+					{readOnly && (
+						<span className="text-[9px] text-white/15 uppercase tracking-wider font-medium">
+							read-only
+						</span>
+					)}
+				</div>
+			)}
 
 			<CodeMirror
 				value={value}
@@ -157,7 +130,7 @@ export function YamlEditor({
 					bracketMatching: true,
 					autocompletion: false,
 				}}
-				theme="dark"
+				theme={torqTheme}
 			/>
 		</div>
 	);

@@ -1,9 +1,16 @@
-import { LogoutIcon, PlusSignIcon, SettingsIcon } from '@hugeicons/core-free-icons';
+import {
+	LogoutIcon,
+	PlusSignIcon,
+	SettingsIcon,
+} from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { authClient } from '@/lib/auth';
+import { useAuthStore } from '@/store/use-auth-store';
 
 const navItems = [
 	{
@@ -73,7 +80,13 @@ const navItems = [
 		to: '/dashboard/settings',
 		label: 'Settings',
 		end: false,
-		icon: <HugeiconsIcon icon={SettingsIcon} className="size-[18px]" strokeWidth={2} />,
+		icon: (
+			<HugeiconsIcon
+				icon={SettingsIcon}
+				className="size-[18px]"
+				strokeWidth={2}
+			/>
+		),
 	},
 ];
 
@@ -123,7 +136,9 @@ export function DashboardLayout() {
 			>
 				{/* Brand & Toggle */}
 				<div className="flex items-center justify-between px-5 pt-6 pb-4">
-					<span className="text-xl font-black tracking-tight text-foreground">Torq</span>
+					<span className="text-xl font-black tracking-tight text-foreground">
+						Torq
+					</span>
 					<button
 						type="button"
 						onClick={() => {
@@ -131,7 +146,11 @@ export function DashboardLayout() {
 							if (!isCollapsed) setIsHovered(false);
 						}}
 						className="text-white/30 hover:text-white/70 transition-colors p-1.5 rounded-md hover:bg-white/[0.04]"
-						title={isCollapsed ? 'Expand sidebar (Cmd+[)' : 'Collapse sidebar (Cmd+[)'}
+						title={
+							isCollapsed
+								? 'Expand sidebar (Cmd+[)'
+								: 'Collapse sidebar (Cmd+[)'
+						}
 					>
 						<svg
 							className="size-[15px]"
@@ -142,6 +161,7 @@ export function DashboardLayout() {
 							strokeLinecap="round"
 							strokeLinejoin="round"
 						>
+							<title>Toggle Sidebar</title>
 							<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
 							<line x1="9" y1="3" x2="9" y2="21" />
 						</svg>
@@ -154,7 +174,11 @@ export function DashboardLayout() {
 						className="w-full gap-2 justify-center font-medium"
 						onClick={() => navigate('/dashboard/workflows/create')}
 					>
-						<HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
+						<HugeiconsIcon
+							icon={PlusSignIcon}
+							className="size-4"
+							strokeWidth={2.5}
+						/>
 						Create Workflow
 					</Button>
 				</div>
@@ -208,9 +232,18 @@ export function DashboardLayout() {
 						variant="ghost"
 						size="sm"
 						className="w-full justify-start gap-2.5 text-muted-foreground hover:text-foreground"
-						onClick={() => navigate('/login')}
+						onClick={async () => {
+							await authClient.signOut();
+							useAuthStore.getState().clearAuth();
+							toast.success('Signed out successfully');
+							navigate('/login');
+						}}
 					>
-						<HugeiconsIcon icon={LogoutIcon} className="size-4" strokeWidth={2} />
+						<HugeiconsIcon
+							icon={LogoutIcon}
+							className="size-4"
+							strokeWidth={2}
+						/>
 						Sign out
 					</Button>
 				</div>
@@ -220,7 +253,9 @@ export function DashboardLayout() {
 			<main className="flex-1 flex flex-col min-w-0 h-svh bg-background relative z-0">
 				{/* Mobile top bar */}
 				<header className="flex md:hidden items-center justify-between border-b border-border/50 px-4 py-3">
-					<span className="text-lg font-black tracking-tight text-foreground">Torq</span>
+					<span className="text-lg font-black tracking-tight text-foreground">
+						Torq
+					</span>
 				</header>
 
 				<div className="flex-1 overflow-y-auto">

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@/lib/auth';
+import { useAuthStore } from '@/store/use-auth-store';
 import type { SignupEmailInput } from '../schema';
 
 type Step = 'email' | 'otp';
@@ -54,9 +56,11 @@ export function useSignup(): UseSignupReturn {
 
 		if (apiError) {
 			setError(apiError.message ?? 'Failed to send OTP');
+			toast.error(apiError.message ?? 'Failed to send OTP');
 			return;
 		}
 
+		toast.success('Code sent! Check your email.');
 		emailRef.current = data.email;
 		setResendCooldown(60);
 		setStep('otp');
@@ -72,13 +76,26 @@ export function useSignup(): UseSignupReturn {
 				otp,
 			});
 
-			setIsPending(false);
-
 			if (apiError) {
+				setIsPending(false);
 				setError(apiError.message ?? 'Invalid OTP');
+				toast.error(apiError.message ?? 'Invalid OTP');
 				return;
 			}
 
+			const result = await authClient.getSession();
+			if (result.data?.session && result.data?.user) {
+				useAuthStore
+					.getState()
+					.setAuth(
+						result.data.user,
+						result.data.session,
+						result.data.session.token || null,
+					);
+			}
+
+			setIsPending(false);
+			toast.success('Successfully verified & signed in');
 			navigate('/dashboard');
 		},
 		[navigate],
@@ -99,9 +116,11 @@ export function useSignup(): UseSignupReturn {
 
 		if (apiError) {
 			setError(apiError.message ?? 'Failed to resend OTP');
+			toast.error(apiError.message ?? 'Failed to resend OTP');
 			return;
 		}
 
+		toast.success('Code resent');
 		setResendCooldown(60);
 	}, [resendCooldown]);
 

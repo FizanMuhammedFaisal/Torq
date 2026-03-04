@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@/lib/auth';
+import { useAuthStore } from '@/store/use-auth-store';
 import type { LoginInput } from '../schema';
 
 interface UseLoginReturn {
@@ -25,12 +27,22 @@ export function useLogin(): UseLoginReturn {
 				{
 					email: data.email,
 					password: data.password,
-					callbackURL: '/dashboard',
 				},
 				{
 					onRequest: () => setIsPending(true),
-					onSuccess: () => {
+					onSuccess: async () => {
+						const result = await authClient.getSession();
+						if (result.data?.session && result.data?.user) {
+							useAuthStore
+								.getState()
+								.setAuth(
+									result.data.user,
+									result.data.session,
+									result.data.session.token || null,
+								);
+						}
 						setIsPending(false);
+						toast.success('Successfully signed in');
 						navigate('/dashboard');
 					},
 					onError: (ctx) => {
