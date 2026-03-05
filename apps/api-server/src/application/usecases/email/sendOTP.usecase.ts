@@ -17,6 +17,7 @@ export class SendOTPUseCase implements ISendOTPEmail {
 			'sign-in': signInOTPStrategy,
 			'email-verification': emailVerificationStrategy,
 			'forget-password': forgetPasswordStrategy,
+			'change-email': emailVerificationStrategy,
 		};
 	}
 	async execute(email: string, otp: string, type: OTPEmailType): Promise<void> {

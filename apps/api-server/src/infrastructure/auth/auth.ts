@@ -1,9 +1,10 @@
+import 'reflect-metadata';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { openAPI } from 'better-auth/plugins';
 import db from '@/infrastructure/repository/database/database.config';
 import { Envconfig } from '@/config/envconfig';
-import * as schema from '@/infrastructure/repository/database/schema/auth-schema';
+import * as schema from '@/infrastructure/repository/database/schema/schema';
 import { jwt } from 'better-auth/plugins';
 import { emailOTP } from 'better-auth/plugins';
 import { container } from '@/config/di/container';
@@ -46,6 +47,12 @@ export const auth = betterAuth({
 		cookieCache: {
 			enabled: true,
 			maxAge: 5 * 60, // Cache duration in seconds
+		},
+	},
+	socialProviders: {
+		google: {
+			clientId: Envconfig.services.googleAuth.clientId,
+			clientSecret: Envconfig.services.googleAuth.clientSecret,
 		},
 	},
 });

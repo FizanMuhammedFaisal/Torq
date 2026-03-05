@@ -19,6 +19,10 @@ export const Envconfig = {
 			//resend verified domain since implemented service uses resend
 			appEmail: process.env.APP_EMAIL || 'fizanmuhammedfaisal@gmail.com',
 		},
+		googleAuth: {
+			clientId: process.env.GOOGLE_CLIENT_ID || 'NEEDED',
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'NEEDED',
+		},
 	},
 };
 export type Envconfig = typeof Envconfig;

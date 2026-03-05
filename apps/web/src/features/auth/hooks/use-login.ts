@@ -22,35 +22,36 @@ export function useLogin(): UseLoginReturn {
 	const mutate = useCallback(
 		async (data: LoginInput) => {
 			setError(null);
+			setIsPending(true);
 
-			await authClient.signIn.email(
-				{
+			try {
+				const { error: apiError } = await authClient.signIn.email({
 					email: data.email,
 					password: data.password,
-				},
-				{
-					onRequest: () => setIsPending(true),
-					onSuccess: async () => {
-						const result = await authClient.getSession();
-						if (result.data?.session && result.data?.user) {
-							useAuthStore
-								.getState()
-								.setAuth(
-									result.data.user,
-									result.data.session,
-									result.data.session.token || null,
-								);
-						}
-						setIsPending(false);
-						toast.success('Successfully signed in');
-						navigate('/dashboard');
-					},
-					onError: (ctx) => {
-						setIsPending(false);
-						setError(ctx.error.message);
-					},
-				},
-			);
+				});
+
+				if (apiError) {
+					setError(apiError.message || 'Invalid email or password');
+					toast.error(apiError.message || 'Invalid email or password');
+					return;
+				}
+
+				const result = await authClient.getSession();
+				if (result.data?.session && result.data?.user) {
+					useAuthStore
+						.getState()
+						.setAuth(result.data.user, result.data.session, result.data.session.token || null);
+				}
+				toast.success('Successfully signed in');
+				navigate('/dashboard');
+			} catch (err: unknown) {
+				const msg =
+					err instanceof Error ? err.message : 'An internal error occurred. Please try again.';
+				setError(msg);
+				toast.error(msg);
+			} finally {
+				setIsPending(false);
+			}
 		},
 		[navigate],
 	);
