@@ -18,4 +18,9 @@ export class WorkflowRouter implements Router {
 			this.workflowController.getWorkflows(ctx),
 		);
 	}
+	create() {
+		return new Elysia({ prefix: this.prefix }).post('/', (ctx) =>
+			this.workflowController.createWorkflow(ctx),
+		);
+	}
 }

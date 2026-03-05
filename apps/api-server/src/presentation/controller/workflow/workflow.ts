@@ -11,4 +11,25 @@ export class WorkflowController implements IWorkflowController {
 			});
 		});
 	};
+	createWorkflow = async (ctx: Context) => {
+		return new Promise<{ message: string }>((resolve) => {
+			resolve({
+				message: 'Workflow created',
+			});
+		});
+	};
+	createSecret = async (ctx: Context) => {
+		return new Promise<{ message: string }>((resolve) => {
+			resolve({
+				message: 'Secret created',
+			});
+		});
+	};,
+	getSecrets = async (ctx: Context) => {
+		return new Promise<{ message: string }>((resolve) => {
+			resolve({
+				message: 'Secrets',
+			});
+		});
+	};
 }
