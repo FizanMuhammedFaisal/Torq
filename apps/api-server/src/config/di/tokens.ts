@@ -9,4 +9,11 @@ export const TOKENS = {
 	EmailVerificationStrategy: Symbol.for('EmailVerificationStrategy'),
 	ForgetPasswordStrategy: Symbol.for('ForgetPasswordStrategy'),
 	SendOTPEmail: Symbol.for('SendOTPEmail'),
+	SecretManagementService: Symbol.for('SecretManagementService'),
+	WorkflowRepository: Symbol.for('WorkflowRepository'),
+	SecretRepository: Symbol.for('SecretRepository'),
+	WorkflowVersionRepository: Symbol.for('WorkflowVersionRepository'),
+	WorkflowMapper: Symbol.for('WorkflowMapper'),
+	SecretMapper: Symbol.for('SecretMapper'),
+	WorkflowVersionMapper: Symbol.for('WorkflowVersionMapper'),
 } as const;

@@ -24,7 +24,7 @@ export class WorkflowController implements IWorkflowController {
 				message: 'Secret created',
 			});
 		});
-	};,
+	};
 	getSecrets = async (ctx: Context) => {
 		return new Promise<{ message: string }>((resolve) => {
 			resolve({

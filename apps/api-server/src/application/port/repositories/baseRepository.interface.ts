@@ -1,0 +1,6 @@
+export interface IBaseRepository<T, ID = string> {
+	findById(id: ID): Promise<T | null>;
+	save(entity: T): Promise<T>;
+	delete(id: ID): Promise<void>;
+	existsById(id: ID): Promise<boolean>;
+}

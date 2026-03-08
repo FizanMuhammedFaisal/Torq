@@ -11,6 +11,13 @@ import { EmailVerificationStrategy } from '@/application/usecases/email/strategi
 import { ForgetPasswordStrategy } from '@/application/usecases/email/strategies/forgetPasswordStrategy';
 import { SendOTPUseCase } from '@/application/usecases/email/sendOTP.usecase';
 
+import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';
+import { SecrectRepository } from '@/infrastructure/repository/secret.repository';
+import { WorkflowVersionRepository } from '@/infrastructure/repository/workflowVersion.repository';
+import { WorkflowMapper } from '@/infrastructure/repository/mappers/workflow.mapper';
+import { SecretMapper } from '@/infrastructure/repository/mappers/secret.mapper';
+import { WorkflowVersionMapper } from '@/infrastructure/repository/mappers/workflowVersion.mapper';
+
 // Register as singletons using Symbols
 container.register(
 	TOKENS.WorkflowController,
@@ -55,5 +62,25 @@ container.register(
 	{ useClass: SendOTPUseCase },
 	{ lifecycle: Lifecycle.Singleton },
 );
+
+// Repository & Mapper Registration
+container.register(
+	TOKENS.WorkflowRepository,
+	{ useClass: WorkflowRepository },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.SecretRepository,
+	{ useClass: SecrectRepository },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.WorkflowVersionRepository,
+	{ useClass: WorkflowVersionRepository },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(TOKENS.WorkflowMapper, { useClass: WorkflowMapper });
+container.register(TOKENS.SecretMapper, { useClass: SecretMapper });
+container.register(TOKENS.WorkflowVersionMapper, { useClass: WorkflowVersionMapper });
 
 export { container };
