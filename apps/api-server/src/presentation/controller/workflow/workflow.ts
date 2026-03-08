@@ -12,6 +12,7 @@ export class WorkflowController implements IWorkflowController {
 		});
 	};
 	createWorkflow = async (ctx: Context) => {
+
 		return new Promise<{ message: string }>((resolve) => {
 			resolve({
 				message: 'Workflow created',

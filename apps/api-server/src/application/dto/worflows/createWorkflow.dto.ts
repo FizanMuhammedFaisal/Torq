@@ -3,7 +3,8 @@ import z from 'zod';
 export const CreateWorkflowSchema = z.object({
 	name: z.string(),
 	description: z.string().optional(),
-	workflowJson: z.string(),
+	workflowSpec: z.string(),
+	specFormat: z.enum(['yaml', 'json']),
 	secrets: z
 		.array(
 			z.object({
