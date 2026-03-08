@@ -11,6 +11,7 @@ import type { ICreateWorkflowUseCase } from '@/application/port/usecases/workflo
 import { TOKENS } from '@/config/di/tokens';
 import type { SpecValidationService } from '@/infrastructure/services/specValidationService';
 import { inject } from 'tsyringe';
+import { DSLPipeline } from '@/domain/dsl/pipeline';
 
 export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 	constructor(
@@ -22,13 +23,15 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 		private workflowVersionRepository: IWorkflowVersionRepository,
 		@inject(TOKENS.SpecValidationService) private specValidationService: SpecValidationService,
 	) { }
-	execute(data: CreateWorkflowInputDto): Promise<CreateWorkflowOutputDto> {
-		// validate json--> a. v alidtion ssytme for each interaoitn of the torq syntax an if not valid throw error for the editor to se
-		// make sure the dag is correct
-		// create the version
-		// create the workflow itself
-		// add secrect that are given
 
-		
+	// validate json--> validate torq schema as version--> validate semantics per version (DAG)
+	// create the version artifact
+	// create the workflow itself
+	// save encrypted secrects
+	async execute(data: CreateWorkflowInputDto): Promise<CreateWorkflowOutputDto> {
+
+		const dslPipeline = new DSLPipeline(this.specValidationService)
+		await dslPipeline.process(data.specFormat, data.specFormat)
+
 	}
 }

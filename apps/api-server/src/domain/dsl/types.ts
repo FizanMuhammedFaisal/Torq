@@ -14,3 +14,5 @@ export interface ValidationIssue {
     path: string;
     message: string;
 }
+
+export type ValidTorqSpec = {}
