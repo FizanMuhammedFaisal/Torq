@@ -17,6 +17,7 @@ export const TOKENS = {
 	SecretMapper: Symbol.for('SecretMapper'),
 	WorkflowVersionMapper: Symbol.for('WorkflowVersionMapper'),
 	SpecValidationService: Symbol.for('SpecValidationService'),
+	UpsertSecretsUseCase: Symbol.for('UpsertSecretsUseCase'),
 	UnitOfWork: Symbol.for('UnitOfWork'),
 	AuthMacro: Symbol.for('AuthMacro'),
 } as const;

@@ -11,8 +11,9 @@ import type { SpecValidationService } from '@/infrastructure/services/specValida
 import { inject } from 'tsyringe';
 import { DSLPipeline } from '@/domain/dsl/pipeline';
 import { Workflow } from '@/domain/entities/workflow';
-import { ulid } from 'ulid'
+import { ulid } from 'ulid';
 import { WorkflowVersion } from '@/domain/entities/workflowVersions';
+import type { UpsertSecretsUseCase } from './upsertSecrets.usecase';
 export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 	constructor(
 		@inject(TOKENS.WorkflowRepository) private workflowRepository: IWorkflowRepository,
@@ -20,6 +21,7 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 		private workflowVersionRepository: IWorkflowVersionRepository,
 		@inject(TOKENS.SpecValidationService) private specValidationService: SpecValidationService,
 		@inject(TOKENS.UnitOfWork) private unitOfWork: IUnitOfWork,
+		@inject(TOKENS.UpsertSecretsUseCase) private upsertSecretsUseCase: UpsertSecretsUseCase,
 	) { }
 
 	// validate json--> validate torq schema as version--> validate semantics per version (DAG)
@@ -27,17 +29,16 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 	// create the workflow itself
 	// save encrypted secrects
 	async execute(data: CreateWorkflowInputDto): Promise<CreateWorkflowOutputDto> {
-
-		const dslPipeline = new DSLPipeline(this.specValidationService)
-		const spec = await dslPipeline.process(data.workflowSpec, data.specFormat)
+		const dslPipeline = new DSLPipeline(this.specValidationService);
+		const spec = await dslPipeline.process(data.workflowSpec, data.specFormat);
 
 		const workflow = Workflow.create({
 			id: ulid(),
 			name: data.name,
 			description: data.description,
 			createdAt: new Date(),
-			identityId: data.req.id
-		})
+			identityId: data.req.id,
+		});
 
 		const workflowVersion = WorkflowVersion.create({
 			id: ulid(),
@@ -45,8 +46,8 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 			raw: data.workflowSpec,
 			workflowId: workflow.id,
 			version: 1,
-			createdAt: new Date()
-		})
+			createdAt: new Date(),
+		});
 
 		const savedWorkflow = await this.unitOfWork.execute(async () => {
 			const saved = await this.workflowRepository.save(workflow);
@@ -54,6 +55,13 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 			return saved;
 		});
 
+		if (data.secrets) {
+			await this.upsertSecretsUseCase.execute({
+				workflowId: workflow.id,
+				secrets: data.secrets,
+				req: data.req,
+			});
+		}
 		return {
 			id: savedWorkflow.id,
 			name: savedWorkflow.name,

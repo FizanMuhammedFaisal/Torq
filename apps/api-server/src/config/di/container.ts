@@ -10,6 +10,7 @@ import { SignInOTPStrategy } from '@/application/usecases/email/strategies/signI
 import { EmailVerificationStrategy } from '@/application/usecases/email/strategies/emailVerificationStrategy';
 import { ForgetPasswordStrategy } from '@/application/usecases/email/strategies/forgetPasswordStrategy';
 import { SendOTPUseCase } from '@/application/usecases/email/sendOTP.usecase';
+import { UpsertSecretsUseCase } from '@/application/usecases/workflows/upsertSecrets.usecase';
 
 import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';
 import { SecrectRepository } from '@/infrastructure/repository/secret.repository';
@@ -98,6 +99,11 @@ container.register(
 container.register(
 	TOKENS.AuthMacro,
 	{ useClass: AuthMacro },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.UpsertSecretsUseCase,
+	{ useClass: UpsertSecretsUseCase },
 	{ lifecycle: Lifecycle.Singleton },
 );
 
