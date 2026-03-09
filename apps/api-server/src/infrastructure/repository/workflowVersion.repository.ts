@@ -1,12 +1,11 @@
 import { eq } from 'drizzle-orm';
 import type { IWorkflowVersionRepository } from '@application/port/repositories/workflowVersionRepository.interface';
 import type { WorkflowVersion } from '@domain/entities/workflowVersions';
-import db from './database/database.config';
+import { getExecutor } from './database/transaction/transactionContext';
 import { workflowVersion } from './database/schema';
 import type { WorkflowVersionMapper } from './mappers/workflowVersion.mapper';
 import { PostgresErrorMapper } from './database/errors/postgresErrorMapper';
 import { DatabaseInternalError } from '@infrastructure/errors/databaseInternalError';
-
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
 
@@ -15,11 +14,11 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	constructor(
 		@inject(TOKENS.WorkflowVersionMapper)
 		private readonly mapper: WorkflowVersionMapper,
-	) {}
+	) { }
 
 	async findById(id: string): Promise<WorkflowVersion | null> {
 		try {
-			const result = await db.query.workflowVersion.findFirst({
+			const result = await getExecutor().query.workflowVersion.findFirst({
 				where: eq(workflowVersion.id, id),
 			});
 
@@ -34,7 +33,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	async save(entity: WorkflowVersion): Promise<WorkflowVersion> {
 		try {
 			const persistenceModel = this.mapper.toPersistence(entity);
-			const result = await db
+			const result = await getExecutor()
 				.insert(workflowVersion)
 				.values(persistenceModel)
 				.onConflictDoUpdate({
@@ -43,6 +42,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 						workflowId: entity.workflowId,
 						version: entity.version,
 						spec: entity.spec,
+						raw: entity.raw
 					},
 				})
 				.returning();
@@ -58,7 +58,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 
 	async delete(id: string): Promise<void> {
 		try {
-			await db.delete(workflowVersion).where(eq(workflowVersion.id, id));
+			await getExecutor().delete(workflowVersion).where(eq(workflowVersion.id, id));
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowVersion' });
 		}
@@ -66,7 +66,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 
 	async existsById(id: string): Promise<boolean> {
 		try {
-			const result = await db.query.workflowVersion.findFirst({
+			const result = await getExecutor().query.workflowVersion.findFirst({
 				columns: { id: true },
 				where: eq(workflowVersion.id, id),
 			});

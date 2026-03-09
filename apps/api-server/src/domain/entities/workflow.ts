@@ -3,9 +3,10 @@ export class Workflow {
 		public id: string,
 		public identityId: string,
 		public name: string,
-		public description: string,
 		public createdAt: Date,
-	) {}
+		public description?: string,
+
+	) { }
 
 	static create({
 		id,
@@ -17,9 +18,10 @@ export class Workflow {
 		id: string;
 		identityId: string;
 		name: string;
-		description: string;
 		createdAt: Date;
+		description?: string;
+
 	}) {
-		return new Workflow(id, identityId, name, description, createdAt);
+		return new Workflow(id, identityId, name, createdAt, description);
 	}
 }

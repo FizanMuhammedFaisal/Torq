@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, integer, json } from 'drizzle-orm/pg-core';
 import { user } from './auth.schema';
 
 export const workflow = pgTable('workflow', {
@@ -18,7 +18,8 @@ export const workflowVersion = pgTable('workflow_version', {
 		.notNull()
 		.references(() => workflow.id),
 	version: integer('version').notNull(),
-	spec: text('spec').notNull(),
+	raw: text('raw').notNull(),
+	spec: json('spec').notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

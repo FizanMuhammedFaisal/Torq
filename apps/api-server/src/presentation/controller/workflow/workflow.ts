@@ -1,6 +1,7 @@
 import type { Context } from 'elysia';
 import { injectable } from 'tsyringe';
 import type { IWorkflowController } from '@/presentation/interfaces/controller/workflow.interface';
+import type { AuthenticatedContext } from '@/presentation/macros/auth.macro';
 
 @injectable()
 export class WorkflowController implements IWorkflowController {
@@ -11,8 +12,7 @@ export class WorkflowController implements IWorkflowController {
 			});
 		});
 	};
-	createWorkflow = async (ctx: Context) => {
-
+	createWorkflow = async (ctx: AuthenticatedContext) => {
 		return new Promise<{ message: string }>((resolve) => {
 			resolve({
 				message: 'Workflow created',

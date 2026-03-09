@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import type { IWorkflowRepository } from '@application/port/repositories/workflowRepository.interface';
 import type { Workflow } from '@domain/entities/workflow';
-import db from './database/database.config';
+import { getExecutor } from './database/transaction/transactionContext';
 import { workflow } from './database/schema';
 import type { WorkflowMapper } from './mappers/workflow.mapper';
 import { PostgresErrorMapper } from './database/errors/postgresErrorMapper';
@@ -19,7 +19,7 @@ export class WorkflowRepository implements IWorkflowRepository {
 
 	async findById(id: string): Promise<Workflow | null> {
 		try {
-			const result = await db.query.workflow.findFirst({
+			const result = await getExecutor().query.workflow.findFirst({
 				where: eq(workflow.id, id),
 			});
 
@@ -34,7 +34,7 @@ export class WorkflowRepository implements IWorkflowRepository {
 	async save(entity: Workflow): Promise<Workflow> {
 		try {
 			const persistenceModel = this.mapper.toPersistence(entity);
-			const result = await db
+			const result = await getExecutor()
 				.insert(workflow)
 				.values(persistenceModel)
 				.onConflictDoUpdate({
@@ -58,7 +58,7 @@ export class WorkflowRepository implements IWorkflowRepository {
 
 	async delete(id: string): Promise<void> {
 		try {
-			await db.delete(workflow).where(eq(workflow.id, id));
+			await getExecutor().delete(workflow).where(eq(workflow.id, id));
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'Workflow' });
 		}
@@ -66,7 +66,7 @@ export class WorkflowRepository implements IWorkflowRepository {
 
 	async existsById(id: string): Promise<boolean> {
 		try {
-			const result = await db.query.workflow.findFirst({
+			const result = await getExecutor().query.workflow.findFirst({
 				columns: { id: true },
 				where: eq(workflow.id, id),
 			});

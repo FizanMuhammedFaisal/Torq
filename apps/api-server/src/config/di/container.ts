@@ -18,6 +18,8 @@ import { WorkflowMapper } from '@/infrastructure/repository/mappers/workflow.map
 import { SecretMapper } from '@/infrastructure/repository/mappers/secret.mapper';
 import { WorkflowVersionMapper } from '@/infrastructure/repository/mappers/workflowVersion.mapper';
 import { SpecValidationService } from '@/infrastructure/services/specValidationService';
+import { DrizzleUnitOfWork } from '@/infrastructure/repository/database/transaction/unitOfWork';
+import { AuthMacro } from '@/presentation/macros/auth.macro';
 
 // Register as singletons using Symbols
 container.register(
@@ -86,6 +88,16 @@ container.register(TOKENS.WorkflowVersionMapper, { useClass: WorkflowVersionMapp
 container.register(
 	TOKENS.SpecValidationService,
 	{ useClass: SpecValidationService },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.UnitOfWork,
+	{ useClass: DrizzleUnitOfWork },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.AuthMacro,
+	{ useClass: AuthMacro },
 	{ lifecycle: Lifecycle.Singleton },
 );
 

@@ -1,6 +1,6 @@
 export interface VersionHandler {
     schemaValidate(raw: unknown): unknown;     // internally typed per version
-    semanticValidate(validated: unknown): void;
+    semanticValidate(validated: unknown): unknown;
 }
 const REGISTRY: Record<string, () => Promise<VersionHandler>> = {
     v1alpha: () => import('./v1apha/handler').then((m) => m.handler),
