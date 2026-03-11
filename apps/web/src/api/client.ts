@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { useAuthStore } from '@/store/use-auth-store';
 import { authClient } from '@/lib/auth';
+import { useAuthStore } from '@/store/use-auth-store';
 
 const apiClient = axios.create({
 	baseURL: import.meta.env.VITE_BASE_URL,
@@ -65,3 +65,15 @@ apiClient.interceptors.response.use(
 );
 
 export { apiClient };
+
+/**
+ * The shape the API server returns in error response bodies.
+ * Use with `AxiosError<ApiErrorBody>` in hooks for typed error handling.
+ */
+export type ApiErrorBody = {
+	message: string;
+	code?: string;
+};
+
+// Re-export so feature hooks never need to import from 'axios' directly
+export type { AxiosError } from 'axios';

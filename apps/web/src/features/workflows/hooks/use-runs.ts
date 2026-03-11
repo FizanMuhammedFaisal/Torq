@@ -87,7 +87,9 @@ export function useRuns() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
 	const [searchQuery, setSearchQuery] = useState('');
-	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>('all');
+	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>(
+		'all',
+	);
 
 	const fetchRuns = useCallback(async () => {
 		try {
@@ -115,8 +117,14 @@ export function useRuns() {
 		let timeoutId: number;
 
 		const insertRandomExecution = () => {
-			const statuses: WorkflowStatus[] = ['running', 'queued', 'success', 'failed'];
-			const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+			const statuses: WorkflowStatus[] = [
+				'running',
+				'queued',
+				'success',
+				'failed',
+			];
+			const randomStatus =
+				statuses[Math.floor(Math.random() * statuses.length)];
 
 			const workflows = [
 				'CI / Build & Test',
@@ -134,7 +142,8 @@ export function useRuns() {
 				status: randomStatus,
 				trigger: 'system_webhook',
 				date: 'Just now',
-				duration: randomStatus === 'running' || randomStatus === 'queued' ? '—' : '12s',
+				duration:
+					randomStatus === 'running' || randomStatus === 'queued' ? '—' : '12s',
 				namespace: 'engineering/core',
 				steps: Math.floor(Math.random() * 10) + 1,
 			};
@@ -142,7 +151,10 @@ export function useRuns() {
 			setRuns((prev) => [newRun, ...prev].slice(0, 100)); // Keep a max of 100 in feed to not kill DOM
 
 			// Randomly enqueue the next execution between 3 and 10 seconds
-			timeoutId = window.setTimeout(insertRandomExecution, Math.random() * 7000 + 3000);
+			timeoutId = window.setTimeout(
+				insertRandomExecution,
+				Math.random() * 7000 + 3000,
+			);
 		};
 
 		timeoutId = window.setTimeout(insertRandomExecution, 5000);
@@ -153,7 +165,8 @@ export function useRuns() {
 	// Filtering
 	const filteredRuns = useMemo(() => {
 		return runs.filter((run) => {
-			const matchesStatus = statusFilter === 'all' || run.status === statusFilter;
+			const matchesStatus =
+				statusFilter === 'all' || run.status === statusFilter;
 			return matchesStatus; // TanStack table handles the search natively via name
 		});
 	}, [runs, statusFilter]);
@@ -164,7 +177,9 @@ export function useRuns() {
 			// Offset by a large number to emulate global total runs, adding the actual array length
 			// as it grows so the counter rolls up on screen
 			total: 1420500 + runs.length,
-			active: runs.filter((r) => r.status === 'running' || r.status === 'queued').length,
+			active: runs.filter(
+				(r) => r.status === 'running' || r.status === 'queued',
+			).length,
 			failed24h: runs.filter((r) => r.status === 'failed').length, // Mocked as just standard failed for now
 		};
 	}, [runs]);

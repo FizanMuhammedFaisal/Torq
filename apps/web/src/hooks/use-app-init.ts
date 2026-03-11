@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
-import { useAuthStore } from '@/store/use-auth-store';
-import { authClient } from '@/lib/auth';
-
 import { useAppConfig } from '@/lib/app-config';
+import { authClient } from '@/lib/auth';
+import { useAuthStore } from '@/store/use-auth-store';
 
 export function useAppInit() {
 	const { setAuth, clearAuth, setLoading } = useAuthStore();

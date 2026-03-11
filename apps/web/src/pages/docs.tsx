@@ -1,17 +1,29 @@
-import { useState } from 'react';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { ArrowLeft01Icon, SidebarLeftIcon } from '@hugeicons/core-free-icons';
-import { motion, AnimatePresence } from 'motion/react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+import type { TorqVersion } from '@/store/version-store';
+import { useVersionStore } from '@/store/version-store';
 import { TORQ_DOCS_REGISTRY } from '@/torqdocs';
 
 export function DocsPage() {
 	const navigate = useNavigate();
-	const [activePageId, setActivePageId] = useState(TORQ_DOCS_REGISTRY[0].id);
+	const { activeVersion, setActiveVersion } = useVersionStore();
+	const registry =
+		TORQ_DOCS_REGISTRY[activeVersion] || TORQ_DOCS_REGISTRY['latest'];
+
+	const [activePageId, setActivePageId] = useState(registry[0].id);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-	const activePage = TORQ_DOCS_REGISTRY.find((p) => p.id === activePageId) || TORQ_DOCS_REGISTRY[0];
+	const activePage = registry.find((p) => p.id === activePageId) || registry[0];
 	const ActiveComponent = activePage.component;
 
 	return (
@@ -29,9 +41,19 @@ export function DocsPage() {
 						</button>
 						<div className="font-semibold tracking-wide text-[15px] flex items-center gap-3">
 							<span className="text-white">Torq Docs</span>
-							<span className="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-								v1.2.0
-							</span>
+							<Select
+								value={activeVersion}
+								onValueChange={(v) => setActiveVersion(v as TorqVersion)}
+							>
+								<SelectTrigger className="w-[100px] h-7 text-[11px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md ring-offset-0 focus:ring-0">
+									<SelectValue placeholder="Version" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="v1alpha">v1alpha</SelectItem>
+									<SelectItem value="v1beta">v1beta</SelectItem>
+									<SelectItem value="latest">latest (v1beta)</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 					</div>
 
@@ -66,7 +88,7 @@ export function DocsPage() {
 									Documentation
 								</h3>
 								<nav className="space-y-1">
-									{TORQ_DOCS_REGISTRY.map((page) => {
+									{registry.map((page) => {
 										const isActive = activePageId === page.id;
 										return (
 											<button

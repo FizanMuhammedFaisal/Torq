@@ -40,13 +40,19 @@ export function useLogin(): UseLoginReturn {
 				if (result.data?.session && result.data?.user) {
 					useAuthStore
 						.getState()
-						.setAuth(result.data.user, result.data.session, result.data.session.token || null);
+						.setAuth(
+							result.data.user,
+							result.data.session,
+							result.data.session.token || null,
+						);
 				}
 				toast.success('Successfully signed in');
 				navigate('/dashboard');
 			} catch (err: unknown) {
 				const msg =
-					err instanceof Error ? err.message : 'An internal error occurred. Please try again.';
+					err instanceof Error
+						? err.message
+						: 'An internal error occurred. Please try again.';
 				setError(msg);
 				toast.error(msg);
 			} finally {

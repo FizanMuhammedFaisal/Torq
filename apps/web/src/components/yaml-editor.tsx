@@ -1,6 +1,9 @@
 import { yaml } from '@codemirror/lang-yaml';
-import CodeMirror, { EditorView, type ReactCodeMirrorProps } from '@uiw/react-codemirror';
 import { vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
+import CodeMirror, {
+	EditorView,
+	type ReactCodeMirrorProps,
+} from '@uiw/react-codemirror';
 import jsYaml from 'js-yaml';
 import * as React from 'react';
 
@@ -99,18 +102,28 @@ export function YamlEditor({
 		>
 			{/* Title bar */}
 			{!hideHeader && (
-				<div className="flex items-center gap-2 px-4 py-2 border-b border-white/6 bg-[#0c0c0c]">
-					<div className="flex gap-1.5">
-						<div className="size-2.5 rounded-full bg-white/10" />
-						<div className="size-2.5 rounded-full bg-white/10" />
-						<div className="size-2.5 rounded-full bg-white/10" />
+				<div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04] bg-[#0c0c0c]">
+					<div className="flex items-center justify-center size-5 rounded-[4px] bg-primary/10 border border-primary/20 text-primary">
+						<svg
+							className="size-3"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2.5"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							<title>File Icon</title>
+							<path d="M4 17l6-6-6-6" />
+							<path d="M12 19h8" />
+						</svg>
 					</div>
-					<span className="flex-1 text-center text-[10px] text-white/20 font-medium">
+					<span className="flex-1 text-[11px] font-mono text-white/50 tracking-wider">
 						workflow.yaml
 					</span>
 					{readOnly && (
-						<span className="text-[9px] text-white/15 uppercase tracking-wider font-medium">
-							read-only
+						<span className="text-[9px] text-white/20 uppercase tracking-widest font-semibold bg-white/5 px-2 py-0.5 rounded-md">
+							READ-ONLY
 						</span>
 					)}
 				</div>

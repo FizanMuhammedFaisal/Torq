@@ -11,6 +11,8 @@ import { EmailVerificationStrategy } from '@/application/usecases/email/strategi
 import { ForgetPasswordStrategy } from '@/application/usecases/email/strategies/forgetPasswordStrategy';
 import { SendOTPUseCase } from '@/application/usecases/email/sendOTP.usecase';
 import { UpsertSecretsUseCase } from '@/application/usecases/workflows/upsertSecrets.usecase';
+import { GetSecretsUseCase } from '@/application/usecases/workflows/getSecrets.usecase';
+import { CreateWorkflowUseCase } from '@/application/usecases/workflows/createWorkflow.usecase';
 
 import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';
 import { SecrectRepository } from '@/infrastructure/repository/secret.repository';
@@ -92,6 +94,11 @@ container.register(
 	{ lifecycle: Lifecycle.Singleton },
 );
 container.register(
+	TOKENS.CreateWorkflowUseCase,
+	{ useClass: CreateWorkflowUseCase },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
 	TOKENS.UnitOfWork,
 	{ useClass: DrizzleUnitOfWork },
 	{ lifecycle: Lifecycle.Singleton },
@@ -104,6 +111,11 @@ container.register(
 container.register(
 	TOKENS.UpsertSecretsUseCase,
 	{ useClass: UpsertSecretsUseCase },
+	{ lifecycle: Lifecycle.Singleton },
+);
+container.register(
+	TOKENS.GetSecretsUseCase,
+	{ useClass: GetSecretsUseCase },
 	{ lifecycle: Lifecycle.Singleton },
 );
 

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
 import { motion, useInView, useSpring, useTransform } from 'motion/react';
+import { useEffect, useRef } from 'react';
 
 // Configuration for the spring physics used in the Apple-like counter
 const SPRING_CONFIG = { damping: 30, stiffness: 400, mass: 1 };
@@ -50,7 +50,8 @@ export function AnimatedCounter({
 	const isInView = useInView(ref, { once: true, margin: '-10% 0px' });
 
 	// Convert value to string to parse out individual characters (digits, letters, chars)
-	const valueStr = typeof value === 'number' ? value.toLocaleString() : String(value);
+	const valueStr =
+		typeof value === 'number' ? value.toLocaleString() : String(value);
 
 	// For the initial scroll effect mimicking the counter starting from 0,
 	// we only trigger the actual final value when the component comes into view.
@@ -59,7 +60,10 @@ export function AnimatedCounter({
 	let digitIndex = 0; // tracking actual digit positions from right-to-left for place values
 
 	return (
-		<span ref={ref} className={`inline-flex items-center leading-none ${className}`}>
+		<span
+			ref={ref}
+			className={`inline-flex items-center leading-none ${className}`}
+		>
 			{valueStr.split('').map((char, i) => {
 				// If it's not a number (e.g. comma, decimal), just render it static
 				if (Number.isNaN(parseInt(char, 10))) {
@@ -76,7 +80,9 @@ export function AnimatedCounter({
 				const digit = parseInt(char, 10);
 				const place = digitIndex++;
 
-				return <Digit key={`digit-col-${place}`} value={isInView ? digit : 0} />;
+				return (
+					<Digit key={`digit-col-${place}`} value={isInView ? digit : 0} />
+				);
 			})}
 		</span>
 	);

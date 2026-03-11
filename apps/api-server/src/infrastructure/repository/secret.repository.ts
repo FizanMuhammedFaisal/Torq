@@ -30,6 +30,18 @@ export class SecrectRepository implements ISecrectRepository {
 		}
 	}
 
+	async findByWorkflowId(workflowId: string): Promise<Secret[]> {
+		try {
+			const results = await getExecutor().query.secrets.findMany({
+				where: eq(secrets.workflowId, workflowId),
+			});
+
+			return results.map((result) => this.mapper.toDomain(result));
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'Secret' });
+		}
+	}
+
 	async save(entity: Secret): Promise<Secret> {
 		try {
 			const persistenceModel = this.mapper.toPersistence(entity);

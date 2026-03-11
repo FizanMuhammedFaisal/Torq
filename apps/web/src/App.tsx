@@ -6,14 +6,14 @@ import { DashboardPage } from '@/pages/dashboard/index';
 import { DashboardLayout } from '@/pages/dashboard/layout';
 import { RunsPage } from '@/pages/dashboard/runs';
 import { SettingsPage } from '@/pages/dashboard/settings';
-import { WorkflowDetailPage } from '@/pages/dashboard/workflow-detail';
+import { WorkflowCreatePage } from '@/pages/dashboard/workflow-create';
+import { WorkflowDetailPage } from '@/pages/dashboard/workflow-detail/index';
 import { WorkflowListPage } from '@/pages/dashboard/workflow-list';
+import { DocsPage } from '@/pages/docs';
+import { ForgotPasswordPage } from '@/pages/forgot-password';
 import { HomePage } from '@/pages/home';
 import { LoginPage } from '@/pages/login';
 import { SignupPage } from '@/pages/signup';
-import { ForgotPasswordPage } from '@/pages/forgot-password';
-import { DocsPage } from '@/pages/docs';
-import { WorkflowCreatePage } from '@/pages/dashboard/workflow-create';
 
 const router = createBrowserRouter([
 	{ path: '/', Component: HomePage },

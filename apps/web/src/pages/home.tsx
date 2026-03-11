@@ -1,9 +1,9 @@
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { useAppConfig } from '@/lib/app-config';
-import { TorqEngine } from '@/components/ui/torq-engine';
 import { FeatureBentoGrid } from '@/components/ui/bento-features';
+import { Button } from '@/components/ui/button';
+import { TorqEngine } from '@/components/ui/torq-engine';
+import { useAppConfig } from '@/lib/app-config';
 
 const ease = [0.25, 1, 0.5, 1] as const;
 const fadeUp = (delay: number) => ({
@@ -39,7 +39,9 @@ export function HomePage() {
 				className="relative z-20 flex items-center justify-between px-6 py-4 md:px-12"
 			>
 				<Link to="/" className="select-none">
-					<span className="text-xl font-black tracking-tighter text-white">torq</span>
+					<span className="text-xl font-black tracking-tighter text-white">
+						torq
+					</span>
 				</Link>
 
 				{authEnabled && (
@@ -75,8 +77,8 @@ export function HomePage() {
 						{...fadeUp(0.28)}
 						className="mt-5 text-[15px] md:text-base text-white/35 leading-relaxed max-w-md"
 					>
-						Design, trigger, and monitor CI/CD pipelines from a&nbsp;single dashboard. Self-host or
-						use the cloud.
+						Design, trigger, and monitor CI/CD pipelines from a&nbsp;single
+						dashboard. Self-host or use the cloud.
 					</motion.p>
 
 					<motion.div
@@ -162,7 +164,8 @@ export function HomePage() {
 			{/* ── Footer ── */}
 			<footer className="relative z-10 flex items-center justify-center pb-10 px-6">
 				<p className="text-[11px] text-white/15 tracking-wide">
-					&copy; {new Date().getFullYear()} Torq &middot; Workflow Execution Platform
+					&copy; {new Date().getFullYear()} Torq &middot; Workflow Execution
+					Platform
 				</p>
 			</footer>
 		</div>

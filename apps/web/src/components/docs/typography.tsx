@@ -1,9 +1,13 @@
+import { ArrowRight01Icon, Link01Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { HugeiconsIcon } from '@hugeicons/react';
-import { Link01Icon, ArrowRight01Icon } from '@hugeicons/core-free-icons';
 
-export const H1 = ({ children, id, className }: React.HTMLAttributes<HTMLHeadingElement>) => (
+export const H1 = ({
+	children,
+	id,
+	className,
+}: React.HTMLAttributes<HTMLHeadingElement>) => (
 	<h1
 		id={id}
 		className={cn(
@@ -15,7 +19,11 @@ export const H1 = ({ children, id, className }: React.HTMLAttributes<HTMLHeading
 	</h1>
 );
 
-export const H2 = ({ children, id, className }: React.HTMLAttributes<HTMLHeadingElement>) => (
+export const H2 = ({
+	children,
+	id,
+	className,
+}: React.HTMLAttributes<HTMLHeadingElement>) => (
 	<div className="group relative mt-16 mb-6">
 		<h2
 			id={id}
@@ -37,7 +45,11 @@ export const H2 = ({ children, id, className }: React.HTMLAttributes<HTMLHeading
 	</div>
 );
 
-export const H3 = ({ children, id, className }: React.HTMLAttributes<HTMLHeadingElement>) => (
+export const H3 = ({
+	children,
+	id,
+	className,
+}: React.HTMLAttributes<HTMLHeadingElement>) => (
 	<h3
 		id={id}
 		className={cn(
@@ -49,22 +61,40 @@ export const H3 = ({ children, id, className }: React.HTMLAttributes<HTMLHeading
 	</h3>
 );
 
-export const P = ({ children, className }: React.HTMLAttributes<HTMLParagraphElement>) => (
-	<p className={cn('leading-7 text-[15px] text-white/60 mb-6 font-light', className)}>{children}</p>
+export const P = ({
+	children,
+	className,
+}: React.HTMLAttributes<HTMLParagraphElement>) => (
+	<p
+		className={cn(
+			'leading-7 text-[15px] text-white/60 mb-6 font-light',
+			className,
+		)}
+	>
+		{children}
+	</p>
 );
 
-export const Ul = ({ children, className }: React.HTMLAttributes<HTMLUListElement>) => (
+export const Ul = ({
+	children,
+	className,
+}: React.HTMLAttributes<HTMLUListElement>) => (
 	<ul className={cn('my-6 ml-6 list-none space-y-2', className)}>
 		{React.Children.map(children, (child) => (
 			<li className="relative">
 				<span className="absolute -left-6 top-1.5 size-1.5 rounded-full bg-white/20" />
-				<span className="text-[15px] text-white/60 font-light leading-7">{child}</span>
+				<span className="text-[15px] text-white/60 font-light leading-7">
+					{child}
+				</span>
 			</li>
 		))}
 	</ul>
 );
 
-export const InlineCode = ({ children, className }: React.HTMLAttributes<HTMLElement>) => (
+export const InlineCode = ({
+	children,
+	className,
+}: React.HTMLAttributes<HTMLElement>) => (
 	<code
 		className={cn(
 			'relative rounded px-[0.3rem] py-[0.15rem] font-mono text-[13px] font-medium bg-white/10 text-emerald-400',

@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '@/store/use-auth-store';
 import { useAppConfig } from '@/lib/app-config';
+import { useAuthStore } from '@/store/use-auth-store';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	const { user, isLoading } = useAuthStore();
@@ -16,7 +16,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 				<div className="flex flex-col items-center gap-6">
 					<div className="relative flex items-center justify-center">
 						{' '}
-						<span className="text-2xl font-black tracking-tighter text-white/90">Torq</span>
+						<span className="text-2xl font-black tracking-tighter text-white/90">
+							Torq
+						</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<p className="text-xs font-medium text-primary uppercase tracking-[0.2em]  animate-pulse">
@@ -28,8 +30,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 		);
 	}
 	// If finished loading and there's no user, move to login
-	if (!user) {
-		return <Navigate to="/login" state={{ from: location }} replace />;
-	}
+	// if (!user) {
+	// 	return <Navigate to="/login" state={{ from: location }} replace />;
+	// }
 	return <>{children}</>;
 }

@@ -1,3 +1,5 @@
+import { ArrowLeft02Icon, ArrowRight02Icon } from '@hugeicons/core-free-icons';
+import { HugeiconsIcon } from '@hugeicons/react';
 import {
 	type ColumnDef,
 	type ColumnFiltersState,
@@ -12,8 +14,6 @@ import {
 } from '@tanstack/react-table';
 import { AnimatePresence, motion } from 'motion/react';
 import * as React from 'react';
-import { ArrowLeft02Icon, ArrowRight02Icon } from '@hugeicons/core-free-icons';
-import { HugeiconsIcon } from '@hugeicons/react';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -44,8 +44,11 @@ export function DataTable<TData, TValue>({
 	onRowClick,
 }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = React.useState<SortingState>([]);
-	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+		[],
+	);
+	const [columnVisibility, setColumnVisibility] =
+		React.useState<VisibilityState>({});
 
 	const table = useReactTable({
 		data,
@@ -108,7 +111,10 @@ export function DataTable<TData, TValue>({
 								<Table className="relative min-w-full">
 									<TableHeader className="bg-[#0a0a0a] sticky top-0 z-20">
 										{table.getHeaderGroups().map((headerGroup) => (
-											<TableRow key={headerGroup.id} className="border-none hover:bg-transparent">
+											<TableRow
+												key={headerGroup.id}
+												className="border-none hover:bg-transparent"
+											>
 												{headerGroup.headers.map((header) => {
 													return (
 														<TableHead
@@ -117,7 +123,10 @@ export function DataTable<TData, TValue>({
 														>
 															{header.isPlaceholder
 																? null
-																: flexRender(header.column.columnDef.header, header.getContext())}
+																: flexRender(
+																		header.column.columnDef.header,
+																		header.getContext(),
+																	)}
 														</TableHead>
 													);
 												})}
@@ -137,7 +146,10 @@ export function DataTable<TData, TValue>({
 														key={cell.id}
 														className="px-4 py-3.5 align-middle group-first:rounded-t-xl group-last:rounded-b-xl"
 													>
-														{flexRender(cell.column.columnDef.cell, cell.getContext())}
+														{flexRender(
+															cell.column.columnDef.cell,
+															cell.getContext(),
+														)}
 													</TableCell>
 												))}
 											</TableRow>
@@ -163,10 +175,13 @@ export function DataTable<TData, TValue>({
 
 									<div className="flex items-center gap-3 text-[12px] text-white/60 font-medium px-4 tracking-wide select-none">
 										<span>
-											Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+											Page {table.getState().pagination.pageIndex + 1} of{' '}
+											{table.getPageCount()}
 										</span>
 										<span className="size-1 rounded-full bg-white/10" />
-										<span>Total: {table.getFilteredRowModel().rows.length}</span>
+										<span>
+											Total: {table.getFilteredRowModel().rows.length}
+										</span>
 									</div>
 
 									<Button

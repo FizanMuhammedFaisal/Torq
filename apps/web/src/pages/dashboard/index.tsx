@@ -3,25 +3,52 @@ import {
 	ArrowRight01Icon,
 	CheckListIcon,
 	File02Icon,
+	GearsIcon,
+	GridIcon,
 	PlusSignIcon,
 	RefreshIcon,
-	GridIcon,
-	GearsIcon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'motion/react';
-import { Button } from '@/components/ui/button';
+import { useMemo } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
-import { useWorkflows } from '@/features/workflows/api/use-workflows';
+import { Button } from '@/components/ui/button';
 import { statusConfig } from '@/features/workflows/config';
+import { MOCK_WORKFLOWS } from '@/features/workflows/hooks/mock-data';
 
 export function DashboardPage() {
 	const navigate = useNavigate();
 	const context = useOutletContext<{ isCollapsed?: boolean }>();
 	const isCollapsed = context?.isCollapsed ?? true;
 
-	const { workflows, metrics, isLoading, error, retry } = useWorkflows();
+	const {
+		data: workflows = [],
+		isLoading,
+		error,
+		refetch: retry,
+	} = useQuery({
+		queryKey: ['workflows', 'dashboard'],
+		queryFn: async () => {
+			await new Promise((resolve) => setTimeout(resolve, 800));
+			return Array.from({ length: 5 }).flatMap((_, i) =>
+				MOCK_WORKFLOWS.map((wf) => ({
+					...wf,
+					id: `${wf.id}-${i}`,
+					name: i === 0 ? wf.name : `${wf.name} (Copy ${i})`,
+				})),
+			);
+		},
+	});
+
+	const metrics = useMemo(() => {
+		return {
+			total: workflows.length,
+			running: workflows.filter((w) => w.status === 'running').length,
+			failed: workflows.filter((w) => w.status === 'failed').length,
+		};
+	}, [workflows]);
 
 	// Mocking Auth State
 	const isAuthEnabledAndLoggedIn = true;
@@ -43,7 +70,8 @@ export function DashboardPage() {
 							<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-20"></span>
 							<span className="relative inline-flex size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
 						</span>
-						Torq Engine via {isAuthEnabledAndLoggedIn ? mockUserName : 'Default Namespace'}
+						Torq Engine via{' '}
+						{isAuthEnabledAndLoggedIn ? mockUserName : 'Default Namespace'}
 					</p>
 				</div>
 				<AnimatePresence>
@@ -55,7 +83,11 @@ export function DashboardPage() {
 							transition={{ duration: 0.2 }}
 						>
 							<Button className="gap-2 rounded-full px-5 text-[13px] font-bold h-9 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.3)] bg-emerald-400 text-emerald-950 hover:bg-emerald-500 border-0">
-								<HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
+								<HugeiconsIcon
+									icon={PlusSignIcon}
+									className="size-4"
+									strokeWidth={2.5}
+								/>
 								New Workflow
 							</Button>
 						</motion.div>
@@ -78,12 +110,24 @@ export function DashboardPage() {
 										initial={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
 										animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
 										exit={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
-										transition={{ duration: 0.8, delay: 0.2, ease: [0.25, 1, 0.5, 1] }}
+										transition={{
+											duration: 0.8,
+											delay: 0.2,
+											ease: [0.25, 1, 0.5, 1],
+										}}
 									>
 										<motion.div
 											className="opacity-[0.06] group-hover:opacity-[0.12] transition-opacity duration-500"
-											animate={{ y: [0, -10, 0], scale: [1, 1.05, 1], rotate: [0, 2, 0] }}
-											transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+											animate={{
+												y: [0, -10, 0],
+												scale: [1, 1.05, 1],
+												rotate: [0, 2, 0],
+											}}
+											transition={{
+												duration: 6,
+												repeat: Infinity,
+												ease: 'easeInOut',
+											}}
 										>
 											<HugeiconsIcon
 												icon={GridIcon}
@@ -102,7 +146,9 @@ export function DashboardPage() {
 							</div>
 							<div className="text-[48px] font-mono font-bold tracking-tight relative z-10 mt-1 flex items-center text-white/95 drop-shadow-sm h-[48px]">
 								{isLoading ? (
-									<span className="text-white/20 animate-pulse leading-none">--</span>
+									<span className="text-white/20 animate-pulse leading-none">
+										--
+									</span>
 								) : (
 									<AnimatedCounter className="h-full" value={metrics.total} />
 								)}
@@ -120,14 +166,26 @@ export function DashboardPage() {
 										initial={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
 										animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
 										exit={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
-										transition={{ duration: 0.8, delay: 0.35, ease: [0.25, 1, 0.5, 1] }}
+										transition={{
+											duration: 0.8,
+											delay: 0.35,
+											ease: [0.25, 1, 0.5, 1],
+										}}
 									>
 										<motion.div
 											className="opacity-[0.06] group-hover:opacity-[0.14] transition-opacity duration-500"
 											animate={{ rotate: 360, scale: [1, 1.03, 1] }}
 											transition={{
-												rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
-												scale: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+												rotate: {
+													duration: 20,
+													repeat: Infinity,
+													ease: 'linear',
+												},
+												scale: {
+													duration: 4,
+													repeat: Infinity,
+													ease: 'easeInOut',
+												},
 											}}
 										>
 											<HugeiconsIcon
@@ -147,7 +205,9 @@ export function DashboardPage() {
 							</div>
 							<div className="text-[48px] font-mono font-bold tracking-tight relative z-10 mt-1 flex items-center text-white/95 drop-shadow-sm h-[48px]">
 								{isLoading ? (
-									<span className="text-white/20 animate-pulse leading-none">--</span>
+									<span className="text-white/20 animate-pulse leading-none">
+										--
+									</span>
 								) : (
 									<AnimatedCounter className="h-full" value={metrics.running} />
 								)}
@@ -165,7 +225,11 @@ export function DashboardPage() {
 										initial={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
 										animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
 										exit={{ opacity: 0, filter: 'blur(16px)', scale: 0.8 }}
-										transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 1, 0.5, 1] }}
+										transition={{
+											duration: 0.8,
+											delay: 0.5,
+											ease: [0.25, 1, 0.5, 1],
+										}}
 									>
 										<motion.div
 											className="opacity-[0.05] group-hover:opacity-[0.15] transition-all duration-500"
@@ -173,7 +237,11 @@ export function DashboardPage() {
 												scale: [1, 1.08, 1],
 												filter: ['blur(0px)', 'blur(1px)', 'blur(0px)'],
 											}}
-											transition={{ duration: 2.5, repeat: Infinity, ease: 'backInOut' }}
+											transition={{
+												duration: 2.5,
+												repeat: Infinity,
+												ease: 'backInOut',
+											}}
 										>
 											<HugeiconsIcon
 												icon={Alert02Icon}
@@ -192,7 +260,9 @@ export function DashboardPage() {
 							</div>
 							<div className="text-[48px] font-mono font-bold tracking-tight relative z-10 mt-1 flex items-center text-white/95 drop-shadow-sm h-[48px]">
 								{isLoading ? (
-									<span className="text-white/20 animate-pulse leading-none">--</span>
+									<span className="text-white/20 animate-pulse leading-none">
+										--
+									</span>
 								) : (
 									<AnimatedCounter className="h-full" value={metrics.failed} />
 								)}
@@ -205,7 +275,10 @@ export function DashboardPage() {
 						<div className="flex items-center justify-between mb-5">
 							<div className="flex items-center gap-2">
 								<div className="size-6 rounded-md bg-white/[0.03] border border-white/[0.05] flex items-center justify-center">
-									<HugeiconsIcon icon={CheckListIcon} className="size-3.5 text-white/60" />
+									<HugeiconsIcon
+										icon={CheckListIcon}
+										className="size-3.5 text-white/60"
+									/>
 								</div>
 								<h2 className="text-[16px] font-semibold text-white/90 tracking-tight">
 									Recent Executions
@@ -217,21 +290,29 @@ export function DashboardPage() {
 								onClick={() => navigate('/dashboard/workflows')}
 							>
 								View All
-								<HugeiconsIcon icon={ArrowRight01Icon} className="size-3.5 opacity-70" />
+								<HugeiconsIcon
+									icon={ArrowRight01Icon}
+									className="size-3.5 opacity-70"
+								/>
 							</Button>
 						</div>
 
 						{error ? (
 							<div className="border border-red-500/20 bg-red-500/[0.02] rounded-2xl p-8 flex flex-col items-center justify-center text-center mt-2 shadow-sm">
 								<div className="size-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
-									<HugeiconsIcon icon={Alert02Icon} className="size-6 text-red-400" />
+									<HugeiconsIcon
+										icon={Alert02Icon}
+										className="size-6 text-red-400"
+									/>
 								</div>
 								<h3 className="text-[16px] font-semibold text-white/90 mb-1">
 									Failed to load executions
 								</h3>
-								<p className="text-[14px] text-white/50 max-w-sm mb-6">{error.message}</p>
+								<p className="text-[14px] text-white/50 max-w-sm mb-6">
+									{error.message}
+								</p>
 								<Button
-									onClick={retry}
+									onClick={() => retry()}
 									variant="outline"
 									className="gap-2 h-9 rounded-full px-5 border-white/[0.08] hover:bg-white/[0.04]"
 								>
@@ -260,14 +341,17 @@ export function DashboardPage() {
 						) : recentWorkflows.length === 0 ? (
 							<div className="border border-dashed border-white/[0.1] bg-white/[0.01] rounded-2xl p-12 flex flex-col items-center justify-center text-center mt-2">
 								<div className="size-12 rounded-full bg-white/[0.03] flex items-center justify-center mb-4 border border-white/[0.05]">
-									<HugeiconsIcon icon={File02Icon} className="size-5 text-white/40" />
+									<HugeiconsIcon
+										icon={File02Icon}
+										className="size-5 text-white/40"
+									/>
 								</div>
 								<h3 className="text-[16px] font-semibold text-white/90 mb-1.5">
 									No recent executions
 								</h3>
 								<p className="text-[14px] text-white/40 max-w-sm mb-6">
-									You don't have any workflow runs in this namespace yet. Create and run a workflow
-									to see activity here.
+									You don't have any workflow runs in this namespace yet. Create
+									and run a workflow to see activity here.
 								</p>
 								<Button
 									onClick={() => navigate('/dashboard/workflows/new')}
@@ -284,7 +368,9 @@ export function DashboardPage() {
 										return (
 											<div
 												key={wf.id}
-												onClick={() => navigate(`/dashboard/workflows/${wf.id}`)}
+												onClick={() =>
+													navigate(`/dashboard/workflows/${wf.id}`)
+												}
 												className="group flex flex-col sm:flex-row sm:items-center gap-6 px-8 py-6 hover:bg-white/[0.03] transition-colors cursor-pointer relative overflow-hidden"
 											>
 												{/* Subtle hover gradient */}

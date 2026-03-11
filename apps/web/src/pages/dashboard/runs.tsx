@@ -11,6 +11,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import {
@@ -23,10 +24,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { type Run, useRuns } from '@/features/workflows/api/use-runs';
 import { statusConfig } from '@/features/workflows/config';
+import { type Run, useRuns } from '@/features/workflows/hooks/use-runs';
 import { useAppConfig } from '@/lib/app-config';
-import { AnimatedCounter } from '@/components/ui/animated-counter';
 
 /* ── Page ─── */
 
@@ -110,7 +110,11 @@ export function RunsPage() {
 				header: 'Date',
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2 text-[13px] text-white/60 whitespace-nowrap">
-						{row.original.date ? row.original.date : <span className="text-white/20">—</span>}
+						{row.original.date ? (
+							row.original.date
+						) : (
+							<span className="text-white/20">—</span>
+						)}
 					</div>
 				),
 			},
@@ -122,7 +126,9 @@ export function RunsPage() {
 						<span className="text-[13px] font-mono text-white/80">
 							{row.original.duration || '—'}
 						</span>
-						<span className="text-[11.5px] text-white/30">{row.original.steps} steps</span>
+						<span className="text-[11.5px] text-white/30">
+							{row.original.steps} steps
+						</span>
 					</div>
 				),
 			},
@@ -160,7 +166,11 @@ export function RunsPage() {
 												navigate(`/dashboard/workflows/${run.workflowId}`);
 											}}
 										>
-											<HugeiconsIcon icon={EyeIcon} className="size-4" strokeWidth={2} />
+											<HugeiconsIcon
+												icon={EyeIcon}
+												className="size-4"
+												strokeWidth={2}
+											/>
 											View Run Logs
 										</DropdownMenuItem>
 									</DropdownMenuGroup>
@@ -185,7 +195,9 @@ export function RunsPage() {
 			<div className="flex flex-col gap-6 px-6 lg:px-8 py-6 border-b border-white/[0.05] bg-[#0c0c0c]">
 				<div>
 					<div className="flex items-center gap-3 mb-2">
-						<h1 className="text-2xl font-bold tracking-tight text-white">Live Feed</h1>
+						<h1 className="text-2xl font-bold tracking-tight text-white">
+							Live Feed
+						</h1>
 						<div className="flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/[0.05] px-2.5 py-1 backdrop-blur-md">
 							<span className="relative flex size-1.5 items-center justify-center">
 								<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
@@ -197,8 +209,8 @@ export function RunsPage() {
 						</div>
 					</div>
 					<p className="text-[13.5px] text-white/40 flex items-center gap-2 max-w-2xl">
-						This view represents every chronological execution hitting the engine across all
-						workflows globally.
+						This view represents every chronological execution hitting the
+						engine across all workflows globally.
 					</p>
 				</div>
 
@@ -249,7 +261,10 @@ export function RunsPage() {
 								<span className="animate-pulse opacity-20">---</span>
 							) : (
 								<>
-									<AnimatedCounter className="h-full" value={metrics.failed24h} />
+									<AnimatedCounter
+										className="h-full"
+										value={metrics.failed24h}
+									/>
 									<span className="text-red-400 text-[13px] tracking-normal font-sans py-1 mt-1">
 										in 24hrs
 									</span>
@@ -287,7 +302,10 @@ export function RunsPage() {
 									/>
 								}
 							>
-								<HugeiconsIcon icon={FilterIcon} className="size-4 text-white/50" />
+								<HugeiconsIcon
+									icon={FilterIcon}
+									className="size-4 text-white/50"
+								/>
 								<span className="text-[13px] font-medium text-white/80">
 									{' '}
 									Status: {statusFilter === 'all' ? 'All' : statusFilter}
@@ -337,12 +355,17 @@ export function RunsPage() {
 						{error ? (
 							<div className="border border-red-500/20 bg-red-500/[0.02] rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm">
 								<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
-									<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
+									<HugeiconsIcon
+										icon={Alert02Icon}
+										className="size-8 text-red-400"
+									/>
 								</div>
 								<h3 className="text-[18px] font-semibold text-white/90 mb-2">
 									Failed to fetch run logs
 								</h3>
-								<p className="text-[14px] text-white/50 max-w-sm mb-8">{error.message}</p>
+								<p className="text-[14px] text-white/50 max-w-sm mb-8">
+									{error.message}
+								</p>
 								<Button
 									onClick={retry}
 									variant="outline"
@@ -360,7 +383,10 @@ export function RunsPage() {
 								</div>
 								<div className="flex flex-col">
 									{[1, 2, 3, 4, 5, 6].map((i) => (
-										<div key={i} className="flex items-center gap-6 px-4 py-3.5">
+										<div
+											key={i}
+											className="flex items-center gap-6 px-4 py-3.5"
+										>
 											<div className="flex items-center gap-4 w-1/3">
 												<div className="size-2.5 rounded-full bg-white/[0.03] animate-pulse" />
 												<div className="flex flex-col gap-2 w-full">
@@ -375,10 +401,15 @@ export function RunsPage() {
 									))}
 								</div>
 							</div>
-						) : filteredRuns.length === 0 && !searchQuery && statusFilter === 'all' ? (
+						) : filteredRuns.length === 0 &&
+							!searchQuery &&
+							statusFilter === 'all' ? (
 							<div className="border border-dashed border-white/10 bg-white/1 rounded-2xl p-16 flex flex-col items-center justify-center text-center mt-2">
 								<div className="size-16 rounded-full bg-white/3 flex items-center justify-center mb-6 border border-white/5">
-									<HugeiconsIcon icon={File02Icon} className="size-7 text-white/40" />
+									<HugeiconsIcon
+										icon={File02Icon}
+										className="size-7 text-white/40"
+									/>
 								</div>
 								<h3 className="text-[18px] font-semibold text-white/90 mb-2">
 									No executions found
@@ -393,7 +424,9 @@ export function RunsPage() {
 								data={filteredRuns}
 								searchKey="workflowName"
 								searchQuery={searchQuery}
-								onRowClick={(run) => navigate(`/dashboard/workflows/${run.workflowId}`)}
+								onRowClick={(run) =>
+									navigate(`/dashboard/workflows/${run.workflowId}`)
+								}
 								noResultsMessage="No runs found"
 								noResultsSubtext={
 									searchQuery || statusFilter !== 'all'

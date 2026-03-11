@@ -48,10 +48,12 @@ export function useSignup(): UseSignupReturn {
 		setIsPending(true);
 
 		try {
-			const { error: apiError } = await authClient.emailOtp.sendVerificationOtp({
-				email: data.email,
-				type: 'sign-in',
-			});
+			const { error: apiError } = await authClient.emailOtp.sendVerificationOtp(
+				{
+					email: data.email,
+					type: 'sign-in',
+				},
+			);
 
 			if (apiError) {
 				const msg = apiError.message || 'Failed to send OTP';
@@ -65,7 +67,8 @@ export function useSignup(): UseSignupReturn {
 			setResendCooldown(60);
 			setStep('otp');
 		} catch (err: any) {
-			const msg = err?.message || 'An internal error occurred. Please try again.';
+			const msg =
+				err?.message || 'An internal error occurred. Please try again.';
 			setError(msg);
 			toast.error(msg);
 		} finally {
@@ -95,14 +98,20 @@ export function useSignup(): UseSignupReturn {
 				if (result.data?.session && result.data?.user) {
 					useAuthStore
 						.getState()
-						.setAuth(result.data.user, result.data.session, result.data.session.token || null);
+						.setAuth(
+							result.data.user,
+							result.data.session,
+							result.data.session.token || null,
+						);
 				}
 
 				toast.success('Successfully verified & signed in');
 				navigate('/dashboard');
 			} catch (err: unknown) {
 				const msg =
-					err instanceof Error ? err.message : 'An internal error occurred. Please try again.';
+					err instanceof Error
+						? err.message
+						: 'An internal error occurred. Please try again.';
 				setError(msg);
 				toast.error(msg);
 			} finally {
@@ -119,10 +128,12 @@ export function useSignup(): UseSignupReturn {
 		setIsPending(true);
 
 		try {
-			const { error: apiError } = await authClient.emailOtp.sendVerificationOtp({
-				email: emailRef.current,
-				type: 'sign-in',
-			});
+			const { error: apiError } = await authClient.emailOtp.sendVerificationOtp(
+				{
+					email: emailRef.current,
+					type: 'sign-in',
+				},
+			);
 
 			if (apiError) {
 				const msg = apiError.message || 'Failed to resend OTP';
@@ -134,7 +145,8 @@ export function useSignup(): UseSignupReturn {
 			toast.success('Code resent');
 			setResendCooldown(60);
 		} catch (err: any) {
-			const msg = err?.message || 'An internal error occurred. Please try again.';
+			const msg =
+				err?.message || 'An internal error occurred. Please try again.';
 			setError(msg);
 			toast.error(msg);
 		} finally {

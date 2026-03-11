@@ -25,8 +25,12 @@ function BentoCard({
 				{children}
 			</div>
 			<div className="p-6">
-				<h3 className="text-base font-semibold text-white/90 tracking-tight mb-2">{title}</h3>
-				<p className="text-sm text-white/40 leading-relaxed font-normal">{desc}</p>
+				<h3 className="text-base font-semibold text-white/90 tracking-tight mb-2">
+					{title}
+				</h3>
+				<p className="text-sm text-white/40 leading-relaxed font-normal">
+					{desc}
+				</p>
 			</div>
 		</div>
 	);
@@ -216,7 +220,12 @@ function ArtifactsGraphic() {
 					className="absolute top-0 flex flex-col items-center justify-center gap-2"
 					initial={{ y: 0 }}
 					animate={{ y: [0, -8, 0] }}
-					transition={{ duration: 4, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
+					transition={{
+						duration: 4,
+						delay: 2,
+						repeat: Infinity,
+						ease: 'easeInOut',
+					}}
 				>
 					<div className="w-8 h-10 rounded-sm border border-cyan-500/50 bg-cyan-500/10 shadow-[0_0_15px_rgba(14,165,233,0.3)] flex items-center justify-center group-hover:border-cyan-500 group-hover:bg-cyan-500/20 transition-colors duration-200">
 						<div className="w-4 h-1 bg-cyan-500/50 rounded-full group-hover:bg-cyan-400 transition-colors duration-200" />
@@ -301,7 +310,12 @@ function SelfHostGraphic() {
 							<motion.div
 								className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(16,185,129,0.8)]"
 								animate={{ opacity: [0.4, 1, 0.4] }}
-								transition={{ duration: 1.5, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
+								transition={{
+									duration: 1.5,
+									repeat: Infinity,
+									ease: 'linear',
+									delay: i * 0.5,
+								}}
 							/>
 						</div>
 					</motion.div>
@@ -325,8 +339,8 @@ export function FeatureBentoGrid() {
 					Built for execution speed
 				</h2>
 				<p className="text-base text-white/40 max-w-lg mx-auto">
-					Every tool you need to run, monitor, and scale your workflows. Perfectly sized for clarity
-					and speed.
+					Every tool you need to run, monitor, and scale your workflows.
+					Perfectly sized for clarity and speed.
 				</p>
 			</motion.div>
 
@@ -370,7 +384,11 @@ export function FeatureBentoGrid() {
 					transition={{ duration: 0.5, delay: 0.2 }}
 					className="sm:col-span-1 md:col-span-2"
 				>
-					<BentoCard title="Run History" desc="Audit trail of every execution." className="h-full">
+					<BentoCard
+						title="Run History"
+						desc="Audit trail of every execution."
+						className="h-full"
+					>
 						<HistoryGraphic />
 					</BentoCard>
 				</motion.div>
@@ -382,7 +400,11 @@ export function FeatureBentoGrid() {
 					transition={{ duration: 0.5, delay: 0.3 }}
 					className="sm:col-span-1 md:col-span-2"
 				>
-					<BentoCard title="Artifacts" desc="Download build outputs instantly." className="h-full">
+					<BentoCard
+						title="Artifacts"
+						desc="Download build outputs instantly."
+						className="h-full"
+					>
 						<ArtifactsGraphic />
 					</BentoCard>
 				</motion.div>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { CheckmarkBadge01Icon, Copy01Icon } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { Copy01Icon, CheckmarkBadge01Icon } from '@hugeicons/core-free-icons';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { YamlEditor } from '../yaml-editor';
 
@@ -34,7 +34,9 @@ export function CodeBlock({
 			<div className="flex items-center justify-between px-4 h-10 border-b border-white/5 bg-[#050505]/50">
 				<div className="flex items-center gap-2">
 					{filename && (
-						<span className="text-[13px] font-mono text-emerald-400/80">{filename}</span>
+						<span className="text-[13px] font-mono text-emerald-400/80">
+							{filename}
+						</span>
 					)}
 					{!filename && (
 						<span className="text-[12px] font-mono text-white/40 uppercase tracking-widest">
@@ -47,7 +49,10 @@ export function CodeBlock({
 					onClick={handleCopy}
 					className="flex items-center gap-1.5 text-white/40 hover:text-white transition-colors opacity-0 group-hover:opacity-100"
 				>
-					<HugeiconsIcon icon={copied ? CheckmarkBadge01Icon : Copy01Icon} className="size-3.5" />
+					<HugeiconsIcon
+						icon={copied ? CheckmarkBadge01Icon : Copy01Icon}
+						className="size-3.5"
+					/>
 					<span className="text-[11px] font-medium tracking-wide uppercase">
 						{copied ? 'Copied' : 'Copy'}
 					</span>

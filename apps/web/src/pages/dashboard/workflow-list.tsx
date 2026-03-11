@@ -9,10 +9,11 @@ import {
 	Search01Icon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
+import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { DataTable } from '@/components/ui/data-table';
@@ -26,9 +27,9 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useWorkflows } from '@/features/workflows/api/use-workflows';
 import { statusConfig } from '@/features/workflows/config';
-import type { Workflow } from '@/features/workflows/types';
+import { MOCK_WORKFLOWS } from '@/features/workflows/hooks/mock-data';
+import type { Workflow, WorkflowStatus } from '@/features/workflows/types';
 import { useAppConfig } from '@/lib/app-config';
 
 /* ── Page ─── */
@@ -37,27 +38,58 @@ export function WorkflowListPage() {
 	const navigate = useNavigate();
 	const context = useOutletContext<{ isCollapsed?: boolean }>();
 	const isCollapsed = context?.isCollapsed ?? true;
+	const queryClient = useQueryClient();
+
+	const [searchQuery, setSearchQuery] = useState('');
+	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>(
+		'all',
+	);
+	const [deleteTarget, setDeleteTarget] = useState<Workflow | null>(null);
 
 	const {
-		workflows: filteredWorkflows,
-		metrics,
-		searchQuery,
-		setSearchQuery,
-		statusFilter,
-		setStatusFilter,
-		handleDelete: deleteWorkflow,
+		data: workflows = [],
 		isLoading,
 		error,
-		retry,
-	} = useWorkflows();
+		refetch: retry,
+	} = useQuery({
+		queryKey: ['workflows', 'list'],
+		queryFn: async () => {
+			await new Promise((resolve) => setTimeout(resolve, 800));
+			return Array.from({ length: 5 }).flatMap((_, i) =>
+				MOCK_WORKFLOWS.map((wf) => ({
+					...wf,
+					id: `${wf.id}-${i}`,
+					name: i === 0 ? wf.name : `${wf.name} (Copy ${i})`,
+				})),
+			);
+		},
+	});
 
-	const [deleteTarget, setDeleteTarget] = useState<Workflow | null>(null);
+	const filteredWorkflows = useMemo(() => {
+		return workflows.filter((wf) => {
+			const matchesStatus =
+				statusFilter === 'all' || wf.status === statusFilter;
+			return matchesStatus; // search handles name/desc natively via TanStack Table
+		});
+	}, [workflows, statusFilter]);
+
+	const metrics = useMemo(() => {
+		return {
+			total: workflows.length,
+			running: workflows.filter((w) => w.status === 'running').length,
+			failed: workflows.filter((w) => w.status === 'failed').length,
+		};
+	}, [workflows]);
 
 	const { authEnabled } = useAppConfig();
 
 	const handleDelete = () => {
 		if (!deleteTarget) return;
-		deleteWorkflow(deleteTarget.id);
+		queryClient.setQueryData(
+			['workflows', 'list'],
+			(old: Workflow[] | undefined) =>
+				old ? old.filter((w) => w.id !== deleteTarget.id) : [],
+		);
 		setDeleteTarget(null);
 	};
 
@@ -100,7 +132,9 @@ export function WorkflowListPage() {
 										{cfg.label.toUpperCase()}
 									</span>
 								</div>
-								<span className="text-[13px] text-white/40 truncate pr-4">{wf.description}</span>
+								<span className="text-[13px] text-white/40 truncate pr-4">
+									{wf.description}
+								</span>
 							</div>
 						</div>
 					);
@@ -137,7 +171,11 @@ export function WorkflowListPage() {
 				header: 'Last Run',
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2 text-[13px] text-white/60 whitespace-nowrap">
-						{row.original.lastRun ? row.original.lastRun : <span className="text-white/20">—</span>}
+						{row.original.lastRun ? (
+							row.original.lastRun
+						) : (
+							<span className="text-white/20">—</span>
+						)}
 					</div>
 				),
 			},
@@ -149,7 +187,9 @@ export function WorkflowListPage() {
 						<span className="text-[13px] font-mono text-white/80">
 							{row.original.duration || '—'}
 						</span>
-						<span className="text-[11.5px] text-white/30">{row.original.steps} steps</span>
+						<span className="text-[11.5px] text-white/30">
+							{row.original.steps} steps
+						</span>
 					</div>
 				),
 			},
@@ -184,7 +224,11 @@ export function WorkflowListPage() {
 												navigate(`/dashboard/workflows/${wf.id}`);
 											}}
 										>
-											<HugeiconsIcon icon={EyeIcon} className="size-4" strokeWidth={2} />
+											<HugeiconsIcon
+												icon={EyeIcon}
+												className="size-4"
+												strokeWidth={2}
+											/>
 											View Details
 										</DropdownMenuItem>
 									</DropdownMenuGroup>
@@ -236,10 +280,13 @@ export function WorkflowListPage() {
 			{/* Header */}
 			<div className="flex items-center justify-between px-6 lg:px-8 py-6 border-b border-white/[0.05] bg-[#0c0c0c]">
 				<div>
-					<h1 className="text-2xl font-bold tracking-tight text-white">Workflows</h1>
+					<h1 className="text-2xl font-bold tracking-tight text-white">
+						Workflows
+					</h1>
 					<p className="text-[13.5px] text-white/40 mt-1.5 flex items-center gap-2">
 						<span className="inline-flex size-2 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-						Connected to Torq Engine {authEnabled ? `(Workspace)` : '(Default Namespace)'}
+						Connected to Torq Engine{' '}
+						{authEnabled ? `(Workspace)` : '(Default Namespace)'}
 					</p>
 				</div>
 				<AnimatePresence>
@@ -251,7 +298,11 @@ export function WorkflowListPage() {
 							transition={{ duration: 0.2 }}
 						>
 							<Button className="gap-2 rounded-full px-5 text-[13px] font-bold h-9 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.3)] bg-emerald-400 text-emerald-950 hover:bg-emerald-500 border-0">
-								<HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
+								<HugeiconsIcon
+									icon={PlusSignIcon}
+									className="size-4"
+									strokeWidth={2.5}
+								/>
 								New Workflow
 							</Button>
 						</motion.div>
@@ -286,7 +337,10 @@ export function WorkflowListPage() {
 									/>
 								}
 							>
-								<HugeiconsIcon icon={FilterIcon} className="size-4 text-white/50" />
+								<HugeiconsIcon
+									icon={FilterIcon}
+									className="size-4 text-white/50"
+								/>
 								<span className="text-[13px] font-medium text-white/80">
 									{' '}
 									Status: {statusFilter === 'all' ? 'All' : statusFilter}
@@ -336,14 +390,19 @@ export function WorkflowListPage() {
 						{error ? (
 							<div className="border border-red-500/20 bg-red-500/[0.02] rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm">
 								<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
-									<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
+									<HugeiconsIcon
+										icon={Alert02Icon}
+										className="size-8 text-red-400"
+									/>
 								</div>
 								<h3 className="text-[18px] font-semibold text-white/90 mb-2">
 									Failed to load workflows
 								</h3>
-								<p className="text-[14px] text-white/50 max-w-sm mb-8">{error.message}</p>
+								<p className="text-[14px] text-white/50 max-w-sm mb-8">
+									{error.message}
+								</p>
 								<Button
-									onClick={retry}
+									onClick={() => retry()}
 									variant="outline"
 									className="gap-2 h-10 rounded-full px-6 border-white/[0.08] hover:bg-white/[0.04]"
 								>
@@ -359,7 +418,10 @@ export function WorkflowListPage() {
 								</div>
 								<div className="flex flex-col">
 									{[1, 2, 3, 4, 5].map((i) => (
-										<div key={i} className="flex items-center gap-6 px-4 py-3.5">
+										<div
+											key={i}
+											className="flex items-center gap-6 px-4 py-3.5"
+										>
 											<div className="flex items-center gap-4 w-1/3">
 												<div className="size-2.5 rounded-full bg-white/[0.03] animate-pulse" />
 												<div className="flex flex-col gap-2 w-full">
@@ -374,21 +436,32 @@ export function WorkflowListPage() {
 									))}
 								</div>
 							</div>
-						) : metrics.total === 0 && !searchQuery && statusFilter === 'all' ? (
+						) : metrics.total === 0 &&
+							!searchQuery &&
+							statusFilter === 'all' ? (
 							<div className="border border-dashed border-white/10 bg-white/1 rounded-2xl p-16 flex flex-col items-center justify-center text-center mt-2">
 								<div className="size-16 rounded-full bg-white/3 flex items-center justify-center mb-6 border border-white/5">
-									<HugeiconsIcon icon={File02Icon} className="size-7 text-white/40" />
+									<HugeiconsIcon
+										icon={File02Icon}
+										className="size-7 text-white/40"
+									/>
 								</div>
-								<h3 className="text-[18px] font-semibold text-white/90 mb-2">No workflows found</h3>
+								<h3 className="text-[18px] font-semibold text-white/90 mb-2">
+									No workflows found
+								</h3>
 								<p className="text-[14px] text-white/40 max-w-sm mb-8">
-									You don't have any workflows in this namespace yet. Create your first workflow to
-									start automating.
+									You don't have any workflows in this namespace yet. Create
+									your first workflow to start automating.
 								</p>
 								<Button
 									onClick={() => navigate('/dashboard/workflows/new')}
 									className="gap-2 h-10 rounded-full px-6 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-[0_0_12px_rgba(16,185,129,0.4)]"
 								>
-									<HugeiconsIcon icon={PlusSignIcon} className="size-4" strokeWidth={2.5} />
+									<HugeiconsIcon
+										icon={PlusSignIcon}
+										className="size-4"
+										strokeWidth={2.5}
+									/>
 									Create Workflow
 								</Button>
 							</div>
