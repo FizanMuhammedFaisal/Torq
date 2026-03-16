@@ -14,7 +14,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	constructor(
 		@inject(TOKENS.WorkflowVersionMapper)
 		private readonly mapper: WorkflowVersionMapper,
-	) { }
+	) {}
 
 	async findById(id: string): Promise<WorkflowVersion | null> {
 		try {
@@ -42,7 +42,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 						workflowId: entity.workflowId,
 						version: entity.version,
 						spec: entity.spec,
-						raw: entity.raw
+						raw: entity.raw,
 					},
 				})
 				.returning();

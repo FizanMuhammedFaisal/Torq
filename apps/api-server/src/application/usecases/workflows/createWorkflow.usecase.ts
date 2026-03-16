@@ -7,22 +7,24 @@ import type { IWorkflowVersionRepository } from '@/application/port/repositories
 import type { ICreateWorkflowUseCase } from '@/application/port/usecases/workflows/createWorkflow.interface';
 import type { IUnitOfWork } from '@/application/port/repositories/unitOfWork.interface';
 import { TOKENS } from '@/config/di/tokens';
-import type { SpecValidationService } from '@/infrastructure/services/specValidationService';
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { DSLPipeline } from '@/domain/dsl/pipeline';
 import { Workflow } from '@/domain/entities/workflow';
 import { ulid } from 'ulid';
 import { WorkflowVersion } from '@/domain/entities/workflowVersions';
 import type { UpsertSecretsUseCase } from './upsertSecrets.usecase';
+import type { ISpecParser } from '@/domain/dsl/types';
+
+@injectable()
 export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 	constructor(
 		@inject(TOKENS.WorkflowRepository) private workflowRepository: IWorkflowRepository,
 		@inject(TOKENS.WorkflowVersionRepository)
 		private workflowVersionRepository: IWorkflowVersionRepository,
-		@inject(TOKENS.SpecValidationService) private specValidationService: SpecValidationService,
+		@inject(TOKENS.SpecValidationService) private specValidationService: ISpecParser,
 		@inject(TOKENS.UnitOfWork) private unitOfWork: IUnitOfWork,
 		@inject(TOKENS.UpsertSecretsUseCase) private upsertSecretsUseCase: UpsertSecretsUseCase,
-	) { }
+	) {}
 	// validate json--> validate torq schema as version--> validate semantics per version (DAG)
 	// create the version artifact
 	// create the workflow itself

@@ -71,25 +71,25 @@
 //   }
 // }
 
-export const version = 'v1alpha'
+export const version = 'v1alpha';
 export interface Step {
-    run: string;
+	run: string;
 }
 
 export interface SecretRef {
-    name: string;  // k8s secret name
-    env: string;  // injected as this env var
+	name: string; // k8s secret name
+	env: string; // injected as this env var
 }
 export interface Job {
-    image: string;
-    needs: string[];
-    env?: Record<string, string>;
-    secrets?: SecretRef[];
-    steps: Step[];
+	image: string;
+	needs: string[];
+	env?: Record<string, string>;
+	secrets?: SecretRef[];
+	steps: Step[];
 }
 
 export interface WorkflowV1Alpha {
-    version: typeof version;
-    workflow: string;
-    jobs: Record<string, Job>;
+	version: typeof version;
+	workflow: string;
+	jobs: Record<string, Job>;
 }

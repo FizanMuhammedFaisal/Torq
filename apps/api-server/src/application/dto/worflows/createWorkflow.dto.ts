@@ -1,4 +1,4 @@
-import type { AuthenticatedContext, AuthUser } from '@/presentation/macros/auth.macro';
+import type { AuthUser } from '@/presentation/macros/auth.macro';
 import z from 'zod';
 
 export const CreateWorkflowSchema = z.object({
@@ -16,7 +16,7 @@ export const CreateWorkflowSchema = z.object({
 		.optional(),
 });
 
-export type CreateWorkflowInputDto = z.infer<typeof CreateWorkflowSchema> & { req: AuthUser; }
+export type CreateWorkflowInputDto = z.infer<typeof CreateWorkflowSchema> & { req: AuthUser };
 
 export type CreateWorkflowOutputDto = {
 	id: string;

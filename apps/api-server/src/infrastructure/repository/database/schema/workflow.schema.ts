@@ -46,6 +46,7 @@ export const workflowRelations = relations(workflow, ({ one, many }) => ({
 	}),
 	versions: many(workflowVersion),
 	secrets: many(secrets),
+	runs: many(workflowRun),
 }));
 
 export const workflowVersionRelations = relations(workflowVersion, ({ one }) => ({
@@ -58,6 +59,25 @@ export const workflowVersionRelations = relations(workflowVersion, ({ one }) => 
 export const secretRelations = relations(secrets, ({ one }) => ({
 	workflow: one(workflow, {
 		fields: [secrets.workflowId],
+		references: [workflow.id],
+	}),
+}));
+
+export const workflowRun = pgTable('workflow_run', {
+	id: text('id').primaryKey(),
+	workflowId: text('workflow_id')
+		.notNull()
+		.references(() => workflow.id),
+	status: text('status', { enum: ['running', 'success', 'failed', 'idle'] }).notNull(),
+	startedAt: timestamp('started_at').defaultNow().notNull(),
+	completedAt: timestamp('completed_at'),
+	duration: integer('duration'),
+	steps: integer('steps').notNull(),
+});
+
+export const workflowRunRelations = relations(workflowRun, ({ one }) => ({
+	workflow: one(workflow, {
+		fields: [workflowRun.workflowId],
 		references: [workflow.id],
 	}),
 }));

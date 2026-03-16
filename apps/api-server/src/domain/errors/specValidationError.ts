@@ -1,5 +1,5 @@
-import { DomainError } from "./domainError.abstract";
-import { DOMAIN_ERROR_CODES } from "./DOMAIN_ERROR_CODES";
+import { DomainError } from './domainError.abstract';
+import { DOMAIN_ERROR_CODES } from './DOMAIN_ERROR_CODES';
 
 export class SpecValidationError extends DomainError {
 	constructor(message: string) {

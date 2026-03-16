@@ -14,7 +14,7 @@ export class SecrectRepository implements ISecrectRepository {
 	constructor(
 		@inject(TOKENS.SecretMapper)
 		private readonly mapper: SecretMapper,
-	) { }
+	) {}
 
 	async findById(id: string): Promise<Secret | null> {
 		try {

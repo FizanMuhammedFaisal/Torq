@@ -21,9 +21,7 @@ export class PostgresErrorMapper {
 			return new DatabaseInternalError(`Missing required data for ${context.entity}`);
 		}
 
-		// Default to internal database error
-		return new DatabaseInternalError(
-			pgError?.message || `An error occurred while accessing ${context.entity}`,
-		);
+		// Default to internal database error. Avoid leaking the postgres error message/query.
+		return new DatabaseInternalError(`An error occurred while accessing ${context.entity}`);
 	}
 }

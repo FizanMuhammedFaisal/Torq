@@ -16,6 +16,7 @@ export class WorkflowVersionMapper
 			workflowId: row.workflowId,
 			version: row.version,
 			spec: row.spec,
+			raw: row.raw,
 			createdAt: row.createdAt,
 		});
 	}
@@ -26,6 +27,7 @@ export class WorkflowVersionMapper
 			workflowId: entity.workflowId,
 			version: entity.version,
 			spec: entity.spec,
+			raw: entity.raw,
 			createdAt: entity.createdAt,
 		};
 	}

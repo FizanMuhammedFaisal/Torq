@@ -1,6 +1,6 @@
 {
-	"id": "9745f753-d025-463e-84b2-2359a1e1cdbd",
-	"prevId": "9b3dd711-ef48-422d-ae1c-6d359608e9fe",
+	"id": "90cf7cc9-28b9-4c30-8ac8-f9fbde6430c7",
+	"prevId": "0552e9b6-879b-40b1-9aab-19bef3bfd7e6",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
@@ -535,13 +535,19 @@
 				},
 				"version": {
 					"name": "version",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true
+				},
+				"raw": {
+					"name": "raw",
 					"type": "text",
 					"primaryKey": false,
 					"notNull": true
 				},
 				"spec": {
 					"name": "spec",
-					"type": "text",
+					"type": "json",
 					"primaryKey": false,
 					"notNull": true
 				},

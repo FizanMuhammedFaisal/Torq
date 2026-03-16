@@ -11,7 +11,7 @@ export class SpecValidationService implements ISpecParser {
 					error: doc.errors.map((e) => e.message).join('; '),
 				};
 			}
-			return { valid: true };
+			return { valid: true, data: doc.toJSON() };
 		} catch (err) {
 			return {
 				valid: false,
@@ -22,8 +22,8 @@ export class SpecValidationService implements ISpecParser {
 
 	validateJson = (input: string): SpecValidationResult => {
 		try {
-			JSON.parse(input);
-			return { valid: true };
+			const data = JSON.parse(input);
+			return { valid: true, data };
 		} catch (err) {
 			return {
 				valid: false,

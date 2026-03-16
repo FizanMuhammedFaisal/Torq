@@ -1,5 +1,8 @@
 import { eq } from 'drizzle-orm';
-import type { IWorkflowRepository } from '@application/port/repositories/workflowRepository.interface';
+import type {
+	IWorkflowRepository,
+	WorkflowWithRuns,
+} from '@application/port/repositories/workflowRepository.interface';
 import type { Workflow } from '@domain/entities/workflow';
 import { getExecutor } from './database/transaction/transactionContext';
 import { workflow } from './database/schema';
@@ -26,6 +29,40 @@ export class WorkflowRepository implements IWorkflowRepository {
 			if (!result) return null;
 
 			return this.mapper.toDomain(result);
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'Workflow' });
+		}
+	}
+
+	async getWorkflowsWithRuns(identityId: string, limitRuns: number): Promise<WorkflowWithRuns[]> {
+		try {
+			const result = await getExecutor().query.workflow.findMany({
+				where: eq(workflow.identityId, identityId),
+				with: {
+					runs: {
+						orderBy: (run, { desc }) => [desc(run.startedAt)],
+						limit: limitRuns,
+						columns: {
+							id: true,
+							status: true,
+							startedAt: true,
+							completedAt: true,
+							duration: true,
+							steps: true,
+						},
+					},
+				},
+				orderBy: (wf, { desc }) => [desc(wf.createdAt)],
+			});
+
+			return result.map((row) => {
+				const domainWf = this.mapper.toDomain(row);
+				return {
+					...domainWf,
+					// The type from Drizzle matches our WorkflowWithRuns runs array type exactly
+					runs: row.runs as WorkflowWithRuns['runs'],
+				};
+			});
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'Workflow' });
 		}

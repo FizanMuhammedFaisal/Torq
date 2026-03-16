@@ -19,7 +19,12 @@ export const TOKENS = {
 	SpecValidationService: Symbol.for('SpecValidationService'),
 	UpsertSecretsUseCase: Symbol.for('UpsertSecretsUseCase'),
 	GetSecretsUseCase: Symbol.for('GetSecretsUseCase'),
+	GetWorkflowsUseCase: Symbol.for('GetWorkflowsUseCase'),
+	CreateRunUseCase: Symbol.for('CreateRunUseCase'),
+	RevealSecretUseCase: Symbol.for('RevealSecretUseCase'),
 	CreateWorkflowUseCase: Symbol.for('CreateWorkflowUseCase'),
+	WorkflowRunRepository: Symbol.for('WorkflowRunRepository'),
 	UnitOfWork: Symbol.for('UnitOfWork'),
 	AuthMacro: Symbol.for('AuthMacro'),
+	ErrorMacro: Symbol.for('ErrorMacro'),
 } as const;

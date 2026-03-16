@@ -12,7 +12,7 @@ export const Envconfig = {
 		cors: {
 			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173'],
 		},
-		masterKeyFile: './torq/master.key',
+		masterKeyFile: './src/config/torq/master.key',
 	},
 	services: {
 		email: {
