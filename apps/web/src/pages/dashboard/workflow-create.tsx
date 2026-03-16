@@ -1,4 +1,5 @@
 import { ArrowRight01Icon, Loading03Icon } from '@hugeicons/core-free-icons';
+import type { ApiErrorBody, AxiosError } from '@/api/client';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { motion } from 'motion/react';
 import { useEffect, useState } from 'react';
@@ -15,7 +16,7 @@ import { WorkflowEditor } from './workflow-create/workflow-editor';
 
 export function WorkflowCreatePage() {
 	const navigate = useNavigate();
-	const { mutate, isPending } = useCreateWorkflow();
+	const { mutateAsync, isPending } = useCreateWorkflow();
 	const { activeVersion, setActiveVersion } = useVersionStore();
 	const templates =
 		WORKFLOW_TEMPLATES[activeVersion] || WORKFLOW_TEMPLATES['latest'];
@@ -29,6 +30,7 @@ export function WorkflowCreatePage() {
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
 	const [nameTouched, setNameTouched] = useState(false);
+	const [apiError, setApiError] = useState<ApiErrorBody | null>(null);
 
 	// Update template/yamlcode when version changes
 	useEffect(() => {
@@ -60,13 +62,14 @@ export function WorkflowCreatePage() {
 
 	const handleSubmit = async () => {
 		setNameTouched(true);
+		setApiError(null);
 		if (!name.trim()) {
 			toast.error('Workflow name is required');
 			return;
 		}
 		const validSecrets = secrets.filter((s) => s.key.trim() && s.value.trim());
 		try {
-			await mutate({
+			await mutateAsync({
 				name: name.trim(),
 				description: description.trim() || undefined,
 				workflowSpec: yamlCode,
@@ -75,8 +78,20 @@ export function WorkflowCreatePage() {
 			});
 			toast.success('Workflow created!');
 			navigate('/dashboard');
-		} catch {
-			toast.error('Failed to create workflow. Please try again.');
+		} catch (err: unknown) {
+			const axiosErr = err as AxiosError<ApiErrorBody>;
+			const errorData = axiosErr?.response?.data;
+			
+			if (errorData) {
+				setApiError(errorData);
+				if (errorData.issues && errorData.issues.length > 0) {
+					toast.error(`Workflow creation failed with ${errorData.issues.length} validation error(s). Please check the editor.`);
+				} else {
+					toast.error(errorData.message || 'Failed to create workflow. Please try again.');
+				}
+			} else {
+				toast.error('Failed to create workflow. Please try again.');
+			}
 		}
 	};
 
@@ -180,6 +195,7 @@ export function WorkflowCreatePage() {
 					yamlCode={yamlCode}
 					setYamlCode={setYamlCode}
 					activeVersion={activeVersion}
+					apiError={apiError}
 				/>
 			</div>
 

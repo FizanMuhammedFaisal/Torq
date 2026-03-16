@@ -8,6 +8,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { motion } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import { YamlEditor } from '@/components/yaml-editor';
+import type { ApiErrorBody } from '@/api/client';
 
 interface WorkflowEditorProps {
 	isExpanded: boolean;
@@ -16,6 +17,7 @@ interface WorkflowEditorProps {
 	yamlCode: string;
 	setYamlCode: (code: string) => void;
 	activeVersion?: string;
+	apiError?: ApiErrorBody | null;
 }
 
 export function WorkflowEditor({
@@ -25,6 +27,7 @@ export function WorkflowEditor({
 	yamlCode,
 	setYamlCode,
 	activeVersion = 'V1Alpha',
+	apiError,
 }: WorkflowEditorProps) {
 	return (
 		<div
@@ -124,19 +127,60 @@ export function WorkflowEditor({
 
 				{/* Editor Body */}
 				<div
-					className={`w-full relative overflow-hidden flex-1 ${
+					className={`w-full relative overflow-hidden flex-1 flex flex-col ${
 						isExpanded
 							? 'border border-t-0 border-white/10 rounded-b-[12px] shadow-[0_20px_60px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)]'
-							: 'shadow-2xl shadow-emerald-500/5 ring-1 ring-white/10 rounded-xl max-h-[600px] min-h-[400px]'
+							: 'shadow-2xl shadow-emerald-500/5 ring-1 ring-white/10 rounded-xl min-h-[400px]'
 					}`}
 					style={isExpanded ? { backgroundColor: 'oklch(0.10 0.005 285)' } : {}}
 				>
-					<YamlEditor
-						value={yamlCode}
-						onChange={(val) => setYamlCode(val)}
-						height="100%"
-						className="absolute inset-0"
-					/>
+					{/* Error Banner overlay */}
+					{apiError && apiError.issues && apiError.issues.length > 0 && (
+						<div className="z-20 w-full shrink-0 bg-red-950/40 border-b border-red-500/30 px-5 py-4 max-h-64 overflow-y-auto backdrop-blur-xl shadow-[0_10px_40px_rgba(239,68,68,0.1)]">
+							<div className="flex items-start gap-3 mb-3">
+								<div className="size-6 rounded-md bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0 mt-0.5">
+									<HugeiconsIcon icon={Cancel01Icon} className="size-3.5 text-red-500" />
+								</div>
+								<div>
+									<h3 className="text-[14px] font-medium text-red-400">
+										Invalid Workflow Specification
+									</h3>
+									<p className="text-[13px] text-red-400/70 mt-0.5">
+										Please fix the following {apiError.issues.length} error{apiError.issues.length > 1 ? 's' : ''} to continue.
+									</p>
+								</div>
+							</div>
+							
+							<div className="space-y-2 mt-4">
+								{apiError.issues.map((issue: any, idx) => {
+									const fieldPath = issue.path || issue.field;
+									return (
+										<div key={idx} className="flex gap-3 bg-red-500/5 border border-red-500/10 rounded-lg p-3 relative overflow-hidden group hover:border-red-500/20 hover:bg-red-500/10 transition-colors">
+											<div className="absolute left-0 top-0 bottom-0 w-[2px] bg-red-500/30 group-hover:bg-red-500/50 transition-colors" />
+											<div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+												{fieldPath && (
+													<div className="shrink-0 font-mono text-[11px] bg-red-500/10 text-red-400/90 px-2 py-0.5 rounded border border-red-500/20">
+														{fieldPath}
+													</div>
+												)}
+												<div className="text-[13px] text-red-200/80 leading-relaxed font-sans truncate whitespace-normal">
+													{issue.message}
+												</div>
+											</div>
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					)}
+					<div className="relative flex-1 min-h-0 h-[400px] lg:h-auto">
+						<YamlEditor
+							value={yamlCode}
+							onChange={(val) => setYamlCode(val)}
+							height="100%"
+							className="absolute inset-0"
+						/>
+					</div>
 				</div>
 			</motion.div>
 		</div>

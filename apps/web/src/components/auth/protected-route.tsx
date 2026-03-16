@@ -30,8 +30,8 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 		);
 	}
 	// If finished loading and there's no user, move to login
-	// if (!user) {
-	// 	return <Navigate to="/login" state={{ from: location }} replace />;
-	// }
+	if (!user) {
+		return <Navigate to="/login" state={{ from: location }} replace />;
+	}
 	return <>{children}</>;
 }

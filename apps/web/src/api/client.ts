@@ -73,6 +73,7 @@ export { apiClient };
 export type ApiErrorBody = {
 	message: string;
 	code?: string;
+	issues?: { path?: string; message: string }[];
 };
 
 // Re-export so feature hooks never need to import from 'axios' directly
