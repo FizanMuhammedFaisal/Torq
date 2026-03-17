@@ -1,4 +1,4 @@
-import type { AuthenticatedContext } from '@/presentation/macros/auth.macro';
+import type { AuthenticatedContext } from '@/presentation/http/macros/auth.macro';
 import type { CreateWorkflowOutputDto } from '@/application/dto/worflows/createWorkflow.dto';
 import type { GetSecretsOutputDto } from '@/application/dto/worflows/getSecrets.dto';
 import type { UpsertSecretsOutputDto } from '@/application/dto/worflows/upsertSecrets.dto';

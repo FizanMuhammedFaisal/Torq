@@ -1,12 +1,12 @@
 import { inject, injectable } from 'tsyringe';
-import type { IWorkflowController } from '@/presentation/interfaces/controller/workflow.interface';
+import type { IWorkflowController } from '@/presentation/http/interfaces/controller/workflow.interface';
 import type { ICreateWorkflowUseCase } from '@/application/port/usecases/workflows/createWorkflow.interface';
 import type { IUpsertSecretsUseCase } from '@/application/port/usecases/workflows/upsertSecrets.interface';
 import type { IGetSecretsUseCase } from '@/application/port/usecases/workflows/getSecrets.interface';
 import type { IGetWorkflowsUseCase } from '@/application/port/usecases/workflows/getWorkflows.interface';
 import type { ICreateRunUseCase } from '@/application/port/usecases/workflows/createRun.interface';
 import type { IRevealSecretUseCase } from '@/application/port/usecases/workflows/revealSecret.interface';
-import type { AuthenticatedContext } from '@/presentation/macros/auth.macro';
+import type { AuthenticatedContext } from '@/presentation/http/macros/auth.macro';
 import { TOKENS } from '@/config/di/tokens';
 import type { CreateWorkflowOutputDto } from '@/application/dto/worflows/createWorkflow.dto';
 import type { CreateWorkflowInputDto } from '@/application/dto/worflows/createWorkflow.dto';

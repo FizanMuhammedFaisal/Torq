@@ -24,7 +24,6 @@ export class CRDManager implements ICRDManager {
 			} else {
 				throw err; // real error
 			}
-			throw err;
 		}
 		try {
 			await apiExtensionsClient.createCustomResourceDefinition(CRD_DEFINITION);

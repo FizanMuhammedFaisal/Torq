@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { AuthUser } from '@/presentation/macros/auth.macro';
+import type { AuthUser } from '@/presentation/http/macros/auth.macro';
 
 export const SecretInputSchema = z.object({
 	key: z.string().min(1, 'Secret key cannot be empty'),

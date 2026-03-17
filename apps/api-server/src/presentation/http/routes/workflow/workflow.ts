@@ -1,11 +1,11 @@
 import Elysia from 'elysia';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
-import type { IWorkflowController } from '@/presentation/interfaces/controller/workflow.interface';
-import type { Router } from '@/presentation/interfaces/routes';
+import type { IWorkflowController } from '@/presentation/http/interfaces/controller/workflow.interface';
+import type { Router } from '@/presentation/http/interfaces/routes';
 import { CreateWorkflowSchema } from '@/application/dto/worflows/createWorkflow.dto';
 import { UpsertSecretsSchema } from '@/application/dto/worflows/upsertSecrets.dto';
-import type { AuthMacro } from '@/presentation/macros/auth.macro';
+import type { AuthMacro } from '@/presentation/http/macros/auth.macro';
 
 @injectable()
 export class WorkflowRouter implements Router {

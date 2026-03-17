@@ -8,9 +8,9 @@ async function main() {
     const crdManager = container.resolve<CRDManager>(TOKENS.CRDManager);
     //ensure the torq crd is preset
     // ensureCrd()
-    crdManager.ensureCrd();
+    await crdManager.ensureCrd();
     //  start grpc server
-    rpcServer.start();
+    await rpcServer.start();
 
     // connect to message queue
     // start the main reconsiliation loop
