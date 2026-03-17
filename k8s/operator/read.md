@@ -1,0 +1,1 @@
+The operator's ServiceAccount needs permission to manage CRDs. This is a cluster-level permission (CRDs are cluster-scoped, not namespace-scoped).

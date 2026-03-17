@@ -1,3 +1,1 @@
-export const TOKENS = {
-
-} as const;
+export const TOKENS = {} as const;

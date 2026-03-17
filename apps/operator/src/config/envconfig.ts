@@ -13,8 +13,6 @@ export const Envconfig = {
 			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:4000'],
 		},
 	},
-	services: {
-
-	},
+	services: {},
 };
 export type Envconfig = typeof Envconfig;
