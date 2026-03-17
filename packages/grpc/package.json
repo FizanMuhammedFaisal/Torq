@@ -1,6 +1,6 @@
 {
   "name": "@torq-system/grpc",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "description": "Generated TypeScript gRPC definitions for Torq protos",
   "private": false,
   "publishConfig": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "generate": "buf generate",
-    "build": "buf generate && tsc && tsx scripts/generate-barrels.ts",
+    "build": "rm -rf dist generated && buf generate && tsc && tsx scripts/generate-barrels.ts",
     "release": "./scripts/publish.sh",
     "lint": "buf lint && biome lint .",
     "format": "biome format --write .",
@@ -25,11 +25,6 @@
       "types": "./dist/generated/common/error/v1/index.d.ts",
       "import": "./dist/generated/common/error/v1/index.js",
       "default": "./dist/generated/common/error/v1/index.js"
-    },
-    "./protos": {
-      "types": "./dist/generated/protos/index.d.ts",
-      "import": "./dist/generated/protos/index.js",
-      "default": "./dist/generated/protos/index.js"
     },
     "./workflow/v1": {
       "types": "./dist/generated/workflow/v1/index.d.ts",

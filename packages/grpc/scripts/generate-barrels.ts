@@ -71,7 +71,6 @@ function syncPackageExports(protoDirs: string[]) {
 }
 
 
-// --- Main Execution ---
 console.log(' Generating barrel files...');
 
 // Scan and create barrels
