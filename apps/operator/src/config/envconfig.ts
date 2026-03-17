@@ -13,6 +13,13 @@ export const Envconfig = {
 			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:4000'],
 		},
 	},
-	services: {},
+
+	services: {
+
+	},
+	grpc: {
+		PORT: process.env.RPC_PORT || 50051,
+		HOST: process.env.RPC_HOST || 'localhost',
+	}
 };
 export type Envconfig = typeof Envconfig;

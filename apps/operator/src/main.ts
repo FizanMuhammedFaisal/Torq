@@ -1,10 +1,18 @@
-import './application';
+import "reflect-metadata"
+import { container } from './config/di/container';
+import { EnsureCrd } from './infrastructure/k8s/ensureCrd';
+import type { GRpcServer } from './presentation/grpc/rpc-server';
+import { TOKENS } from './config/di/tokens';
 async function main() {
-	//ensure the torq crd is preset
-	// ensureCrd()
-	//  start grpc server
-	// connect to message queue
-	// start the main reconsiliation loop
+    const rpcServer = container.resolve<GRpcServer>(TOKENS.GRPCServer);
+    //ensure the torq crd is preset
+    // ensureCrd()
+    EnsureCrd();
+    //  start grpc server
+    rpcServer.start()
+
+    // connect to message queue
+    // start the main reconsiliation loop
 }
 
 await main();

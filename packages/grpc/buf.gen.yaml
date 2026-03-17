@@ -1,0 +1,12 @@
+version: v2
+plugins:
+  - local: protoc-gen-es
+    include_imports: true
+    opt: 
+      - target=ts
+      - import_extension=.js
+    out: generated
+# https://buf.build/blog/connect-es-v2
+# new reslese only need one package for generation
+# - remote: buf.build/connectrpc/es:v1.6.1
+#   out: packages/typescript/src

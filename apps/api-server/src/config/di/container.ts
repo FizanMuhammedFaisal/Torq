@@ -1,9 +1,9 @@
 import { container, Lifecycle } from 'tsyringe';
-import { WorkflowController } from '@/presentation/controller/workflow/workflow';
-import { AppRouter } from '@/presentation/routes';
-import { AuthRouter } from '@/presentation/routes/auth/auth';
-import { HealthRouter } from '@/presentation/routes/health/health';
-import { WorkflowRouter } from '@/presentation/routes/workflow/workflow';
+import { WorkflowController } from '@/presentation/http/controller/workflow/workflow';
+import { AppRouter } from '@/presentation/http/routes';
+import { AuthRouter } from '@/presentation/http/routes/auth/auth';
+import { HealthRouter } from '@/presentation/http/routes/health/health';
+import { WorkflowRouter } from '@/presentation/http/routes/workflow/workflow';
 import { TOKENS } from './tokens';
 import { ResendEmailService } from '@/infrastructure/services/emailService';
 import { SignInOTPStrategy } from '@/application/usecases/email/strategies/signInOTPStrategy';
@@ -26,8 +26,8 @@ import { SecretMapper } from '@/infrastructure/repository/mappers/secret.mapper'
 import { WorkflowVersionMapper } from '@/infrastructure/repository/mappers/workflowVersion.mapper';
 import { SpecValidationService } from '@/infrastructure/services/specValidationService';
 import { DrizzleUnitOfWork } from '@/infrastructure/repository/database/transaction/unitOfWork';
-import { AuthMacro } from '@/presentation/macros/auth.macro';
-import { ErrorMacro } from '@/presentation/macros/error.macro';
+import { AuthMacro } from '@/presentation/http/macros/auth.macro';
+import { ErrorMacro } from '@/presentation/http/macros/error.macro';
 import { SecretManagementService } from '@/infrastructure/services/secretManagementService';
 
 // Register as singletons using Symbols

@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package workflow.v1;
+
+import "google/protobuf/timestamp.proto";
+
+service WorkflowService {
+  rpc GetWorkflows(GetWorkflowsRequest) returns (GetWorkflowsResponse);
+}
+
+message GetWorkflowsRequest {
+  string user_id = 1;
+}
+
+message GetWorkflowsResponse {
+  repeated Workflow workflows = 1;
+}
+
+message Workflow {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  google.protobuf.Timestamp created_at = 4;
+}

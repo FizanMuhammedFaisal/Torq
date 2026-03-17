@@ -14,7 +14,11 @@
 		"emitDecoratorMetadata": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["src/*"],
+			"@application/*": ["src/application/*"],
+			"@domain/*": ["src/domain/*"],
+			"@presentation/*": ["src/presentation/*"],
+			"@infrastructure/*": ["src/infrastructure/*"]
 		}
 	},
 	"include": ["src/**/*"],
