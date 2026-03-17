@@ -1,0 +1,1 @@
+ALTER TABLE "workflow_version" ALTER COLUMN "version" SET DATA TYPE integer USING "version"::integer;

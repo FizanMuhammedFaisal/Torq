@@ -46,6 +46,8 @@ Built on modern foundations for maximum resilience:
 - **High Performance**: Powered by Bun for lightning-fast API responses.
 - **Modern Frontend**: A reactive, beautiful UI built with React and Vite.
 
+
+
 ## 📚 Documentation
 
 Explore our comprehensive guides to master the platform:

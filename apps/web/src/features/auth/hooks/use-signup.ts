@@ -1,6 +1,8 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { authClient } from '@/lib/auth';
+import { useAuthStore } from '@/store/use-auth-store';
 import type { SignupEmailInput } from '../schema';
 
 type Step = 'email' | 'otp';
@@ -45,21 +47,33 @@ export function useSignup(): UseSignupReturn {
 		setError(null);
 		setIsPending(true);
 
-		const { error: apiError } = await authClient.emailOtp.sendVerificationOtp({
-			email: data.email,
-			type: 'sign-in',
-		});
+		try {
+			const { error: apiError } = await authClient.emailOtp.sendVerificationOtp(
+				{
+					email: data.email,
+					type: 'sign-in',
+				},
+			);
 
-		setIsPending(false);
+			if (apiError) {
+				const msg = apiError.message || 'Failed to send OTP';
+				setError(msg);
+				toast.error(msg);
+				return;
+			}
 
-		if (apiError) {
-			setError(apiError.message ?? 'Failed to send OTP');
-			return;
+			toast.success('Code sent! Check your email.');
+			emailRef.current = data.email;
+			setResendCooldown(60);
+			setStep('otp');
+		} catch (err: any) {
+			const msg =
+				err?.message || 'An internal error occurred. Please try again.';
+			setError(msg);
+			toast.error(msg);
+		} finally {
+			setIsPending(false);
 		}
-
-		emailRef.current = data.email;
-		setResendCooldown(60);
-		setStep('otp');
 	}, []);
 
 	const verifyOtp = useCallback(
@@ -67,19 +81,42 @@ export function useSignup(): UseSignupReturn {
 			setError(null);
 			setIsPending(true);
 
-			const { error: apiError } = await authClient.signIn.emailOtp({
-				email: emailRef.current,
-				otp,
-			});
+			try {
+				const { error: apiError } = await authClient.signIn.emailOtp({
+					email: emailRef.current,
+					otp,
+				});
 
-			setIsPending(false);
+				if (apiError) {
+					const msg = apiError.message || 'Invalid OTP';
+					setError(msg);
+					toast.error(msg);
+					return;
+				}
 
-			if (apiError) {
-				setError(apiError.message ?? 'Invalid OTP');
-				return;
+				const result = await authClient.getSession();
+				if (result.data?.session && result.data?.user) {
+					useAuthStore
+						.getState()
+						.setAuth(
+							result.data.user,
+							result.data.session,
+							result.data.session.token || null,
+						);
+				}
+
+				toast.success('Successfully verified & signed in');
+				navigate('/dashboard');
+			} catch (err: unknown) {
+				const msg =
+					err instanceof Error
+						? err.message
+						: 'An internal error occurred. Please try again.';
+				setError(msg);
+				toast.error(msg);
+			} finally {
+				setIsPending(false);
 			}
-
-			navigate('/dashboard');
 		},
 		[navigate],
 	);
@@ -90,20 +127,40 @@ export function useSignup(): UseSignupReturn {
 		setError(null);
 		setIsPending(true);
 
-		const { error: apiError } = await authClient.emailOtp.sendVerificationOtp({
-			email: emailRef.current,
-			type: 'sign-in',
-		});
+		try {
+			const { error: apiError } = await authClient.emailOtp.sendVerificationOtp(
+				{
+					email: emailRef.current,
+					type: 'sign-in',
+				},
+			);
 
-		setIsPending(false);
+			if (apiError) {
+				const msg = apiError.message || 'Failed to resend OTP';
+				setError(msg);
+				toast.error(msg);
+				return;
+			}
 
-		if (apiError) {
-			setError(apiError.message ?? 'Failed to resend OTP');
-			return;
+			toast.success('Code resent');
+			setResendCooldown(60);
+		} catch (err: any) {
+			const msg =
+				err?.message || 'An internal error occurred. Please try again.';
+			setError(msg);
+			toast.error(msg);
+		} finally {
+			setIsPending(false);
 		}
-
-		setResendCooldown(60);
 	}, [resendCooldown]);
 
-	return { step, sendOtp, verifyOtp, resendOtp, resendCooldown, isPending, error };
+	return {
+		step,
+		sendOtp,
+		verifyOtp,
+		resendOtp,
+		resendCooldown,
+		isPending,
+		error,
+	};
 }

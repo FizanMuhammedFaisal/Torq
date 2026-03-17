@@ -4,6 +4,7 @@ import { Elysia } from 'elysia';
 import { container } from '@/config/di/container';
 import { TOKENS } from '@/config/di/tokens';
 import type { AppRouter } from '@/presentation/routes';
+import type { ErrorMacro } from '@/presentation/macros/error.macro';
 import { Envconfig } from '../config/envconfig';
 import { OpenAPI } from './routes/auth/openapi';
 
@@ -29,7 +30,9 @@ export class HTTPServer {
 
 	private setupRoutes() {
 		const appRouter = container.resolve<AppRouter>(TOKENS.AppRouter);
-		this.app.use(appRouter.getRoutes());
+		const errorMacro = container.resolve<ErrorMacro>(TOKENS.ErrorMacro);
+
+		this.app.use(errorMacro.plugin()).use(appRouter.getRoutes());
 	}
 
 	private configureCORS() {

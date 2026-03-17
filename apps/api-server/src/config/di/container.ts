@@ -8,46 +8,59 @@ import { TOKENS } from './tokens';
 import { ResendEmailService } from '@/infrastructure/services/emailService';
 import { SignInOTPStrategy } from '@/application/usecases/email/strategies/signInOTPStrategy';
 import { EmailVerificationStrategy } from '@/application/usecases/email/strategies/emailVerificationStrategy';
+import { ForgetPasswordStrategy } from '@/application/usecases/email/strategies/forgetPasswordStrategy';
 import { SendOTPUseCase } from '@/application/usecases/email/sendOTP.usecase';
+import { UpsertSecretsUseCase } from '@/application/usecases/workflows/upsertSecrets.usecase';
+import { GetSecretsUseCase } from '@/application/usecases/workflows/getSecrets.usecase';
+import { CreateWorkflowUseCase } from '@/application/usecases/workflows/createWorkflow.usecase';
+import { GetWorkflowsUseCase } from '@/application/usecases/workflows/getWorkflows.usecase';
+import { CreateRunUseCase } from '@/application/usecases/workflows/createRun.usecase';
+import { RevealSecretUseCase } from '@/application/usecases/workflows/revealSecret.usecase';
+import { WorkflowRunRepository } from '@/infrastructure/repository/workflowRun.repository';
+
+import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';
+import { SecrectRepository } from '@/infrastructure/repository/secret.repository';
+import { WorkflowVersionRepository } from '@/infrastructure/repository/workflowVersion.repository';
+import { WorkflowMapper } from '@/infrastructure/repository/mappers/workflow.mapper';
+import { SecretMapper } from '@/infrastructure/repository/mappers/secret.mapper';
+import { WorkflowVersionMapper } from '@/infrastructure/repository/mappers/workflowVersion.mapper';
+import { SpecValidationService } from '@/infrastructure/services/specValidationService';
+import { DrizzleUnitOfWork } from '@/infrastructure/repository/database/transaction/unitOfWork';
+import { AuthMacro } from '@/presentation/macros/auth.macro';
+import { ErrorMacro } from '@/presentation/macros/error.macro';
+import { SecretManagementService } from '@/infrastructure/services/secretManagementService';
 
 // Register as singletons using Symbols
-container.register(
-	TOKENS.WorkflowController,
-	{ useClass: WorkflowController },
-	{ lifecycle: Lifecycle.Singleton },
-);
-container.register(
-	TOKENS.WorkflowRouter,
-	{ useClass: WorkflowRouter },
-	{ lifecycle: Lifecycle.Singleton },
-);
-container.register(
-	TOKENS.HealthRouter,
-	{ useClass: HealthRouter },
-	{ lifecycle: Lifecycle.Singleton },
-);
+container.register(TOKENS.WorkflowController, { useClass: WorkflowController }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRouter, { useClass: WorkflowRouter }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.HealthRouter, { useClass: HealthRouter }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.AuthRouter, { useClass: AuthRouter }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.AppRouter, { useClass: AppRouter }, { lifecycle: Lifecycle.Singleton });
-container.register(
-	TOKENS.EmailService,
-	{ useClass: ResendEmailService },
-	{ lifecycle: Lifecycle.Singleton },
-);
+container.register(TOKENS.EmailService, { useClass: ResendEmailService }, { lifecycle: Lifecycle.Singleton });
 
-container.register(
-	TOKENS.SignInOTPStrategy,
-	{ useClass: SignInOTPStrategy },
-	{ lifecycle: Lifecycle.Singleton },
-);
-container.register(
-	TOKENS.EmailVerificationStrategy,
-	{ useClass: EmailVerificationStrategy },
-	{ lifecycle: Lifecycle.Singleton },
-);
-container.register(
-	TOKENS.SendOTPEmail,
-	{ useClass: SendOTPUseCase },
-	{ lifecycle: Lifecycle.Singleton },
-);
+container.register(TOKENS.SignInOTPStrategy, { useClass: SignInOTPStrategy }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.EmailVerificationStrategy, { useClass: EmailVerificationStrategy }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.ForgetPasswordStrategy, { useClass: ForgetPasswordStrategy }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.SendOTPEmail, { useClass: SendOTPUseCase }, { lifecycle: Lifecycle.Singleton });
+
+// Repository & Mapper Registration
+container.register(TOKENS.WorkflowRepository, { useClass: WorkflowRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.SecretRepository, { useClass: SecrectRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowVersionRepository, { useClass: WorkflowVersionRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowMapper, { useClass: WorkflowMapper });
+container.register(TOKENS.SecretMapper, { useClass: SecretMapper });
+container.register(TOKENS.WorkflowVersionMapper, { useClass: WorkflowVersionMapper });
+container.register(TOKENS.SpecValidationService, { useClass: SpecValidationService }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.CreateWorkflowUseCase, { useClass: CreateWorkflowUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.UnitOfWork, { useClass: DrizzleUnitOfWork }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.AuthMacro, { useClass: AuthMacro }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.ErrorMacro, { useClass: ErrorMacro }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.UpsertSecretsUseCase, { useClass: UpsertSecretsUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GetSecretsUseCase, { useClass: GetSecretsUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GetWorkflowsUseCase, { useClass: GetWorkflowsUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.CreateRunUseCase, { useClass: CreateRunUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.RevealSecretUseCase, { useClass: RevealSecretUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.SecretManagementService, { useClass: SecretManagementService }, { lifecycle: Lifecycle.Singleton });
 
 export { container };

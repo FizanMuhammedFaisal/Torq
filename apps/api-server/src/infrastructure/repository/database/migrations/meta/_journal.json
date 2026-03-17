@@ -1,27 +1,62 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1770965985379,
-      "tag": "0000_odd_the_leader",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1771945151884,
-      "tag": "0001_premium_toad_men",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1771946083620,
-      "tag": "0002_nostalgic_venom",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1770965985379,
+			"tag": "0000_odd_the_leader",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1771945151884,
+			"tag": "0001_premium_toad_men",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1771946083620,
+			"tag": "0002_nostalgic_venom",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1772808256819,
+			"tag": "0003_eager_whizzer",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1773211237300,
+			"tag": "0004_oval_lifeguard",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1773211463045,
+			"tag": "0005_vengeful_leech",
+			"breakpoints": true
+		},
+		{
+			"idx": 6,
+			"version": "7",
+			"when": 1773211525550,
+			"tag": "0006_reflective_wonder_man",
+			"breakpoints": true
+		},
+		{
+			"idx": 7,
+			"version": "7",
+			"when": 1773218255438,
+			"tag": "0007_wise_pride",
+			"breakpoints": true
+		}
+	]
 }

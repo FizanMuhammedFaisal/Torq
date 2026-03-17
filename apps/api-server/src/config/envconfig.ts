@@ -12,12 +12,17 @@ export const Envconfig = {
 		cors: {
 			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173'],
 		},
+		masterKeyFile: './src/config/torq/master.key',
 	},
 	services: {
 		email: {
 			resendKey: process.env.RESEND_KEY || 'NEEDED',
 			//resend verified domain since implemented service uses resend
 			appEmail: process.env.APP_EMAIL || 'fizanmuhammedfaisal@gmail.com',
+		},
+		googleAuth: {
+			clientId: process.env.GOOGLE_CLIENT_ID || 'NEEDED',
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'NEEDED',
 		},
 	},
 };

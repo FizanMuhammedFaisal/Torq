@@ -1,5 +1,5 @@
 import type {
-	EmailService,
+	IEmailService,
 	SendEmailOptions,
 } from '@/application/port/services/emailService.interface';
 import { Envconfig } from '@/config/envconfig';
@@ -7,7 +7,7 @@ import { Resend } from 'resend';
 import { logger } from '../logger/logger';
 
 const resend = new Resend(Envconfig.services.email.resendKey);
-export class ResendEmailService implements EmailService {
+export class ResendEmailService implements IEmailService {
 	async sendEmail(
 		options: SendEmailOptions,
 	): Promise<{ ok: true } | { ok: false; error: unknown }> {

@@ -200,23 +200,119 @@ Full-screen dark, centered form — inspired by Resend:
 
 ---
 
-## 6. File Structure Reference
+## 6. Dashboard
+
+### Sidebar
+- Width: `260px`, `bg-card/30`, right border `border-border/50`
+- Logo: "Torq" — `text-lg font-black tracking-tight`, all white
+- "Create Workflow" button at top — full-width primary, `+` icon
+- Nav items: `rounded-lg`, `px-3 py-2.5`, `gap-1` between items
+- Active: `bg-primary/10 text-primary`
+- Bottom: sign-out, separated by `border-t border-border/30`
+
+### Workflow List
+- Data table layout: Workflow (name + description), Status, Last Run, Duration, Actions
+- Rows are clickable → navigate to `/dashboard/workflows/:id`
+- Delete → type-to-confirm dialog
+- Empty state: centered icon, heading, description, prominent CTA
+
+### Workflow Detail Page
+Tabbed interface at `/dashboard/workflows/:id`:
+
+| Tab | Content |
+|---|---|
+| Overview | Stat cards, description, recent runs preview |
+| Editor | CodeMirror YAML editor with live validation |
+| Runs | History table, expandable for step-level detail |
+| Metrics | Total runs, success rate bar, avg duration, recent failures |
+
+- Back button → `/dashboard`
+- Tab indicator: spring-animated underline (`layoutId`)
+- Tab content fades in (opacity only, 150ms)
+
+### 6.4 Global Runs (Live Feed)
+The **Runs** page (`/dashboard/runs`) is distinct from the Workflows page. 
+- **Workflows (The Blueprints)**: The static definitions, rules, and triggers. Creating, editing, and managing automations.
+- **Runs (The Global Live Feed)**: A chronological feed of *everything* executing across the user's accessible workflows (or their active namespace). Used for system-wide auditing, monitoring live queues, and troubleshooting global failures without digging into individual workflow definitions.
+
+**UI Implementation**:
+- A prominent status distribution header or timeline.
+- A high-density data table that includes the specific *Workflow Name* alongside the execution details (Status, Trigger, Duration, Timestamp).
+- Global filters to easily surface all system-wide failures or currently running jobs.
+
+---
+
+## 7. Confirm Dialog
+
+Type-to-confirm pattern (like GitHub's "type name to delete"):
+
+```ts
+interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmText: string;     // what user must type
+  confirmLabel?: string;    // button label
+  variant?: 'destructive' | 'default';
+  onConfirm: () => void;
+  isPending?: boolean;
+}
+```
+
+- Built on `AlertDialog` (Base UI)
+- Input must exactly match `confirmText` to enable submit
+- `variant: 'destructive'` → red button styling
+- Input resets when dialog closes
+
+---
+
+## 8. YAML Editor
+
+Reusable CodeMirror wrapper (`@uiw/react-codemirror` + `@codemirror/lang-yaml`):
+
+### Theme
+- Background: `oklch(0.10 0.005 285)` — slightly lighter than auth bg
+- Cursor / selection: primary emerald `oklch(0.70 0.15 162)`
+- Gutters: same bg, muted line numbers
+- Active line: `oklch(0.12 0.005 285)`
+
+### Title Bar
+- Terminal-style: three dots + centered filename + read-only badge
+- Background: `oklch(0.09 0.005 285)`
+
+### Validation
+- `js-yaml` parses on every change
+- Error count + inline error panel above editor
+- Save/Discard toolbar with unsaved indicator
+
+---
+
+## 9. File Structure Reference
 
 ```
 src/
   features/
     auth/
-      login-form.tsx     — Form UI component
-      signup-form.tsx    — Form UI component
-      index.ts           — Barrel export
+      login-form.tsx         — Login form
+      signup-form.tsx         — Multi-step signup (email + OTP)
   pages/
-    login.tsx            — Route page, split-panel layout
-    signup.tsx           — Route page, split-panel layout
+    home.tsx                 — Landing page
+    auth-layout.tsx          — Full-dark centered auth layout
+    login.tsx / signup.tsx   — Route wrappers
+    dashboard/
+      layout.tsx             — Sidebar + main layout
+      index.tsx              — Workflow list (table)
+      workflow-detail.tsx    — Detail page (tabs)
   components/
-    ui/                  — Shared UI primitives (button, input, field…)
-  App.tsx                — Router setup
+    ui/                      — Shared primitives (button, input, field, alert-dialog, confirm-dialog…)
+    yaml-editor.tsx          — CodeMirror YAML editor
+  lib/
+    app-config.tsx           — Auth config provider
+  App.tsx                    — Router setup
 ```
 
 ---
 
 *Last updated: Feb 2026*
+

@@ -53,3 +53,17 @@ graph TD
 - **Container Isolation**: Steps run in ephemeral containers with restricted permissions.
 - **Network Policies**: By default, steps have no network access unless explicitly granted.
 - **Resource Limits**: CPU and Memory limits are enforced per step to prevent resource exhaustion.
+
+## Frontend Application Configuration
+The platform uses a centralized React Context for environment-based feature flags to ensure consistency across the application.
+When checking if features (like Authentication) are enabled in UI components or hooks, **always** use the `useAppConfig()` hook from `@/lib/app-config` rather than reading `import.meta.env` directly.
+
+```tsx
+import { useAppConfig } from '@/lib/app-config';
+
+function MyComponent() {
+  const config = useAppConfig();
+  if (!config.authEnabled) return <PublicView />;
+  return <ProtectedView />;
+}
+```
