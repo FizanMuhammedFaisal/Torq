@@ -1,9 +1,17 @@
-import { Elysia } from 'elysia';
 
-const app = new Elysia();
+import './application'
+async function main() {
 
-app.get('/', () => 'Hello World');
+    //ensure the torq crd is preset
+    // ensureCrd()
 
-app.listen(3000);
+    //  start grpc server
 
-console.log(`🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`);
+    // connect to message queue
+    // start the main reconsiliation loop
+
+
+}
+
+await main();
+
