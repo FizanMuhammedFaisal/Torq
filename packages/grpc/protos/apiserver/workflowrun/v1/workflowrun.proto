@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package apiserver.workflowrun.v1;
+
+service ApiServerService{
+   rpc hello(helloRequest) returns (helloResponse);
+}
+
+message helloRequest{
+    string name = 1;
+}
+
+message helloResponse{
+    string message = 1;
+}

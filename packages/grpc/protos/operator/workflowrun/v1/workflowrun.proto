@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package operator.workflowrun.v1;
+
+service OperatorService{
+    rpc TriggerWorkflowRun(TriggerWorkflowRunRequest) returns (TriggerWorkflowRunResponse);
+}
+
+message TriggerWorkflowRunRequest{
+    string workflow_id = 1;
+}
+
+message TriggerWorkflowRunResponse{
+    string run_id = 1;
+}
