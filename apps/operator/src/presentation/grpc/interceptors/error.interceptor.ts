@@ -38,4 +38,4 @@ export const errorInterceptor: Interceptor = (next) => async (req) => {
 		logger.error({ error: err }, 'RPC: Unexpected error occurred');
 		throw new ConnectError('Internal server error', Code.Internal);
 	}
-};
+};	

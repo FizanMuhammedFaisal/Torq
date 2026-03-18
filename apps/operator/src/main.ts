@@ -13,6 +13,7 @@ async function main() {
     await rpcServer.start();
 
     // connect to message queue
+
     // start the main reconsiliation loop
 }
 

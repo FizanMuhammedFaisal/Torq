@@ -15,7 +15,11 @@ export const Envconfig = {
 	},
 
 	services: {
-
+		grpc: {
+			apiServer: {
+				baseUrl: process.env.API_SERVER_GRPC_BASE_URL || 'http://localhost:50052',
+			}
+		}
 	},
 	grpc: {
 		PORT: process.env.RPC_PORT || 50051,

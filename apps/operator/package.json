@@ -14,6 +14,7 @@
 	"dependencies": {
 		"@bufbuild/protobuf": "^2.11.0",
 		"@connectrpc/connect": "^2.1.1",
+		"@connectrpc/connect-node": "^2.1.1",
 		"@kubernetes/client-node": "^1.4.0",
 		"@torq-system/grpc": "^0.0.6",
 		"elysia": "^1.4.27",
