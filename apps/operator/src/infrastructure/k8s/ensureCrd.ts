@@ -4,13 +4,11 @@ import { CRD_DEFINITION, CRDName } from './CrdDefenition';
 import { logger } from '../logger/logger';
 import { injectable } from 'tsyringe';
 
-
 interface ICRDManager {
-	ensureCrd(): Promise<void>
+	ensureCrd(): Promise<void>;
 }
 @injectable()
 export class CRDManager implements ICRDManager {
-
 	async ensureCrd() {
 		try {
 			// https://kubernetes-client.github.io/javascript/classes/ApiextensionsV1Api.html#readCustomResourceDefinition

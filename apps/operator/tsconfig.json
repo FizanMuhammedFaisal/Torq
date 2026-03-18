@@ -18,9 +18,10 @@
 			"@application/*": ["src/application/*"],
 			"@domain/*": ["src/domain/*"],
 			"@presentation/*": ["src/presentation/*"],
-			"@infrastructure/*": ["src/infrastructure/*"]
+			"@infrastructure/*": ["src/infrastructure/*"],
+			"@config/*": ["src/config/*"]
 		}
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "drizzle.config.ts"],
 	"exclude": ["node_modules", "dist"]
 }
