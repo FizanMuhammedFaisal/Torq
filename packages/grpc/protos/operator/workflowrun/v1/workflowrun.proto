@@ -8,6 +8,16 @@ service OperatorService{
 
 message TriggerWorkflowRunRequest{
     string workflow_id = 1;
+    string spec = 2;
+    TriggerType trigger_type = 3;
+    optional string triggered_by = 4;
+}
+
+enum TriggerType {
+    TRIGGER_TYPE_UNSPECIFIED = 0;
+    TRIGGER_TYPE_MANUAL = 1;
+    TRIGGER_TYPE_WEBHOOK = 2;
+    TRIGGER_TYPE_SCHEDULE = 3;
 }
 
 message TriggerWorkflowRunResponse{

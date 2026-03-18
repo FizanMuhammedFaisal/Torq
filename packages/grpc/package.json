@@ -1,6 +1,6 @@
 {
   "name": "@torq-system/grpc",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Generated TypeScript gRPC definitions for Torq protos",
   "private": false,
   "publishConfig": {
@@ -21,15 +21,20 @@
   "exports": {
     ".": "./dist/generated/index.js",
     "./*": "./dist/*",
+    "./apiserver/workflowrun/v1": {
+      "types": "./dist/generated/apiserver/workflowrun/v1/index.d.ts",
+      "import": "./dist/generated/apiserver/workflowrun/v1/index.js",
+      "default": "./dist/generated/apiserver/workflowrun/v1/index.js"
+    },
     "./common/error/v1": {
       "types": "./dist/generated/common/error/v1/index.d.ts",
       "import": "./dist/generated/common/error/v1/index.js",
       "default": "./dist/generated/common/error/v1/index.js"
     },
-    "./workflow/v1": {
-      "types": "./dist/generated/workflow/v1/index.d.ts",
-      "import": "./dist/generated/workflow/v1/index.js",
-      "default": "./dist/generated/workflow/v1/index.js"
+    "./operator/workflowrun/v1": {
+      "types": "./dist/generated/operator/workflowrun/v1/index.d.ts",
+      "import": "./dist/generated/operator/workflowrun/v1/index.js",
+      "default": "./dist/generated/operator/workflowrun/v1/index.js"
     }
   },
   "files": [
@@ -41,7 +46,8 @@
   "dependencies": {
     "@bufbuild/protobuf": "^2.11.0",
     "@connectrpc/connect": "^1.4.0",
-    "@connectrpc/connect-node": "^1.4.0"
+    "@connectrpc/connect-node": "^1.4.0",
+    "@torq-system/grpc": "0.0.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.7",

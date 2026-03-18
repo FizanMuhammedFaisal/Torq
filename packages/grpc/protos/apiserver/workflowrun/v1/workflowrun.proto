@@ -3,13 +3,13 @@ syntax = "proto3";
 package apiserver.workflowrun.v1;
 
 service ApiServerService{
-   rpc hello(helloRequest) returns (helloResponse);
+   rpc Hello(HelloRequest) returns (HelloResponse);
 }
 
-message helloRequest{
+message HelloRequest{
     string name = 1;
 }
 
-message helloResponse{
+message HelloResponse{
     string message = 1;
 }

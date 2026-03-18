@@ -16,7 +16,7 @@ import { CreateWorkflowUseCase } from '@/application/usecases/workflows/createWo
 import { GetWorkflowsUseCase } from '@/application/usecases/workflows/getWorkflows.usecase';
 import { RevealSecretUseCase } from '@/application/usecases/workflows/revealSecret.usecase';
 import { TriggerWorkflowRunUseCase } from '@/application/usecases/workflows/triggerWorkflowRun.usecase';
-import { OperatorService } from '@/infrastructure/services/operator.service';
+import { OperatorService } from '@/infrastructure/services/operatorService';
 import { WorkflowRunRepository } from '@/infrastructure/repository/workflowRun.repository';
 
 import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';

@@ -3,7 +3,6 @@ import * as k8s from '@kubernetes/client-node';
 const kc = new k8s.KubeConfig();
 //load the kuber config from the standard location
 kc.loadFromDefault();
-
 export const kubeConfig = kc;
 
 export const apiExtensionsClient = kc.makeApiClient(k8s.ApiextensionsV1Api);

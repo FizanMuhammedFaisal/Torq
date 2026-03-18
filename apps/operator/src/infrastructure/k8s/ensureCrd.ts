@@ -1,61 +1,96 @@
-import { ApiException } from '@kubernetes/client-node';
-import { apiExtensionsClient } from './client';
-import { CRD_DEFINITION, CRDName } from './CrdDefenition';
-import { logger } from '../logger/logger';
-import { injectable } from 'tsyringe';
+// https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/
+// https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
+import {
+	ApiException,
+	type ApiextensionsV1ApiCreateCustomResourceDefinitionRequest,
+} from '@kubernetes/client-node'
+import { apiExtensionsClient } from './client'
 
-interface ICRDManager {
-	ensureCrd(): Promise<void>;
+import { logger } from '../logger/logger'
+import { injectable } from 'tsyringe'
+import { Envconfig } from '@/config/envconfig'
+import { CRD_DEFINITION, CRD_NAME } from './CrdDefenition'
+
+export interface ICRDManager {
+	ensureCrd(): Promise<void>
 }
+
 @injectable()
 export class CRDManager implements ICRDManager {
-	async ensureCrd() {
+	// https://kubernetes-client.github.io/javascript/classes/ApiextensionsV1Api.html#readCustomResourceDefinition
+
+	async ensureCrd(): Promise<void> {
+		const exists = await this.crdExists()
+
+		if (exists) {
+			logger.info('[crd] already exists — skipping creation')
+			await this.waitForCRDReady()
+			return
+		}
+
+		await this.createCRD()
+		await this.waitForCRDReady()
+	}
+
+	private async crdExists(): Promise<boolean> {
 		try {
-			// https://kubernetes-client.github.io/javascript/classes/ApiextensionsV1Api.html#readCustomResourceDefinition
-			await apiExtensionsClient.readCustomResourceDefinition({
-				name: CRDName,
-			});
-			logger.info('CRD already exists, skipping creation');
+			await apiExtensionsClient.readCustomResourceDefinition({ name: CRD_NAME })
+			return true
 		} catch (err) {
 			if (err instanceof ApiException && err.code === 404) {
-				logger.info('CRD not found, creating...');
-			} else {
-				throw err; // real error
+				return false
 			}
+			throw err  // unexpected error — propagate up
 		}
+	}
+
+	private async createCRD(): Promise<void> {
 		try {
-			await apiExtensionsClient.createCustomResourceDefinition(CRD_DEFINITION);
+			const request: ApiextensionsV1ApiCreateCustomResourceDefinitionRequest = {
+				body: CRD_DEFINITION,
+				pretty: undefined,
+				dryRun: undefined,
+				fieldManager: Envconfig.app.name,
+			}
+			await apiExtensionsClient.createCustomResourceDefinition(request)
+			logger.info('[crd] created WorkflowRun CRD')
+
 		} catch (err) {
 			if (err instanceof ApiException && err.code === 409) {
-				logger.info('CRD already created by another instance');
-			} else {
-				throw err;
+				// another operator replica created it between our read and create — fine
+				logger.info('[crd] created by another instance, continuing')
+				return
 			}
+			throw err
 		}
-
-		await this.waitForCRDReady();
 	}
-	private async waitForCRDReady() {
-		const start = Date.now();
-		const maxWaitMs = 30_000;
+
+	private async waitForCRDReady(maxWaitMs = 30_000): Promise<void> {
+		const start = Date.now()
+
 		while (Date.now() - start < maxWaitMs) {
-			const { status } = await apiExtensionsClient.readCustomResourceDefinitionStatus({
-				name: CRDName,
-			});
+			const { status } = await apiExtensionsClient
+				.readCustomResourceDefinitionStatus({ name: CRD_NAME })
 
 			const established = status?.conditions?.find(
-				(c) => c.type === 'Established' && c.status === 'True',
-			);
+				c => c.type === 'Established' && c.status === 'True'
+			)
+			const namesAccepted = status?.conditions?.find(
+				c => c.type === 'NamesAccepted' && c.status === 'True'
+			)
 
-			if (established) return;
+			if (established && namesAccepted) {
+				logger.info('[crd] ready')
+				return
+			}
 
-			await this.sleep(500);
+			await this.sleep(500)
 		}
 
-		throw new Error('CRD did not become ready within 30 seconds');
+		throw new Error('[crd] did not become ready within 30 seconds')
 	}
 
-	private sleep(ms: number) {
-		return new Promise((resolve) => setTimeout(resolve, ms));
+	private sleep(ms: number): Promise<void> {
+		return new Promise(resolve => setTimeout(resolve, ms))
 	}
 }

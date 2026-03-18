@@ -10,7 +10,8 @@
 		"lint": "bun x biome lint --write .",
 		"check": "bun x biome check --write .",
 		"db:migrate": "bun run drizzle-kit migrate --config ./drizzle.config.ts",
-		"db:generate": "bun run drizzle-kit generate --config ./drizzle.config.ts"
+		"db:generate": "bun run drizzle-kit generate --config ./drizzle.config.ts",
+		"kubernetes:delete:crd": "kubectl delete crd workflowruns.torq.dev"
 	},
 	"type": "module",
 	"dependencies": {
