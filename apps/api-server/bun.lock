@@ -12,7 +12,7 @@
         "@elysiajs/cors": "^1.4.1",
         "@elysiajs/openapi": "^1.4.14",
         "@elysiajs/opentelemetry": "^1.4.10",
-        "@torq-system/grpc": "^0.0.6",
+        "@torq-system/grpc": "0.0.7",
         "better-auth": "1.5.0",
         "dotenv": "^17.3.1",
         "drizzle-orm": "^0.45.1",
@@ -373,7 +373,7 @@
 
     "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
 
-    "@torq-system/grpc": ["@torq-system/grpc@0.0.6", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-ri1qnOchwMNwpdGMrV8kmLlvBBTzg5AF7kkOWcEwj2MK4e0afMJr6JflIgveltUPK8CYJH7kaVBfESSrlHEAkg=="],
+    "@torq-system/grpc": ["@torq-system/grpc@0.0.7", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-phitY9MbzNuw3x5ArktHGD9PNNnr3wb1LeLDAal2JzGYXJOGKOyRA3lRjQY0uBe4axoUozTDt7iklwomKt2wQg=="],
 
     "@types/bun": ["@types/bun@1.3.10", "", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
 

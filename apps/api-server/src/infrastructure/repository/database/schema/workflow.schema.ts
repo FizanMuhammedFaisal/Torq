@@ -68,7 +68,12 @@ export const workflowRun = pgTable('workflow_run', {
 	workflowId: text('workflow_id')
 		.notNull()
 		.references(() => workflow.id),
+	workflowVersionId: text('workflow_version_id')
+		.notNull()
+		.references(() => workflowVersion.id),
 	status: text('status', { enum: ['running', 'success', 'failed', 'idle'] }).notNull(),
+	triggerType: text('trigger_type', { enum: ['manual', 'webhook', 'schedule'] }).notNull(),
+	triggeredBy: text('triggered_by').notNull(),
 	startedAt: timestamp('started_at').defaultNow().notNull(),
 	completedAt: timestamp('completed_at'),
 	duration: integer('duration'),

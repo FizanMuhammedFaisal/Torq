@@ -1,15 +1,21 @@
-export type WorkflowRunStatus = 'running' | 'success' | 'failed' | 'idle';
+import { z } from 'zod';
+import type { AuthUser } from '@/presentation/http/macros/auth.macro';
+
+export const WorkflowRunStatusSchema = z.enum(['running', 'success', 'failed', 'idle']);
+export type WorkflowRunStatus = z.infer<typeof WorkflowRunStatusSchema>;
+
+export const WorkflowRunSummarySchema = z.object({
+	status: WorkflowRunStatusSchema,
+	startedAt: z.date(),
+	completedAt: z.date().nullable(),
+	duration: z.number().nullable(),
+	steps: z.number().int(),
+});
+
+export type WorkflowRunSummary = z.infer<typeof WorkflowRunSummarySchema>;
 
 export interface GetWorkflowsInputDto {
-	req: { id: string };
-}
-
-export interface WorkflowRunSummary {
-	status: WorkflowRunStatus;
-	startedAt: Date;
-	completedAt: Date | null;
-	duration: number | null;
-	steps: number;
+	req: AuthUser;
 }
 
 export interface GetWorkflowsOutputDto {
@@ -18,7 +24,6 @@ export interface GetWorkflowsOutputDto {
 		name: string;
 		description: string | undefined;
 		createdAt: Date;
-		/** true = success, false = failed, undefined = running */
 		health: (boolean | null)[];
 		lastRun: WorkflowRunSummary | null;
 		status: WorkflowRunStatus;

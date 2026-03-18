@@ -5,6 +5,9 @@ import type { IWorkflowController } from '@/presentation/http/interfaces/control
 import type { Router } from '@/presentation/http/interfaces/routes';
 import { CreateWorkflowSchema } from '@/application/dto/worflows/createWorkflow.dto';
 import { UpsertSecretsSchema } from '@/application/dto/worflows/upsertSecrets.dto';
+import { TriggerWorkflowRunSchema } from '@/application/dto/worflows/triggerWorkflowRun.dto';
+import { GetSecretsSchema } from '@/application/dto/worflows/getSecrets.dto';
+import { RevealSecretSchema } from '@/application/dto/worflows/revealSecret.dto';
 import type { AuthMacro } from '@/presentation/http/macros/auth.macro';
 
 @injectable()
@@ -24,7 +27,7 @@ export class WorkflowRouter implements Router {
 			.use(this.list())
 			.use(this.upsertSecrets())
 			.use(this.getSecrets())
-			.use(this.createRun())
+			.use(this.trigger())
 			.use(this.revealSecret());
 	}
 
@@ -73,18 +76,20 @@ export class WorkflowRouter implements Router {
 				return this.workflowController.getSecrets(ctx);
 			},
 			{
+				params: GetSecretsSchema,
 				auth: true,
 			},
 		);
 	}
 
-	createRun() {
+	trigger() {
 		return new Elysia().use(this.authMacro.plugin()).post(
-			'/:id/runs',
+			'/:id/trigger',
 			(ctx) => {
-				return this.workflowController.createRun(ctx);
+				return this.workflowController.triggerWorkflowRun(ctx);
 			},
 			{
+				body: TriggerWorkflowRunSchema,
 				auth: true,
 			},
 		);
@@ -97,6 +102,7 @@ export class WorkflowRouter implements Router {
 				return this.workflowController.revealSecret(ctx);
 			},
 			{
+				params: RevealSecretSchema,
 				auth: true,
 			},
 		);

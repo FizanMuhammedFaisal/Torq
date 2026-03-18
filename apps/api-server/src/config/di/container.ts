@@ -14,8 +14,9 @@ import { UpsertSecretsUseCase } from '@/application/usecases/workflows/upsertSec
 import { GetSecretsUseCase } from '@/application/usecases/workflows/getSecrets.usecase';
 import { CreateWorkflowUseCase } from '@/application/usecases/workflows/createWorkflow.usecase';
 import { GetWorkflowsUseCase } from '@/application/usecases/workflows/getWorkflows.usecase';
-import { CreateRunUseCase } from '@/application/usecases/workflows/createRun.usecase';
 import { RevealSecretUseCase } from '@/application/usecases/workflows/revealSecret.usecase';
+import { TriggerWorkflowRunUseCase } from '@/application/usecases/workflows/triggerWorkflowRun.usecase';
+import { OperatorService } from '@/infrastructure/services/operator.service';
 import { WorkflowRunRepository } from '@/infrastructure/repository/workflowRun.repository';
 
 import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';
@@ -29,6 +30,7 @@ import { DrizzleUnitOfWork } from '@/infrastructure/repository/database/transact
 import { AuthMacro } from '@/presentation/http/macros/auth.macro';
 import { ErrorMacro } from '@/presentation/http/macros/error.macro';
 import { SecretManagementService } from '@/infrastructure/services/secretManagementService';
+import { GrpcClient } from '@/infrastructure/grpc/client';
 
 // Register as singletons using Symbols
 container.register(TOKENS.WorkflowController, { useClass: WorkflowController }, { lifecycle: Lifecycle.Singleton });
@@ -46,6 +48,8 @@ container.register(TOKENS.SendOTPEmail, { useClass: SendOTPUseCase }, { lifecycl
 // Repository & Mapper Registration
 container.register(TOKENS.WorkflowRepository, { useClass: WorkflowRepository }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.SecretRepository, { useClass: SecrectRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.OperatorService, { useClass: OperatorService }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.WorkflowVersionRepository, { useClass: WorkflowVersionRepository }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.WorkflowMapper, { useClass: WorkflowMapper });
 container.register(TOKENS.SecretMapper, { useClass: SecretMapper });
@@ -57,10 +61,10 @@ container.register(TOKENS.AuthMacro, { useClass: AuthMacro }, { lifecycle: Lifec
 container.register(TOKENS.ErrorMacro, { useClass: ErrorMacro }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.UpsertSecretsUseCase, { useClass: UpsertSecretsUseCase }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.GetSecretsUseCase, { useClass: GetSecretsUseCase }, { lifecycle: Lifecycle.Singleton });
-container.register(TOKENS.GetWorkflowsUseCase, { useClass: GetWorkflowsUseCase }, { lifecycle: Lifecycle.Singleton });
-container.register(TOKENS.CreateRunUseCase, { useClass: CreateRunUseCase }, { lifecycle: Lifecycle.Singleton });
-container.register(TOKENS.RevealSecretUseCase, { useClass: RevealSecretUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GetWorkflowsUseCase, { useClass: GetWorkflowsUseCase }, { lifecycle: Lifecycle.Singleton }); container.register(TOKENS.RevealSecretUseCase, { useClass: RevealSecretUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.TriggerWorkflowRunUseCase, { useClass: TriggerWorkflowRunUseCase }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.SecretManagementService, { useClass: SecretManagementService }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GrpcClient, { useClass: GrpcClient }, { lifecycle: Lifecycle.Singleton });
 
 export { container };

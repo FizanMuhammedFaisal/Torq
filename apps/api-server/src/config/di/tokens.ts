@@ -22,13 +22,15 @@ export const TOKENS = {
 	UpsertSecretsUseCase: Symbol.for('UpsertSecretsUseCase'),
 	GetSecretsUseCase: Symbol.for('GetSecretsUseCase'),
 	GetWorkflowsUseCase: Symbol.for('GetWorkflowsUseCase'),
-	CreateRunUseCase: Symbol.for('CreateRunUseCase'),
 	RevealSecretUseCase: Symbol.for('RevealSecretUseCase'),
+	TriggerWorkflowRunUseCase: Symbol.for('TriggerWorkflowRunUseCase'),
 	CreateWorkflowUseCase: Symbol.for('CreateWorkflowUseCase'),
 	WorkflowRunRepository: Symbol.for('WorkflowRunRepository'),
+	OperatorService: Symbol.for('OperatorService'),
 	UnitOfWork: Symbol.for('UnitOfWork'),
 	AuthMacro: Symbol.for('AuthMacro'),
 	ErrorMacro: Symbol.for('ErrorMacro'),
 	RPCRouter: Symbol.for('RPCRouter'),
+	GrpcClient: Symbol.for('GrpcClient'),
 
 } as const;
