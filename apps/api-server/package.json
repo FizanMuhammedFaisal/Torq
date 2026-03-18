@@ -19,9 +19,12 @@
 	"dependencies": {
 		"@better-auth/drizzle-adapter": "1.5.0",
 		"@better-auth/telemetry": "1.5.0",
+		"@connectrpc/connect": "^2.1.1",
+		"@connectrpc/connect-node": "^2.1.1",
 		"@elysiajs/cors": "^1.4.1",
 		"@elysiajs/openapi": "^1.4.14",
 		"@elysiajs/opentelemetry": "^1.4.10",
+		"@torq-system/grpc": "^0.0.6",
 		"better-auth": "1.5.0",
 		"dotenv": "^17.3.1",
 		"drizzle-orm": "^0.45.1",

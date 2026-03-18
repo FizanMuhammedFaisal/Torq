@@ -1,4 +1,6 @@
 export const TOKENS = {
+	HTTPServer: Symbol.for('HTTPServer'),
+	GRPCServer: Symbol.for('GRPCServer'),
 	WorkflowController: Symbol.for('WorkflowController'),
 	WorkflowRouter: Symbol.for('WorkflowRouter'),
 	HealthRouter: Symbol.for('HealthRouter'),
@@ -27,4 +29,6 @@ export const TOKENS = {
 	UnitOfWork: Symbol.for('UnitOfWork'),
 	AuthMacro: Symbol.for('AuthMacro'),
 	ErrorMacro: Symbol.for('ErrorMacro'),
+	RPCRouter: Symbol.for('RPCRouter'),
+
 } as const;
