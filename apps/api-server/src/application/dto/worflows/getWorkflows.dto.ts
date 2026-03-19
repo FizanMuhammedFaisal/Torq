@@ -9,7 +9,6 @@ export const WorkflowRunSummarySchema = z.object({
 	startedAt: z.date(),
 	completedAt: z.date().nullable(),
 	duration: z.number().nullable(),
-	steps: z.number().int(),
 });
 
 export type WorkflowRunSummary = z.infer<typeof WorkflowRunSummarySchema>;

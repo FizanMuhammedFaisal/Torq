@@ -1,51 +1,20 @@
-import z from 'zod';
-
-export const RUN_STATUS = {
-	RUNNING: 'running',
-	SUCCESS: 'success',
-	FAILED: 'failed',
-	IDLE: 'idle',
-} as const;
-
-export const TRIGGER_TYPE = {
-	MANUAL: 'manual',
-	WEBHOOK: 'webhook',
-	SCHEDULE: 'schedule',
-} as const;
-
-export const RunStatusSchema = z.enum(['running', 'success', 'failed', 'idle']);
-export type RunStatus = z.infer<typeof RunStatusSchema>;
-
-export const TriggerTypeSchema = z.enum(['manual', 'webhook', 'schedule']);
-export type TriggerType = z.infer<typeof TriggerTypeSchema>;
+import type { WorkflowRun, WorkflowRunStatus, WorkflowTriggerType } from '@/domain/entities/workflowRun';
+import type { IBaseRepository } from './baseRepository.interface';
 
 export type PersistRunDto = {
-	status: RunStatus;
+	status: WorkflowRunStatus;
 	startedAt?: string;
 	completedAt?: string | null;
 	duration?: number | null;
-	steps: number;
 	workflowId: string;
 	workflowVersionId: string;
 	identityId: string;
-	triggerType: TriggerType;
+	triggerType: WorkflowTriggerType;
 	triggeredBy: string;
 };
 
-export type PersistedRunDto = {
-	id: string;
-	workflowId: string;
-	workflowVersionId: string;
-	status: RunStatus;
-	triggerType: TriggerType;
-	triggeredBy: string;
-	startedAt: Date;
-	completedAt: Date | null;
-	duration: number | null;
-	steps: number;
-};
-
-export interface IWorkflowRunRepository {
-	createRun(data: PersistRunDto): Promise<PersistedRunDto>;
-	updateRunStatus(id: string, status: RunStatus): Promise<void>;
+export interface IWorkflowRunRepository extends IBaseRepository<WorkflowRun> {
+	create(data: PersistRunDto): Promise<WorkflowRun>;
+	updateStatus(id: string, status: WorkflowRunStatus): Promise<void>;
+	findByWorkflowId(workflowId: string, options?: { limit?: number }): Promise<WorkflowRun[]>;
 }

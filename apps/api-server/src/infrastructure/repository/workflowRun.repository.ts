@@ -1,16 +1,26 @@
-import { injectable } from 'tsyringe';
+import { injectable, inject } from 'tsyringe';
 import { ulid } from 'ulid';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { getExecutor } from './database/transaction/transactionContext';
 import { workflowRun } from './database/schema';
 import { PostgresErrorMapper } from './database/errors/postgresErrorMapper';
 import { DatabaseInternalError } from '@infrastructure/errors/databaseInternalError';
-import type { IWorkflowRunRepository, PersistRunDto, PersistedRunDto, RunStatus } from '@/application/port/repositories/workflowRunRepository.interface';
-import { RUN_STATUS } from '@/application/port/repositories/workflowRunRepository.interface';
+import type {
+	IWorkflowRunRepository,
+	PersistRunDto,
+} from '@/application/port/repositories/workflowRunRepository.interface';
+import type { WorkflowRun, WorkflowRunStatus } from '@/domain/entities/workflowRun';
+import type { WorkflowRunMapper } from './mappers/workflowRun.mapper';
+import { TOKENS } from '@/config/di/tokens';
 
 @injectable()
 export class WorkflowRunRepository implements IWorkflowRunRepository {
-	async createRun(data: PersistRunDto): Promise<PersistedRunDto> {
+	constructor(
+		@inject(TOKENS.WorkflowRunMapper)
+		private readonly mapper: WorkflowRunMapper,
+	) { }
+
+	async create(data: PersistRunDto): Promise<WorkflowRun> {
 		try {
 			const id = ulid();
 			const startedAt = data.startedAt ? new Date(data.startedAt) : new Date();
@@ -28,39 +38,82 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 					startedAt,
 					completedAt,
 					duration: data.duration ?? null,
-					steps: data.steps,
 				})
 				.returning();
 
 			const row = result[0];
 			if (!row) throw new DatabaseInternalError('Failed to create workflow run');
 
-			return {
-				id: row.id,
-				workflowId: row.workflowId,
-				workflowVersionId: row.workflowVersionId,
-				status: row.status as PersistedRunDto['status'],
-				triggerType: row.triggerType as PersistedRunDto['triggerType'],
-				triggeredBy: row.triggeredBy,
-				startedAt: row.startedAt,
-				completedAt: row.completedAt,
-				duration: row.duration,
-				steps: row.steps,
-			};
+			return this.mapper.toDomain(row);
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
 		}
 	}
 
-	async updateRunStatus(id: string, status: RunStatus): Promise<void> {
+	async updateStatus(id: string, status: WorkflowRunStatus): Promise<void> {
 		try {
 			await getExecutor()
 				.update(workflowRun)
 				.set({
 					status,
-					completedAt: status === RUN_STATUS.FAILED || status === RUN_STATUS.SUCCESS ? new Date() : null,
+					completedAt: status === 'failed' || status === 'success' ? new Date() : null,
 				})
 				.where(eq(workflowRun.id, id));
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
+		}
+	}
+
+	async findByWorkflowId(workflowId: string, options?: { limit?: number }): Promise<WorkflowRun[]> {
+		try {
+			const results = await getExecutor().query.workflowRun.findMany({
+				where: eq(workflowRun.workflowId, workflowId),
+				orderBy: [desc(workflowRun.startedAt)],
+				limit: options?.limit,
+			});
+
+			return results.map((row) => this.mapper.toDomain(row));
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
+		}
+	}
+
+	async findById(id: string): Promise<WorkflowRun | null> {
+		try {
+			const result = await getExecutor().query.workflowRun.findFirst({
+				where: eq(workflowRun.id, id),
+			});
+
+			if (!result) return null;
+
+			return this.mapper.toDomain(result);
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
+		}
+	}
+
+	/**
+	 * Runs are immutable after creation — only their status can be updated via updateStatus().
+	 */
+	async save(_entity: WorkflowRun): Promise<WorkflowRun> {
+		throw new Error('WorkflowRun is immutable — use create() or updateStatus() instead.');
+	}
+
+	async delete(id: string): Promise<void> {
+		try {
+			await getExecutor().delete(workflowRun).where(eq(workflowRun.id, id));
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
+		}
+	}
+
+	async existsById(id: string): Promise<boolean> {
+		try {
+			const result = await getExecutor().query.workflowRun.findFirst({
+				columns: { id: true },
+				where: eq(workflowRun.id, id),
+			});
+			return !!result;
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
 		}

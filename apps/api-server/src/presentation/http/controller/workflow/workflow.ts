@@ -4,6 +4,7 @@ import type { ICreateWorkflowUseCase } from '@/application/port/usecases/workflo
 import type { IUpsertSecretsUseCase } from '@/application/port/usecases/workflows/upsertSecrets.interface';
 import type { IGetSecretsUseCase } from '@/application/port/usecases/workflows/getSecrets.interface';
 import type { IGetWorkflowsUseCase } from '@/application/port/usecases/workflows/getWorkflows.interface';
+import type { IGetWorkflowByIdUseCase } from '@/application/port/usecases/workflows/getWorkflowById.interface';
 import type { IRevealSecretUseCase } from '@/application/port/usecases/workflows/revealSecret.interface';
 import type { ITriggerWorkflowRunUseCase } from '@/application/port/usecases/workflows/triggerWorkflowRun.interface';
 import type { AuthenticatedContext } from '@/presentation/http/macros/auth.macro';
@@ -24,6 +25,8 @@ export class WorkflowController implements IWorkflowController {
 		private getSecretsUseCase: IGetSecretsUseCase,
 		@inject(TOKENS.GetWorkflowsUseCase)
 		private getWorkflowsUseCase: IGetWorkflowsUseCase,
+		@inject(TOKENS.GetWorkflowByIdUseCase)
+		private getWorkflowByIdUseCase: IGetWorkflowByIdUseCase,
 		@inject(TOKENS.RevealSecretUseCase)
 		private revealSecretUseCase: IRevealSecretUseCase,
 		@inject(TOKENS.TriggerWorkflowRunUseCase)
@@ -32,6 +35,10 @@ export class WorkflowController implements IWorkflowController {
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
 		return this.getWorkflowsUseCase.execute({ req: ctx.user });
+	};
+	getWorkflowById = async (ctx: AuthenticatedContext) => {
+		const id = ctx.params.id;
+		return this.getWorkflowByIdUseCase.execute({ id, req: ctx.user });
 	};
 
 	triggerWorkflowRun = async (ctx: AuthenticatedContext) => {

@@ -28,7 +28,20 @@ export class WorkflowRouter implements Router {
 			.use(this.upsertSecrets())
 			.use(this.getSecrets())
 			.use(this.trigger())
-			.use(this.revealSecret());
+			.use(this.revealSecret())
+			.use(this.getById());
+	}
+
+	getById() {
+		return new Elysia().use(this.authMacro.plugin()).get(
+			'/:id',
+			(ctx) => {
+				return this.workflowController.getWorkflowById(ctx);
+			},
+			{
+				auth: true,
+			},
+		);
 	}
 
 	create() {

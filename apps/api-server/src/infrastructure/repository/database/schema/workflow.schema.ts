@@ -8,7 +8,7 @@ export const workflow = pgTable('workflow', {
 		.notNull()
 		.references(() => user.id),
 	name: text('name').notNull(),
-	description: text('description').notNull(),
+	description: text('description'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -19,7 +19,7 @@ export const workflowVersion = pgTable('workflow_version', {
 		.references(() => workflow.id),
 	version: integer('version').notNull(),
 	raw: text('raw').notNull(),
-	spec: json('spec').notNull(),
+	spec: json('spec').$type<Record<string, unknown>>().notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
@@ -49,6 +49,7 @@ export const workflowRelations = relations(workflow, ({ one, many }) => ({
 	runs: many(workflowRun),
 }));
 
+
 export const workflowVersionRelations = relations(workflowVersion, ({ one }) => ({
 	workflow: one(workflow, {
 		fields: [workflowVersion.workflowId],
@@ -63,6 +64,7 @@ export const secretRelations = relations(secrets, ({ one }) => ({
 	}),
 }));
 
+// Workflow runs
 export const workflowRun = pgTable('workflow_run', {
 	id: text('id').primaryKey(),
 	workflowId: text('workflow_id')
@@ -71,13 +73,12 @@ export const workflowRun = pgTable('workflow_run', {
 	workflowVersionId: text('workflow_version_id')
 		.notNull()
 		.references(() => workflowVersion.id),
-	status: text('status', { enum: ['running', 'success', 'failed', 'idle'] }).notNull(),
+	status: text('status', { enum: ['pending', 'running', 'success', 'failed', 'idle'] }).notNull(),
 	triggerType: text('trigger_type', { enum: ['manual', 'webhook', 'schedule'] }).notNull(),
 	triggeredBy: text('triggered_by').notNull(),
 	startedAt: timestamp('started_at').defaultNow().notNull(),
 	completedAt: timestamp('completed_at'),
 	duration: integer('duration'),
-	steps: integer('steps').notNull(),
 });
 
 export const workflowRunRelations = relations(workflowRun, ({ one }) => ({

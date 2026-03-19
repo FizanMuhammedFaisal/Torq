@@ -25,6 +25,7 @@ export const TOKENS = {
 	RevealSecretUseCase: Symbol.for('RevealSecretUseCase'),
 	TriggerWorkflowRunUseCase: Symbol.for('TriggerWorkflowRunUseCase'),
 	CreateWorkflowUseCase: Symbol.for('CreateWorkflowUseCase'),
+	GetWorkflowByIdUseCase: Symbol.for('GetWorkflowByIdUseCase'),
 	WorkflowRunRepository: Symbol.for('WorkflowRunRepository'),
 	OperatorService: Symbol.for('OperatorService'),
 	UnitOfWork: Symbol.for('UnitOfWork'),
@@ -32,5 +33,7 @@ export const TOKENS = {
 	ErrorMacro: Symbol.for('ErrorMacro'),
 	RPCRouter: Symbol.for('RPCRouter'),
 	GrpcClient: Symbol.for('GrpcClient'),
+	WorkflowAggregateRepository: Symbol.for("WorkflowAggregateRepository"),
+	WorkflowRunMapper: Symbol.for("WorkflowRunMapper")
 
 } as const;
