@@ -1,12 +1,12 @@
 import { Envconfig } from '@/config/envconfig';
 import { type Transport, type Client, createClient } from '@connectrpc/connect';
 import { createGrpcTransport } from '@connectrpc/connect-node';
-import { WorkflowService } from '@torq-system/grpc';
+import { OperatorService } from '@torq-system/grpc';
 import { loggingInterceptor } from './interceptors/loggingInterceptor';
 // Keep-alive settings
 // https://github.com/connectrpc/connect-es/pull/673 read if want to know aboout keep alive
 export class GrpcClient {
-	private apiServerClient: Client<typeof WorkflowService>;
+	private apiServerClient: Client<typeof OperatorService>;
 	private operatorTransport: Transport;
 	constructor() {
 		this.operatorTransport = createGrpcTransport({
@@ -14,9 +14,9 @@ export class GrpcClient {
 			pingIntervalMs: 300000,
 			interceptors: [loggingInterceptor],
 		});
-		this.apiServerClient = createClient(WorkflowService, this.operatorTransport);
+		this.apiServerClient = createClient(OperatorService, this.operatorTransport);
 	}
-	getApiServerClient(): Client<typeof WorkflowService> {
+	getApiServerClient(): Client<typeof OperatorService> {
 		return this.apiServerClient;
 	}
 }

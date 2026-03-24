@@ -1,10 +1,10 @@
 import { injectable } from 'tsyringe';
-import type { IResourceWatcher } from '@/application/port/k8s/watcher.interface';
-import * as k8s from '@kubernetes/client-node'
+import * as k8s from '@kubernetes/client-node';
 import { kubeConfig } from '../client';
 import { Envconfig } from '@/config/envconfig';
 import { logger } from '@/infrastructure/logger/logger';
 import { BaseWatcher } from './baseWatcher';
+import { toDomainWorkflowRun, type WorkflowRunK8s } from './mappers/workflowRunSnapshot.mapper';
 
 // https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes
 // workflow watcher should watch modified/created events
@@ -27,7 +27,13 @@ export class CRDWatcher extends BaseWatcher {
 
 
 	}
-	private async handler(phase: string, apiObj: any, _watchObj?: unknown) {
+	private async handler(phase: string, apiObj: unknown, _watchObj?: unknown) {
+		if (!this.isWorkflowRunK8s(apiObj)) {
+			logger.warn({
+				"[crd - watcher] received unexpected object shape": apiObj
+			})
+			return
+		}
 		if (apiObj.metadata?.resourceVersion) {
 			this.lastResourceVersion = apiObj.metadata.resourceVersion
 		}
@@ -39,5 +45,23 @@ export class CRDWatcher extends BaseWatcher {
 			logger.error({ '[crd-watcher] reconcile error': err })
 			// never crash the watcher — log and continue
 		}
+	}
+	private isWorkflowRunK8s(obj: unknown): obj is WorkflowRunK8s {
+
+		if (typeof obj !== 'object' || obj === null) return false
+
+		const o = obj as Record<string, unknown>
+
+		if (typeof o.apiVersion !== 'string') return false
+		if (typeof o.kind !== 'string') return false
+		if (o.kind !== 'WorkflowRun') return false
+
+		const spec = o.spec as Record<string, unknown> | undefined
+		if (!spec) return false
+		if (typeof spec.workflowId !== 'string') return false
+		if (typeof spec.versionId !== 'string') return false
+		if (typeof spec.torqVersion !== 'string') return false
+
+		return true
 	}
 }
