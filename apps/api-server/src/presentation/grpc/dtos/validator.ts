@@ -2,8 +2,7 @@ import { ConnectError, Code } from '@connectrpc/connect';
 import type { z } from 'zod';
 
 /**
- * Validates data against a Zod schema.
- * Throws ConnectError with InvalidArgument code if validation fails.
+ * use zod safeparse and throws connectError if failed
  */
 export function validate<T extends z.ZodSchema>(schema: T, data: z.input<T>): z.output<T> {
 	const result = schema.safeParse(data);
