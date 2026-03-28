@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MOCK_RUNS, statusMap } from '../mock-data';
 
-export function RunsTab() {
+export function RunsTab({ workflowId }: { workflowId: string }) {
 	const [selectedRunId, setSelectedRunId] = useState<string>(MOCK_RUNS[0].id);
 	const [expandedSteps, setExpandedSteps] = useState<Record<string, boolean>>({});
+
+	// In a real app, you'd use workflowId to fetch runs
+	console.log('Fetching runs for workflow:', workflowId);
 
 	const selectedRun = MOCK_RUNS.find((r) => r.id === selectedRunId) || MOCK_RUNS[0];
 

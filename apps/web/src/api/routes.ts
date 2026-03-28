@@ -3,5 +3,6 @@ export const API_ROUTES = {
 		BASE: '/workflows',
 		BY_ID: (id: string) => `/workflows/${id}`,
 		SECRETS: (id: string) => `/workflows/${id}/secrets`,
+		TRIGGER: (id: string) => `/workflows/${id}/trigger`,
 	},
 };

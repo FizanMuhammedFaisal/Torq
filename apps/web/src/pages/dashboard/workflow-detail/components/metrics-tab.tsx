@@ -5,7 +5,8 @@ import { GearsIcon, File02Icon } from '@hugeicons/core-free-icons';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { MOCK_WORKFLOW } from '../mock-data';
 
-export function MetricsTab() {
+export function MetricsTab({ workflowId }: { workflowId: string }) {
+	console.log('Metrics for:', workflowId);
 	const successRate = MOCK_WORKFLOW.successRate;
 
 	// Generate mock historical run data for the histogram

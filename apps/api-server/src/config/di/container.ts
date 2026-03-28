@@ -35,6 +35,8 @@ import { ErrorMacro } from '@/presentation/http/macros/error.macro';
 import { SecretManagementService } from '@/infrastructure/services/secretManagementService';
 import { GrpcClient } from '@/infrastructure/grpc/client';
 import { HTTPServer } from '@/presentation/server';
+import { GRpcServer } from '@/presentation/grpc/rpc-server';
+import { RPCRouter } from '@/presentation/grpc/routers/router';
 
 // Register as singletons using Symbols
 container.register(TOKENS.WorkflowController, { useClass: WorkflowController }, { lifecycle: Lifecycle.Singleton });
@@ -74,5 +76,7 @@ container.register(TOKENS.WorkflowAggregateRepository, { useClass: WorkflowAggre
 container.register(TOKENS.SecretManagementService, { useClass: SecretManagementService }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.GrpcClient, { useClass: GrpcClient }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.HTTPServer, { useClass: HTTPServer }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GRPCServer, { useClass: GRpcServer }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.RPCRouter, { useClass: RPCRouter }, { lifecycle: Lifecycle.Singleton });
 
 export { container };

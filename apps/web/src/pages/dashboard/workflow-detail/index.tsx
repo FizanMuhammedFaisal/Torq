@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { motion } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Loading03Icon, Alert02Icon } from '@hugeicons/core-free-icons';
+import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-
-import { MOCK_WORKFLOW, statusMap } from './mock-data';
+import type { ApiErrorBody } from '@/api/client';
+import { statusMap } from './mock-data';
 
 // Tabs
 import { OverviewTab } from './components/overview-tab';
@@ -15,6 +15,8 @@ import { EditorTab } from './components/editor-tab';
 import { RunsTab } from './components/runs-tab';
 import { MetricsTab } from './components/metrics-tab';
 import { SecretsTab } from './components/secrets-tab';
+import { useTriggerRun } from '@/features/workflows/hooks/use-trigger-run';
+import { useWorkflow } from '@/features/workflows/hooks/use-workflow';
 
 const tabs = ['Overview', 'Editor', 'Runs', 'Metrics', 'Secrets'] as const;
 type Tab = (typeof tabs)[number];
@@ -25,37 +27,45 @@ export function WorkflowDetailPage() {
 	const [activeTab, setActiveTab] = useState<Tab>('Overview');
 	const [showDelete, setShowDelete] = useState(false);
 
-	const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState<Error | null>(null);
+	const triggerRun = useTriggerRun(id);
+	const { data: workflow, isLoading, error } = useWorkflow(id);
 
-	useEffect(() => {
-		const load = async () => {
-			if (!id) return;
-			setIsLoading(true);
-			setError(null);
-			await new Promise((res) => setTimeout(res, 600));
-			// Optional error simulation: if (id === 'error') throw new Error('Could not find Workflow');
-			setIsLoading(false);
-		};
-		load();
-	}, [id]);
+	const cfg = workflow ? (statusMap[workflow.status as keyof typeof statusMap] || statusMap.idle) : statusMap.idle;
 
-	const wf = MOCK_WORKFLOW;
-	const cfg = statusMap[wf.status];
+	if (!id) {
+		return (
+			<div className="flex flex-col h-full bg-[#0a0a0a] items-center justify-center p-8">
+				<div className="border border-red-500/20 bg-red-500/2 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm max-w-md w-full">
+					<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
+						<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
+					</div>
+					<h3 className="text-[18px] font-semibold text-white/90 mb-2">Invalid Workflow</h3>
+					<p className="text-[14px] text-white/50 mb-8">No workflow ID provided in URL.</p>
+					<Button
+						onClick={() => navigate('/dashboard/workflows')}
+						variant="outline"
+						className="gap-2 h-10 rounded-full px-6 border-white/8 hover:bg-white/4"
+					>
+						Back to Workflows
+					</Button>
+				</div>
+			</div>
+		);
+	}
 
 	if (error) {
 		return (
 			<div className="flex flex-col h-full bg-[#0a0a0a] items-center justify-center p-8">
-				<div className="border border-red-500/20 bg-red-500/[0.02] rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm max-w-md w-full">
+				<div className="border border-red-500/20 bg-red-500/2 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm max-w-md w-full">
 					<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
-						<HugeiconsIcon icon={Alert02Icon as any} className="size-8 text-red-400" />
+						<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
 					</div>
 					<h3 className="text-[18px] font-semibold text-white/90 mb-2">Workflow Not Found</h3>
 					<p className="text-[14px] text-white/50 mb-8">{error.message}</p>
 					<Button
 						onClick={() => navigate('/dashboard/workflows')}
 						variant="outline"
-						className="gap-2 h-10 rounded-full px-6 border-white/[0.08] hover:bg-white/[0.04]"
+						className="gap-2 h-10 rounded-full px-6 border-white/8 hover:bg-white/4"
 					>
 						Back to Workflows
 					</Button>
@@ -66,53 +76,42 @@ export function WorkflowDetailPage() {
 
 	if (isLoading) {
 		return (
-			<div className="flex flex-col h-full bg-[#0a0a0a]">
-				<div className="px-6 lg:px-8 pt-6 pb-5 border-b border-white/[0.05]">
-					<div className="flex items-center gap-4 mb-5">
-						<div className="size-9 rounded-full bg-white/[0.03] animate-pulse" />
-						<div className="flex flex-col gap-2">
-							<div className="w-48 h-6 bg-white/[0.05] rounded animate-pulse" />
-							<div className="w-64 h-3 bg-white/[0.03] rounded animate-pulse" />
-						</div>
-					</div>
-				</div>
-				<div className="flex-1 flex items-center justify-center">
-					<HugeiconsIcon icon={Loading03Icon as any} className="size-8 text-white/20 animate-spin" />
-				</div>
+			<div className="flex flex-col h-full bg-[#0a0a0a] items-center justify-center p-8">
+				<HugeiconsIcon icon={Loading03Icon} className="size-8 text-white/20 animate-spin" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col h-full">
-			{/* Header */}
-			<div className="px-6 lg:px-8 pt-6 pb-5 border-b border-white/[0.05]">
-				{/* Back + title + actions */}
-				<div className="flex items-center justify-between mb-5">
-					<div className="flex items-center gap-4">
-						{/* Back button — round */}
+		<div className="flex flex-col h-full bg-[#0a0a0a]">
+			{/* Top Header */}
+			<div className="border-b border-white/4 bg-[#0a0a0a]/50 backdrop-blur-md sticky top-0 z-30">
+				<div className="max-w-[1400px] mx-auto px-8 h-20 flex items-center justify-between">
+					<div className="flex items-center gap-6">
 						<button
 							type="button"
-							onClick={() => navigate('/dashboard')}
-							className="flex items-center justify-center size-9 rounded-full border border-white/[0.08] text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-all"
+							onClick={() => navigate('/dashboard/workflows')}
+							className="group flex items-center justify-center size-9 rounded-full bg-white/3 border border-white/8 hover:bg-white/10 transition-all active:scale-95"
 						>
-							<svg className="size-4" viewBox="0 0 16 16" fill="none">
+							<svg
+								className="size-4 text-white/40 group-hover:text-white transition-colors"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+							>
 								<title>Back</title>
-								<path
-									d="M10 12L6 8l4-4"
-									stroke="currentColor"
-									strokeWidth="1.5"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
+								<path d="M19 12H5M12 19l-7-7 7-7" />
 							</svg>
 						</button>
 						<div>
 							<div className="flex items-center gap-3">
-								<h1 className="text-2xl font-bold tracking-tight text-white">{wf.name}</h1>
-								<div className="flex items-center gap-1.5 rounded-full border border-white/[0.06] px-2.5 py-1">
+								<h1 className="text-2xl font-bold tracking-tight text-white">{workflow?.name}</h1>
+								<div className="flex items-center gap-1.5 rounded-full border border-white/6 px-2.5 py-1">
 									<span
-										className={`size-[6px] rounded-full ${wf.status === 'running' ? 'animate-pulse' : ''}`}
+										className={`size-[6px] rounded-full ${workflow?.status === 'running' ? 'animate-pulse' : ''}`}
 										style={{ background: cfg.color }}
 									/>
 									<span className="text-[11px] font-medium" style={{ color: cfg.color }}>
@@ -120,67 +119,89 @@ export function WorkflowDetailPage() {
 									</span>
 								</div>
 							</div>
-							<p className="text-[14px] text-white/30 mt-1.5">{wf.description}</p>
+							<p className="text-[14px] text-white/30 mt-1.5">{workflow?.description}</p>
 						</div>
 					</div>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-3">
+						<Button
+							variant="outline"
+							size="sm"
+							className="rounded-full gap-1.5 px-5 bg-white/2 border-white/8 hover:bg-white/4"
+						>
+							<svg
+								className="size-3.5 text-white/40"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+							>
+								<title>Edit workflow</title>
+								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+							</svg>
+							Edit
+						</Button>
 						<Button
 							size="sm"
-							variant="ghost"
-							className="rounded-full text-white/30 hover:text-red-400"
-							onClick={() => setShowDelete(true)}
+							className="rounded-full gap-1.5 px-5"
+							onClick={() => triggerRun.mutate(undefined, {
+								onSuccess: () => {
+									toast.success('Workflow triggered successfully');
+									setActiveTab('Runs');
+								},
+								onError: (error) => {
+									const body = error.response?.data as ApiErrorBody;
+									toast.error(body?.message || 'Failed to trigger workflow run');
+								}
+							})}
+							disabled={triggerRun.isPending}
 						>
-							Delete
-						</Button>
-						<Button size="sm" className="rounded-full gap-1.5 px-5">
-							<svg className="size-3" viewBox="0 0 24 24" fill="currentColor">
-								<title>Run workflow</title>
-								<polygon points="6 3 20 12 6 21 6 3" />
-							</svg>
-							Run
+							{triggerRun.isPending ? (
+								<HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin" />
+							) : (
+								<svg className="size-3" viewBox="0 0 24 24" fill="currentColor">
+									<title>Run workflow</title>
+									<polygon points="6 3 20 12 6 21 6 3" />
+								</svg>
+							)}
+							{triggerRun.isPending ? 'Triggering...' : 'Run'}
 						</Button>
 					</div>
 				</div>
 
 				{/* Tabs — sliding pill */}
-				<div className="flex items-center gap-1 p-1 rounded-full bg-white/[0.03] border border-white/[0.05] w-fit">
-					{tabs.map((tab) => (
-						<button
-							key={tab}
-							type="button"
-							onClick={() => setActiveTab(tab)}
-							className={`relative px-5 py-2 text-[13px] font-medium rounded-full transition-colors z-10 ${activeTab === tab ? 'text-white' : 'text-white/40 hover:text-white/70'
-								}`}
-						>
-							{activeTab === tab && (
-								<motion.div
-									layoutId="active-pill"
-									className="absolute inset-0 rounded-full bg-primary/10 border border-primary/20"
-									style={{ boxShadow: '0 0 16px 0 rgba(16,185,129,0.15)' }}
-									transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
-								/>
-							)}
-							<span className="relative z-10">{tab}</span>
-						</button>
-					))}
+				<div className="max-w-[1400px] mx-auto px-8 pb-4">
+					<div className="flex items-center gap-1 p-1 rounded-full bg-white/3 border border-white/5 w-fit">
+						{tabs.map((tab) => (
+							<button
+								key={tab}
+								type="button"
+								onClick={() => setActiveTab(tab)}
+								className={`
+                  px-5 py-1.5 rounded-full text-[13px] font-medium transition-all relative
+                  ${activeTab === tab ? 'text-white' : 'text-white/40 hover:text-white/60'}
+                `}
+							>
+								{activeTab === tab && (
+									<div className="absolute inset-0 bg-white/10 rounded-full shadow-[0_2px_10px_rgba(255,255,255,0.05)]" />
+								)}
+								<span className="relative z-10">{tab}</span>
+							</button>
+						))}
+					</div>
 				</div>
 			</div>
 
-			{/* Content */}
-			<div className="flex-1 overflow-y-auto p-6 lg:p-8">
-				<motion.div
-					key={activeTab}
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ duration: 0.15 }}
-				>
+			{/* Main Content Area */}
+			<div className="flex-1 overflow-auto bg-[#080808]">
+				<div className="max-w-[1400px] mx-auto p-8">
 					{activeTab === 'Overview' && <OverviewTab />}
 					{activeTab === 'Editor' && <EditorTab />}
-					{activeTab === 'Runs' && <RunsTab />}
-					{activeTab === 'Metrics' && <MetricsTab />}
-					{activeTab === 'Secrets' && id && <SecretsTab workflowId={id} />}
-				</motion.div>
+					{activeTab === 'Runs' && <RunsTab workflowId={id} />}
+					{activeTab === 'Metrics' && <MetricsTab workflowId={id} />}
+					{activeTab === 'Secrets' && <SecretsTab />}
+				</div>
 			</div>
 
 			{/* Delete dialog */}
@@ -188,8 +209,8 @@ export function WorkflowDetailPage() {
 				open={showDelete}
 				onOpenChange={setShowDelete}
 				title="Delete workflow"
-				description={`This will permanently delete "${wf.name}" and all its run history. This action cannot be undone.`}
-				confirmText={wf.name}
+				description={`This will permanently delete "${workflow?.name}" and all its run history. This action cannot be undone.`}
+				confirmText={workflow?.name || ''}
 				confirmLabel="Delete Workflow"
 				variant="destructive"
 				onConfirm={() => {

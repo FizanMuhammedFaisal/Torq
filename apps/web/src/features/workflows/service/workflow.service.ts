@@ -15,6 +15,7 @@ export type WorkflowResponse = {
 	description?: string;
 	createdAt: string;
 	updatedAt: string;
+	status: 'running' | 'success' | 'failed' | 'idle';
 };
 
 export const workflowService = {
@@ -29,6 +30,13 @@ export const workflowService = {
 	list: async (): Promise<WorkflowResponse[]> => {
 		const { data } = await apiClient.get<WorkflowResponse[]>(
 			API_ROUTES.WORKFLOWS.BASE,
+		);
+		return data;
+	},
+
+	getById: async (id: string): Promise<WorkflowResponse> => {
+		const { data } = await apiClient.get<WorkflowResponse>(
+			API_ROUTES.WORKFLOWS.BY_ID(id),
 		);
 		return data;
 	},
@@ -50,6 +58,14 @@ export const workflowService = {
 		const { data } = await apiClient.get<
 			{ id: string; key: string; createdAt: string; updatedAt: string }[]
 		>(API_ROUTES.WORKFLOWS.SECRETS(workflowId));
+		return data;
+	},
+
+	trigger: async (workflowId: string, version?: number): Promise<{ runId: string }> => {
+		const { data } = await apiClient.post<{ runId: string }>(
+			API_ROUTES.WORKFLOWS.TRIGGER(workflowId),
+			{ version },
+		);
 		return data;
 	},
 };

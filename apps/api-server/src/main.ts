@@ -6,7 +6,7 @@
 import 'reflect-metadata';
 import { Envconfig } from './config/envconfig';
 import type { HTTPServer } from './presentation/server';
-import { container } from 'tsyringe';
+import { container } from './config/di/container';
 import { TOKENS } from './config/di/tokens';
 import type { GRpcServer } from './presentation/grpc/rpc-server';
 
