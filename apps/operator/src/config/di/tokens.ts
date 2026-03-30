@@ -3,8 +3,9 @@ export const TOKENS = {
 	GRPCServer: Symbol('GRPCServer'),
 	CRDManager: Symbol('CRDManager'),
 	HealthServer: Symbol('HealthServer'),
-	WorkflowRunWatcher: Symbol('WorkflowRunWatcher'),
+	CRDWatcher: Symbol('CRDWatcher'),
 	JobWatcher: Symbol('JobWatcher'),
 	K8sWatchManager: Symbol('K8sWatchManager'),
+	Reconciler: Symbol('Reconciler'),
 
 } as const;

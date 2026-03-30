@@ -1,14 +1,14 @@
 import { injectable, inject } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
-import type { WorkflowRunWatcher } from './watchers/CRDWatcher';
+import type { CRDWatcher } from './watchers/CRDWatcher';
 import type { JobWatcher } from './watchers/jobWatcher';
 
 
 @injectable()
 export class K8sWatchManager {
     constructor(
-        @inject(TOKENS.WorkflowRunWatcher)
-        private readonly workflowRunWatcher: WorkflowRunWatcher,
+        @inject(TOKENS.CRDWatcher)
+        private readonly workflowRunWatcher: CRDWatcher,
         @inject(TOKENS.JobWatcher)
         private readonly jobWatcher: JobWatcher,
     ) { }
@@ -19,7 +19,7 @@ export class K8sWatchManager {
         try {
             await Promise.all([
                 this.workflowRunWatcher.start(),
-                this.jobWatcher.start(),
+                // this.jobWatcher.start(),
             ]);
 
             console.log('All configured K8s watchers are running.');

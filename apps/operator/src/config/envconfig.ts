@@ -26,7 +26,7 @@ export const Envconfig = {
 		HOST: process.env.RPC_HOST || 'localhost',
 	},
 	k8s: {
-		group: process.env.K8S_GROUP || 'torq.app',
+		group: process.env.K8S_GROUP || 'torq.dev',
 		version: process.env.K8S_VERSION || 'v1alpha1',
 		plural: process.env.K8S_PLURAL || 'workflowruns',
 		namespace: process.env.K8S_NAMESPACE || 'default',

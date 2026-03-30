@@ -32,4 +32,18 @@ so in loop we get actions like added, modified, deleted line by line refer wachi
 
 inside that hanlder
 
-1. 
+1. get the spec of the workflow ( use a cache inmemery or external) through grpc from api server
+2. for each steps in this 
+
+1. leases acquire:
+ lease is needed here to ensure only one jobrunner is being runned for a job
+ if there is already a lease skip
+
+2. make secrects for the job and used owned rerfece i guess (TODO: check )
+3. create the job wiht all the things, add a log sidecar that can do the log streaming refer Logs_Collection.md
+4. update postgress audit log for observabilty 
+5. publish to message broker for apiserver to consume an update 
+
+## Loop2 (Job Watcher)
+
+K8s streams job modified events (label:managedby-torq)

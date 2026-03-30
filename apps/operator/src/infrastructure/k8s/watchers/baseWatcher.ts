@@ -1,9 +1,9 @@
 import { logger } from "@/infrastructure/logger/logger";
-
 export abstract class BaseWatcher {
     protected lastResourceVersion: string | undefined
     private retryCount = 0;
     private isWatching = false;
+
     abstract startWatch(): Promise<void>;
 
     public async start(): Promise<void> {
@@ -23,6 +23,9 @@ export abstract class BaseWatcher {
         logger.info({ 'watcher stopped for': this.constructor.name })
     }
     public hanldeDisconnect(err: unknown) {
+        if (this.isGoneError(err)) {
+            this.lastResourceVersion = undefined
+        }
         if (!this.isWatching) return
         const delay = this.getRetryDelay()
         logger.error({ 'watcher disconnected': err, 'will retry in': delay, resourceVersion: this.lastResourceVersion })
@@ -30,5 +33,9 @@ export abstract class BaseWatcher {
         setTimeout(() => {
             this.startWatch()
         }, delay)
+    }
+    private isGoneError(error: unknown): boolean {
+        return (error as any)?.statusCode === 401
+
     }
 }

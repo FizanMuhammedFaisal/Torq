@@ -6,7 +6,7 @@ import { TOKENS } from './config/di/tokens';
 import type { IHealthServer } from './presentation/http/health';
 import type { K8sWatchManager } from './infrastructure/k8s/watch';
 
-async function main() {
+async function Main() {
 	const grpcServer = container.resolve<GRpcServer>(TOKENS.GRPCServer);
 	const crdManager = container.resolve<ICRDManager>(TOKENS.CRDManager);
 	const healthServer = container.resolve<IHealthServer>(TOKENS.HealthServer);
@@ -20,7 +20,7 @@ async function main() {
 	await grpcServer.start();
 
 	// connect to message queue
-
+	
 	// start watchers right before marking as ready
 	await k8sWatchManager.startWatchers();
 
@@ -29,4 +29,4 @@ async function main() {
 	healthServer.markReady();
 }
 
-await main();
+await Main();

@@ -18,7 +18,7 @@ type TransactionClient = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 /**
  * Stores the active transaction client for the current async context.
- * Only the {@link DrizzleUnitOfWork} should write to this storage.
+ * Only the  DrizzleUnitOfWork should write to this storage.
  */
 const transactionStorage = new AsyncLocalStorage<TransactionClient>();
 

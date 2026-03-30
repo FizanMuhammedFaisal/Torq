@@ -15,3 +15,4 @@ export function validate<T extends z.ZodSchema>(schema: T, data: z.input<T>): z.
 	}
 	return result.data;
 }
+
