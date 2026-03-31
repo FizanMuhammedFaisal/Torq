@@ -14,7 +14,9 @@ export const TRIGGER_TYPE = {
 	WEBHOOK: 'webhook',
 	SCHEDULE: 'schedule',
 } as const satisfies Record<string, WorkflowTriggerType>;
-
+/**
+ * THe Api server user defined entity
+ */
 export class WorkflowRun {
 	constructor(
 		public readonly id: string,

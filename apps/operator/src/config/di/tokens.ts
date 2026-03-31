@@ -8,4 +8,8 @@ export const TOKENS = {
 	K8sWatchManager: Symbol('K8sWatchManager'),
 	Reconciler: Symbol('Reconciler'),
 	CleanupService: Symbol('CleanupService'),
+	ReconcilerVersionRouter: Symbol('ReconcilerVersionRouter'),
+
+	//reconcilation hanlders
+
 } as const;
