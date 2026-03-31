@@ -11,6 +11,7 @@ export const TOKENS = {
 	ReconcilerVersionRouter: Symbol('ReconcilerVersionRouter'),
 	SpecCache: Symbol('SpecCache'),
 	GRPCClient: Symbol('GRPCClient'),
+	RedisClient: Symbol('RedisClient'),
 
 	//reconcilation hanlders
 

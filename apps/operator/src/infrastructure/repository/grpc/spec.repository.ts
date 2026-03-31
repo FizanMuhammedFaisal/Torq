@@ -16,9 +16,18 @@ export class SpecRepository implements ISpecRepository {
             return data;
         } else {
             // Fetch from gRPC if cache miss or error
-            const client = this.rpcClient.getApiServerClient()
-
-            return null; // Placeholder
+            const client = this.rpcClient.getApiServerClient();
+            try {
+                const response = await client.getSpec({ id });
+                const spec = response.spec; // map<string, string>
+                if (spec) {
+                    await this.specCache.set(id, spec);
+                    return spec;
+                }
+            } catch (grpcError) {
+                // Log error
+            }
+            return null;
         }
     }
 }

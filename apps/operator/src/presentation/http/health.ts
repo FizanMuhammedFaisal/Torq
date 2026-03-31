@@ -3,6 +3,7 @@ import { createServer } from 'node:http';
 // 
 export interface IHealthServer {
 	markReady(): void;
+	markNotReady(): void;
 	start(): void;
 }
 
@@ -11,6 +12,9 @@ export class HealthServer implements IHealthServer {
 
 	markReady() {
 		this.ready = true;
+	}
+	markNotReady(): void {
+		this.ready = false
 	}
 
 	start() {
