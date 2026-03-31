@@ -1,3 +1,6 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
+import db from '../database.config';
+// https://github.com/drizzle-team/drizzle-orm/issues/543
 /**
  * Transaction context using AsyncLocalStorage.
  *
@@ -7,19 +10,16 @@
  *
  * @module transactionContext
  */
-import { AsyncLocalStorage } from 'node:async_hooks';
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import db from '../database.config';
 
-/**
- * The Drizzle transaction client type, inferred from `db.transaction()`.
- */
-type TransactionClient = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type DB = typeof db;
+type TransactionClient = Parameters<Parameters<DB['transaction']>[0]>[0];
+// type AfterCommitCallback = () => Promise<unknown>;
+// type TransactionState = {
+// 	transaction: TransactionClient,
+// 	afterCommit: AfterCommitCallback[],
 
-/**
- * Stores the active transaction client for the current async context.
- * Only the  DrizzleUnitOfWork should write to this storage.
- */
+// }
+
 const transactionStorage = new AsyncLocalStorage<TransactionClient>();
 
 /**
@@ -32,7 +32,9 @@ const transactionStorage = new AsyncLocalStorage<TransactionClient>();
  *
  * @returns The active transaction client or default database connection.
  */
-export function getExecutor(): TransactionClient | NodePgDatabase<typeof import('../schema')> {
+export function getExecutor():
+	| TransactionClient
+	| DB {
 	return transactionStorage.getStore() ?? db;
 }
 

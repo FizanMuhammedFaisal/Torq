@@ -7,5 +7,5 @@ export const TOKENS = {
 	JobWatcher: Symbol('JobWatcher'),
 	K8sWatchManager: Symbol('K8sWatchManager'),
 	Reconciler: Symbol('Reconciler'),
-
+	CleanupService: Symbol('CleanupService'),
 } as const;

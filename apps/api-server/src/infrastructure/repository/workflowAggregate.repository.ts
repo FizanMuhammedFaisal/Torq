@@ -32,10 +32,10 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 			});
 
 			return result.map((row) => {
-				const domainWf = this.workflowMapper.toDomain(row);
+				const workflow = this.workflowMapper.toDomain(row);
 				const latestRunData = row.runs[0] || null;
 				const latestRun = latestRunData ? this.runMapper.toDomain(latestRunData) : null;
-				return new WorkflowWithLatestRun(domainWf, latestRun);
+				return WorkflowWithLatestRun.create({ workflow, latestRun });
 			});
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowAggregate' });
@@ -56,10 +56,10 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 
 			if (!result) return null;
 
-			const domainWf = this.workflowMapper.toDomain(result);
+			const workflow = this.workflowMapper.toDomain(result);
 			const latestRunData = result.runs[0] || null;
 			const latestRun = latestRunData ? this.runMapper.toDomain(latestRunData) : null;
-			return new WorkflowWithLatestRun(domainWf, latestRun);
+			return WorkflowWithLatestRun.create({ workflow, latestRun });
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowAggregate' });
 		}

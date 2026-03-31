@@ -15,6 +15,9 @@ import { DomainError } from '@/domain/errors/domainError.abstract';
 import { RUN_STATUS, TRIGGER_TYPE } from '@/domain/entities/workflowRun';
 import type { IOperatorService } from '@/application/port/services/operatorService.interface';
 
+/**
+ * Will be calling the operator system to execute this workflow
+ */
 @injectable()
 export class TriggerWorkflowRunUseCase implements ITriggerWorkflowRunUseCase {
 	constructor(
