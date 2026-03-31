@@ -9,6 +9,7 @@ import { CRDWatcher } from '@/infrastructure/k8s/watchers/CRDWatcher';
 import { JobWatcher } from '@/infrastructure/k8s/watchers/jobWatcher';
 import { K8sWatchManager } from '@/infrastructure/k8s/watch';
 import { HealthServer } from '@/presentation/http/health';
+import { SpecCacheService } from '@/infrastructure/service/SpecCache.service';
 
 container.register(TOKENS.GRPCServer, { useClass: GRpcServer }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.RPCRouter, { useClass: RPCRouter }, { lifecycle: Lifecycle.Singleton });
@@ -17,5 +18,6 @@ container.register(TOKENS.CRDManager, { useClass: CRDManager }, { lifecycle: Lif
 container.register(TOKENS.CRDWatcher, { useClass: CRDWatcher }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.JobWatcher, { useClass: JobWatcher }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.K8sWatchManager, { useClass: K8sWatchManager }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.SpecCache, { useClass: SpecCacheService }, { lifecycle: Lifecycle.Singleton });
 
 export { container };

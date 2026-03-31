@@ -1,11 +1,9 @@
-import type { IReconciliationHandler } from '@/application/port/k8s/reconciliationHandler.interface';
-import type { WorkflowRun } from '@/domain/entities/workflowRun';
+import type { IReconciliationHandler } from '@/application/port/reconciler/reconciliationHandler.interface';
+import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
 
 export class V1AlphaReconciliationHandler implements IReconciliationHandler {
-    reconcile(run: WorkflowRun): Promise<void> {
-        throw new Error('Method not implemented.');
-    }
-    onJobComplete(runId: string, stepName: string, succeeded: boolean): Promise<void> {
-        throw new Error('Method not implemented.');
+    reconcile(run: WorkflowRunSnapshot): Promise<void> {
+        // get the speac ffom api server
+        // make secrect and schedule jobs 
     }
 }

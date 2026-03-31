@@ -1,5 +1,5 @@
 import { injectable } from 'tsyringe';
-import type { IResourceWatcher } from '@/application/port/k8s/watcher.interface';
+import type { IResourceWatcher } from '@/application/port/reconciler/watcher.interface';
 
 
 @injectable()

@@ -34,6 +34,7 @@ export class Reconciler implements IReconciler {
                 await this.markUnsupportedVersion(run)
                 return
             }
+            await handler.reconcile(run)
             // check hanlder if not supprted hanlde it via marking unsupprted
         } catch (error) { }
     }
