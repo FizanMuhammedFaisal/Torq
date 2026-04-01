@@ -76,12 +76,6 @@ versions:
               triggeredBy:
                 type: string
                 description: User or system that triggered this run.
-              inputs:
-                type: object
-                x-kubernetes-preserve-unknown-fields: true
-                description: >
-                  Runtime inputs passed to the workflow.
-                  Shape varies per workflow definition.
 # status is controller by the opearator
           status:
             type: object

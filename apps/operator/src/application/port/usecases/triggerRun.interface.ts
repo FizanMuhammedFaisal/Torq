@@ -1,5 +1,5 @@
-import type { TriggerRunInput } from '@/application/dto/triggerRun';
+import type { TriggerRunInput, TriggerRunOutput } from '@/application/dto/triggerRun';
 
 export interface ITriggerRunUseCase {
-    execute(input: TriggerRunInput): Promise<void>;
+    execute(input: TriggerRunInput): Promise<TriggerRunOutput>;
 }

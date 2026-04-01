@@ -30,6 +30,7 @@ export const Envconfig = {
 		version: process.env.K8S_VERSION || 'v1alpha1',
 		plural: process.env.K8S_PLURAL || 'workflowruns',
 		namespace: process.env.K8S_NAMESPACE || 'default',
+		kind: process.env.K8S_KIND || 'WorkflowRun',
 	},
 	redis: {
 		url: `redis://${process.env.REDIS_HOST ?? 'localhost'}:${process.env.REDIS_PORT ?? 6379}`,

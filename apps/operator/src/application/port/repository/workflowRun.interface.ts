@@ -1,3 +1,3 @@
 export interface IWorkflowRunRepository {
-    create(manifest: object): Promise<boolean>
+    create(manifest: object): Promise<void>
 }

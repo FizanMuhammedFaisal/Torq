@@ -1,53 +1,35 @@
-export type WorkflowRunStatus = 'pending' | 'running' | 'success' | 'failed' | 'idle';
-export type WorkflowTriggerType = 'manual' | 'webhook' | 'schedule';
+import type { Registry } from '../registry';
 
-export const RUN_STATUS = {
-	PENDING: 'pending',
-	RUNNING: 'running',
-	SUCCESS: 'success',
-	FAILED: 'failed',
-	IDLE: 'idle',
-} as const satisfies Record<string, WorkflowRunStatus>;
-
-export const TRIGGER_TYPE = {
-	MANUAL: 'manual',
-	WEBHOOK: 'webhook',
-	SCHEDULE: 'schedule',
-} as const satisfies Record<string, WorkflowTriggerType>;
-/**
- * THe Api server user defined entity
- */
-export class WorkflowRun {
-	constructor(
-		public readonly id: string,
+export const TriggerType = {
+	MANUAL: 'MANUAL',
+	WEBHOOK: 'WEBHOOK',
+	SCHEDULE: 'SCHEDULE',
+};
+export type TriggerType = (typeof TriggerType)[keyof typeof TriggerType];
+export class Workflow {
+	private constructor(
 		public readonly workflowId: string,
-		public readonly workflowVersionId: string,
-		public readonly status: WorkflowRunStatus,
-		public readonly triggerType: WorkflowTriggerType,
-		public readonly startedAt: Date,
-		public readonly completedAt: Date | null,
-		public spec: Record<string, unknown>,
+		public readonly versionId: string,
+		public readonly torqVersion: Registry,
+		public readonly triggerType: TriggerType,
+		public readonly createdAt: Date,
+
 	) { }
 
-	static create(props: {
-		id: string;
+	static create({
+		workflowId,
+		versionId,
+		torqVersion,
+		createdAt,
+		triggerType,
+	}: {
 		workflowId: string;
-		workflowVersionId: string;
-		status: WorkflowRunStatus;
-		triggerType: WorkflowTriggerType;
-		startedAt: Date;
-		completedAt: Date | null;
-		spec: Record<string, unknown>;
+		versionId: string;
+		torqVersion: Registry;
+		triggerType: TriggerType;
+		createdAt: Date;
+
 	}) {
-		return new WorkflowRun(
-			props.id,
-			props.workflowId,
-			props.workflowVersionId,
-			props.status,
-			props.triggerType,
-			props.startedAt,
-			props.completedAt,
-			props.spec
-		);
+		return new Workflow(workflowId, versionId, torqVersion, triggerType, createdAt);
 	}
 }

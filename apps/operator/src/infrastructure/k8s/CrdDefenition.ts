@@ -46,11 +46,12 @@ export const CRD_DEFINITION: V1CustomResourceDefinition = {
 									workflowId: { type: 'string' },
 									versionId: { type: 'string' },
 									torqVersion: { type: 'string', _enum: ['v1alpha'] },
-									triggeredBy: { type: 'string' },
-									inputs: {
-										type: 'object',
-										x_kubernetes_preserve_unknown_fields: true,
-									},
+									triggerType: { type: 'string' },
+									createdAt: { type: 'string', format: 'date-time' },
+									// inputs: {
+									// 	type: 'object',
+									// 	x_kubernetes_preserve_unknown_fields: true,
+									// },
 								},
 							},
 							status: {

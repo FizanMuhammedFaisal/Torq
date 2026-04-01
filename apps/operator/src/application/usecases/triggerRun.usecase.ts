@@ -2,22 +2,16 @@ import { inject } from 'tsyringe';
 import type { ITriggerRun } from '../port/usecases/triggerRun.interface';
 import { TOKENS } from '@/config/di/tokens';
 import type { IWorkflowRunDispatcherService } from '../port/services/workflowRunDispatcher.interface';
+import type { TriggerRunInput, TriggerRunOutput } from '../dto/triggerRun';
 /**
- *  build the CRD object
- *  call K8s API to create it
- *  add a finalizer
- *  write RunCreated event to DB
- *  publish state to Message Stream
+ * Would call the workflowDispatcher to trigger the run
  */
 export class TriggerRun implements ITriggerRun {
     constructor(
         @inject(TOKENS.IWorkflowRunDispatcherService)
         private workflowRunDispatcherService: IWorkflowRunDispatcherService,
     ) { }
-    execute(data: any): Promise<void> {
-
-
-        this.workflowRunDispatcherService.create(data)
-
+    execute(data: TriggerRunInput): Promise<TriggerRunOutput> {
+        this.workflowRunDispatcherService.create(data);
     }
 }

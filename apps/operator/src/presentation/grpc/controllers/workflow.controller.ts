@@ -1,10 +1,11 @@
 import type { HandlerContext } from '@connectrpc/connect';
-import type { TriggerWorkflowRunRequest, TriggerWorkflowRunResponse } from '@torq-system/grpc';
+import { TriggerWorkflowRunResponseSchema, type TriggerWorkflowRunRequest, type TriggerWorkflowRunResponse } from '@torq-system/grpc';
 import type { IWorkflowRunController } from '../interfaces/controllers/workflow.interface';
 import { inject } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
 import type { ITriggerRunUseCase } from '@/application/port/usecases/triggerRun.interface';
 import type { IWorkflowRPCMapper } from '../interfaces/mappers/workflow.interface';
+import { create } from '@bufbuild/protobuf';
 
 export class WorkflowController implements IWorkflowRunController {
     constructor(
@@ -12,12 +13,16 @@ export class WorkflowController implements IWorkflowRunController {
         @inject(TOKENS.WorkflowRunMapper) private workflowRPCMapper: IWorkflowRPCMapper,
     ) { }
 
-    triggerRun(
+    async triggerRun(
         request: TriggerWorkflowRunRequest,
-        context: HandlerContext,
+        _context: HandlerContext,
     ): Promise<TriggerWorkflowRunResponse> {
         const workflow = this.workflowRPCMapper.fromProtoGetTriggerWorkflowRunRequest(request)
 
-        this.triggerRunUseCase.execute(workflow)
+        const res = await this.triggerRunUseCase.execute(workflow)
+
+        return create(TriggerWorkflowRunResponseSchema, {
+            runId: res.runId
+        })
     }
 }

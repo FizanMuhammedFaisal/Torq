@@ -25,9 +25,6 @@ export interface WorkflowRunK8s extends KubernetesObject {
 
 export function toDomainWorkflowRun(raw: WorkflowRunK8s): WorkflowRunSnapshot {
     return {
-        name: raw.metadata?.name ?? '',
-        namespace: raw.metadata?.namespace ?? '',
-        uid: raw.metadata?.uid ?? '',
         metadata: {
             name: raw.metadata?.name ?? '',
             namespace: raw.metadata?.namespace ?? '',
