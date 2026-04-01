@@ -3,16 +3,16 @@
 import {
 	ApiException,
 	type ApiextensionsV1ApiCreateCustomResourceDefinitionRequest,
-} from '@kubernetes/client-node'
-import { apiExtensionsClient } from './client'
+} from '@kubernetes/client-node';
+import { apiExtensionsClient } from './client';
 
-import { logger } from '../logger/logger'
-import { injectable } from 'tsyringe'
-import { Envconfig } from '@/config/envconfig'
-import { CRD_DEFINITION, CRD_NAME } from './CrdDefenition'
+import { logger } from '../logger/logger';
+import { injectable } from 'tsyringe';
+import { Envconfig } from '@/config/envconfig';
+import { CRD_DEFINITION, CRD_NAME } from './CrdDefenition';
 
 export interface ICRDManager {
-	ensureCrd(): Promise<void>
+	ensureCrd(): Promise<void>;
 }
 
 @injectable()
@@ -20,27 +20,27 @@ export class CRDManager implements ICRDManager {
 	// https://kubernetes-client.github.io/javascript/classes/ApiextensionsV1Api.html#readCustomResourceDefinition
 
 	async ensureCrd(): Promise<void> {
-		const exists = await this.crdExists()
+		const exists = await this.crdExists();
 
 		if (exists) {
-			logger.info('[crd] already exists — skipping creation')
-			await this.waitForCRDReady()
-			return
+			logger.info('[crd] already exists — skipping creation');
+			await this.waitForCRDReady();
+			return;
 		}
 
-		await this.createCRD()
-		await this.waitForCRDReady()
+		await this.createCRD();
+		await this.waitForCRDReady();
 	}
 
 	private async crdExists(): Promise<boolean> {
 		try {
-			await apiExtensionsClient.readCustomResourceDefinition({ name: CRD_NAME })
-			return true
+			await apiExtensionsClient.readCustomResourceDefinition({ name: CRD_NAME });
+			return true;
 		} catch (err) {
 			if (err instanceof ApiException && err.code === 404) {
-				return false
+				return false;
 			}
-			throw err  // unexpected error — propagate up
+			throw err; // unexpected error — propagate up
 		}
 	}
 
@@ -51,46 +51,46 @@ export class CRDManager implements ICRDManager {
 				pretty: undefined,
 				dryRun: undefined,
 				fieldManager: Envconfig.app.name,
-			}
-			await apiExtensionsClient.createCustomResourceDefinition(request)
-			logger.info('[crd] created WorkflowRun CRD')
-
+			};
+			await apiExtensionsClient.createCustomResourceDefinition(request);
+			logger.info('[crd] created WorkflowRun CRD');
 		} catch (err) {
 			if (err instanceof ApiException && err.code === 409) {
 				// another operator replica created it between our read and create — fine
-				logger.info('[crd] created by another instance, continuing')
-				return
+				logger.info('[crd] created by another instance, continuing');
+				return;
 			}
-			throw err
+			throw err;
 		}
 	}
 
 	private async waitForCRDReady(maxWaitMs = 30_000): Promise<void> {
-		const start = Date.now()
+		const start = Date.now();
 
 		while (Date.now() - start < maxWaitMs) {
-			const { status } = await apiExtensionsClient
-				.readCustomResourceDefinitionStatus({ name: CRD_NAME })
+			const { status } = await apiExtensionsClient.readCustomResourceDefinitionStatus({
+				name: CRD_NAME,
+			});
 
 			const established = status?.conditions?.find(
-				c => c.type === 'Established' && c.status === 'True'
-			)
+				(c) => c.type === 'Established' && c.status === 'True',
+			);
 			const namesAccepted = status?.conditions?.find(
-				c => c.type === 'NamesAccepted' && c.status === 'True'
-			)
+				(c) => c.type === 'NamesAccepted' && c.status === 'True',
+			);
 
 			if (established && namesAccepted) {
-				logger.info('[crd] ready')
-				return
+				logger.info('[crd] ready');
+				return;
 			}
 
-			await this.sleep(500)
+			await this.sleep(500);
 		}
 
-		throw new Error('[crd] did not become ready within 30 seconds')
+		throw new Error('[crd] did not become ready within 30 seconds');
 	}
 
 	private sleep(ms: number): Promise<void> {
-		return new Promise(resolve => setTimeout(resolve, ms))
+		return new Promise((resolve) => setTimeout(resolve, ms));
 	}
 }

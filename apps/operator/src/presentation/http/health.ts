@@ -1,6 +1,6 @@
 import { createServer } from 'node:http';
 
-// 
+//
 export interface IHealthServer {
 	markReady(): void;
 	markNotReady(): void;
@@ -14,7 +14,7 @@ export class HealthServer implements IHealthServer {
 		this.ready = true;
 	}
 	markNotReady(): void {
-		this.ready = false
+		this.ready = false;
 	}
 
 	start() {

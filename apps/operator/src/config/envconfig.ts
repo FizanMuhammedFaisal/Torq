@@ -34,6 +34,6 @@ export const Envconfig = {
 	},
 	redis: {
 		url: `redis://${process.env.REDIS_HOST ?? 'localhost'}:${process.env.REDIS_PORT ?? 6379}`,
-	}
+	},
 };
 export type Envconfig = typeof Envconfig;

@@ -11,8 +11,6 @@ import type { IReconciler } from '@/application/port/reconciler/reconciler.inter
 // https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes
 // workflow watcher should watch modified/created events
 
-
-
 /**
  * the watcher loop, even when on crash will restart to watch for events from kuber-api-server
  * doing reconciliation
@@ -40,8 +38,8 @@ export class CRDWatcher extends BaseWatcher {
 	}
 
 	/**
-	 * 
-	 * Start of the reconciliation loop, each event and workflowrunCRD will be modified 
+	 *
+	 * Start of the reconciliation loop, each event and workflowrunCRD will be modified
 	 * accordance with how we need to move currect status to given spec
 	 */
 	private async handler(phase: string, apiObj: unknown, _watchObj?: unknown) {

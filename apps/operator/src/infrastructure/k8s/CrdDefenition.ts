@@ -24,7 +24,7 @@ export const CRD_DEFINITION: V1CustomResourceDefinition = {
 				storage: true,
 
 				subresources: {
-					status: {}
+					status: {},
 				},
 
 				additionalPrinterColumns: [
@@ -64,4 +64,4 @@ export const CRD_DEFINITION: V1CustomResourceDefinition = {
 			},
 		],
 	},
-}
+};

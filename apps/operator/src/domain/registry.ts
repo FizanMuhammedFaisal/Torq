@@ -1,5 +1,5 @@
 export const Registry = {
-    v1alpha: "v1alpha"
-} as const
+	v1alpha: 'v1alpha',
+} as const;
 
-export type Registry = keyof (typeof Registry)
+export type Registry = keyof typeof Registry;

@@ -13,8 +13,7 @@ export class Workflow {
 		public readonly torqVersion: Registry,
 		public readonly triggerType: TriggerType,
 		public readonly createdAt: Date,
-
-	) { }
+	) {}
 
 	static create({
 		workflowId,
@@ -28,7 +27,6 @@ export class Workflow {
 		torqVersion: Registry;
 		triggerType: TriggerType;
 		createdAt: Date;
-
 	}) {
 		return new Workflow(workflowId, versionId, torqVersion, triggerType, createdAt);
 	}

@@ -9,10 +9,10 @@ import type { IWorkflowRunController } from '../interfaces/controllers/workflow.
 export class RPCRouter implements IRPCRouter {
 	constructor(
 		@inject(TOKENS.IWorkflowRunController) private workflowRunController: IWorkflowRunController,
-	) { }
+	) {}
 	public register(router: ConnectRouter): void {
 		router.service(OperatorService, {
-			triggerWorkflowRun: (req, context) => this.workflowRunController.triggerRun(req, context)
+			triggerWorkflowRun: (req, context) => this.workflowRunController.triggerRun(req, context),
 		});
 	}
 }

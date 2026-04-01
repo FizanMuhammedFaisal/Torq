@@ -18,15 +18,14 @@ export const TOKENS = {
 	WorkflowRunDispatcherService: Symbol('WorkflowRunDispatcherService'),
 
 	// usecase
-	TriggerRunUseCase: Symbol("TriggerRunUseCase"),
+	TriggerRunUseCase: Symbol('TriggerRunUseCase'),
 
 	// repo
 	WorkflowRunRepository: Symbol('WorkflowRunRepository'),
 
 	// mapper
-	WorkflowRunMapper: Symbol("WorkflowRunMapper"),
+	WorkflowRunMapper: Symbol('WorkflowRunMapper'),
 	//RPC
-	IWorkflowRunController: Symbol("IWorkflowRunController")
+	IWorkflowRunController: Symbol('IWorkflowRunController'),
 	//reconcilation hanlders
-
 } as const;

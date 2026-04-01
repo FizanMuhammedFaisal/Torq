@@ -1,3 +1,3 @@
 export interface IJobRepository {
-    test(): void
+	test(): void;
 }

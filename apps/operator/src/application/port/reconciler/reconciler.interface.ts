@@ -1,5 +1,5 @@
-import type { WorkflowRunSnapshot } from "@/domain/entities/WorkflowRunSnapshot";
+import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
 
 export interface IReconciler {
-    reconcile(run: WorkflowRunSnapshot): Promise<void>
+	reconcile(run: WorkflowRunSnapshot): Promise<void>;
 }
