@@ -1,7 +1,7 @@
 import { container, Lifecycle } from 'tsyringe';
 
 import { TOKENS } from './tokens';
-import { GRpcServer } from '@/presentation/grpc/rpc-server';
+import { GRpcServer } from '@/presentation/grpc/rpcServer';
 
 import { RPCRouter } from '@/presentation/grpc/routers/router';
 import { CRDManager } from '@/infrastructure/k8s/ensureCrd';

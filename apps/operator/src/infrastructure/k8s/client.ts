@@ -5,7 +5,9 @@ const kc = new k8s.KubeConfig();
 kc.loadFromDefault();
 export const kubeConfig = kc;
 
+// used for making CRD
 export const apiExtensionsClient = kc.makeApiClient(k8s.ApiextensionsV1Api);
+// Used for making customObject (CR)
 export const customObjectsClient = kc.makeApiClient(k8s.CustomObjectsApi);
 export const batchClient = kc.makeApiClient(k8s.BatchV1Api);
 export const coreClient = kc.makeApiClient(k8s.CoreV1Api);

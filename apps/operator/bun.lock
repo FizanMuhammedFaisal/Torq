@@ -9,7 +9,7 @@
         "@connectrpc/connect": "^2.1.1",
         "@connectrpc/connect-node": "^2.1.1",
         "@kubernetes/client-node": "^1.4.0",
-        "@torq-system/grpc": "^0.0.7",
+        "@torq-system/grpc": "0.0.8",
         "@types/pg": "^8.18.0",
         "drizzle-kit": "^0.31.10",
         "drizzle-orm": "^0.45.1",
@@ -144,7 +144,7 @@
 
     "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
 
-    "@torq-system/grpc": ["@torq-system/grpc@0.0.7", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-phitY9MbzNuw3x5ArktHGD9PNNnr3wb1LeLDAal2JzGYXJOGKOyRA3lRjQY0uBe4axoUozTDt7iklwomKt2wQg=="],
+    "@torq-system/grpc": ["@torq-system/grpc@0.0.8", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0", "@torq-system/grpc": "0.0.7" } }, "sha512-FkIU4E2bCPHznC/rxWM4AX4pUL9tqoebDq35euA11GvDSXBx7/vim+/P6j3QRzmsQRM3plhILjVLffHTdou36A=="],
 
     "@types/bun": ["@types/bun@1.3.10", "", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
 
@@ -421,6 +421,8 @@
     "@torq-system/grpc/@connectrpc/connect": ["@connectrpc/connect@1.7.0", "", { "peerDependencies": { "@bufbuild/protobuf": "^1.10.0" } }, "sha512-iNKdJRi69YP3mq6AePRT8F/HrxWCewrhxnLMNm0vpqXAR8biwzRtO6Hjx80C6UvtKJ5sFmffQT7I4Baecz389w=="],
 
     "@torq-system/grpc/@connectrpc/connect-node": ["@connectrpc/connect-node@1.7.0", "", { "dependencies": { "undici": "^5.28.4" }, "peerDependencies": { "@bufbuild/protobuf": "^1.10.0", "@connectrpc/connect": "1.7.0" } }, "sha512-6vaPIkG/NyhxlYgytLoR9KYbPhczEboFB2OYWkA9qvUz1K7efXfeGrlRxoLtpa+r8VxyIOw73w5ktNe743nD+A=="],
+
+    "@torq-system/grpc/@torq-system/grpc": ["@torq-system/grpc@0.0.7", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-phitY9MbzNuw3x5ArktHGD9PNNnr3wb1LeLDAal2JzGYXJOGKOyRA3lRjQY0uBe4axoUozTDt7iklwomKt2wQg=="],
 
     "@types/node-fetch/@types/node": ["@types/node@24.12.0", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-GYDxsZi3ChgmckRT9HPU0WEhKLP08ev/Yfcq2AstjrDASOYCSXeyjDsHg4v5t4jOj7cyDX3vmprafKlWIG9MXQ=="],
 

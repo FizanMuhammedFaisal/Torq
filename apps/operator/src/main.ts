@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { container } from './config/di/container';
 import type { ICRDManager } from './infrastructure/k8s/ensureCrd';
-import type { GRpcServer } from './presentation/grpc/rpc-server';
+import type { GRpcServer } from './presentation/grpc/rpcServer';
 import { TOKENS } from './config/di/tokens';
 import type { IHealthServer } from './presentation/http/health';
 import type { K8sWatchManager } from './infrastructure/k8s/watch';

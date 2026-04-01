@@ -7,12 +7,19 @@ export const TOKENS = {
 	JobWatcher: Symbol('JobWatcher'),
 	K8sWatchManager: Symbol('K8sWatchManager'),
 	Reconciler: Symbol('Reconciler'),
-	CleanupService: Symbol('CleanupService'),
 	ReconcilerVersionRouter: Symbol('ReconcilerVersionRouter'),
 	SpecCache: Symbol('SpecCache'),
 	GRPCClient: Symbol('GRPCClient'),
 	RedisClient: Symbol('RedisClient'),
+	SpecRepository: Symbol('SpecRepository'),
 
+	// services
+	CleanupService: Symbol('CleanupService'),
+	IWorkflowRunDispatcherService: Symbol('IWorkflowRunDispatcherService'),
+
+
+	//RPC
+	IWorkflowRunController: Symbol("IWorkflowRunController")
 	//reconcilation hanlders
 
 } as const;
