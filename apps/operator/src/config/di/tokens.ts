@@ -17,7 +17,11 @@ export const TOKENS = {
 	CleanupService: Symbol('CleanupService'),
 	IWorkflowRunDispatcherService: Symbol('IWorkflowRunDispatcherService'),
 
+	// usecase
+	TriggerRunUseCase: Symbol("TriggerRunUseCase"),
 
+	// mapper
+	IWorkflowRPCMapper: Symbol("IWorkflowRPCMapper"),
 	//RPC
 	IWorkflowRunController: Symbol("IWorkflowRunController")
 	//reconcilation hanlders

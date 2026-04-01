@@ -14,6 +14,13 @@
 // import type { GetTagByIdInputDto } from '@dtos/tags/getTagById.dto';
 // import type { ITagRPCMapper, TagAppData } from '../interfaces/tagMapper.interface';
 
+import type {
+    TriggerRunInput,
+    TriggerType as DomainTriggerType,
+} from '@/application/dto/triggerRun';
+import { TriggerType, type TriggerWorkflowRunRequest } from '@torq-system/grpc';
+import type { IWorkflowRPCMapper } from '../interfaces/mappers/workflow.interface';
+
 // function mapSortBy(sortBy: SortBy | undefined): TagSortableField | undefined {
 // 	switch (sortBy) {
 // 		case SortBy.NAME:
@@ -71,3 +78,27 @@
 // 		});
 // 	}
 // }
+
+export class WorkflowMapper implements IWorkflowRPCMapper {
+    fromProtoGetTriggerWorkflowRunRequest(request: TriggerWorkflowRunRequest): TriggerRunInput {
+        return {
+            workflowId: request.workflowId,
+            versionId: request.versionId,
+            torqVersion: request.torqVersion,
+            triggerType: this.mapTriggerType(request.triggerType),
+        };
+    }
+
+    private mapTriggerType(triggerType: TriggerType): DomainTriggerType {
+        switch (triggerType) {
+            case TriggerType.MANUAL:
+                return 'MANUAL';
+            case TriggerType.WEBHOOK:
+                return 'WEBHOOK';
+            case TriggerType.SCHEDULE:
+                return 'SCHEDULE';
+            default:
+                return "MANUAL"
+        }
+    }
+}
