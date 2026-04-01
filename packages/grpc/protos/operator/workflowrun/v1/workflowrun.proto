@@ -8,9 +8,11 @@ service OperatorService{
 
 message TriggerWorkflowRunRequest{
     string workflow_id = 1;
-    string spec = 2;
-    TriggerType trigger_type = 3;
-    optional string triggered_by = 4;
+    // workflowVersion that was triggered
+    string version_id = 2;
+    // whihc is the torq version of this workflow
+    string torq_version = 3;
+    TriggerType trigger_type = 4;
 }
 
 enum TriggerType {

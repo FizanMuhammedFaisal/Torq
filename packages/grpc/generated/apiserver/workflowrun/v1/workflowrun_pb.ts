@@ -4,13 +4,14 @@
 
 import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
 import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import { file_google_protobuf_struct } from "@bufbuild/protobuf/wkt";
+import type { JsonObject, Message } from "@bufbuild/protobuf";
 
 /**
  * Describes the file apiserver/workflowrun/v1/workflowrun.proto.
  */
 export const file_apiserver_workflowrun_v1_workflowrun: GenFile = /*@__PURE__*/
-  fileDesc("CiphcGlzZXJ2ZXIvd29ya2Zsb3dydW4vdjEvd29ya2Zsb3dydW4ucHJvdG8SGGFwaXNlcnZlci53b3JrZmxvd3J1bi52MSIcCgxIZWxsb1JlcXVlc3QSDAoEbmFtZRgBIAEoCSIgCg1IZWxsb1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkybAoQQXBpU2VydmVyU2VydmljZRJYCgVIZWxsbxImLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5IZWxsb1JlcXVlc3QaJy5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuSGVsbG9SZXNwb25zZWIGcHJvdG8z");
+  fileDesc("CiphcGlzZXJ2ZXIvd29ya2Zsb3dydW4vdjEvd29ya2Zsb3dydW4ucHJvdG8SGGFwaXNlcnZlci53b3JrZmxvd3J1bi52MSIcCgxIZWxsb1JlcXVlc3QSDAoEbmFtZRgBIAEoCSIgCg1IZWxsb1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiHAoOR2V0U3BlY1JlcXVlc3QSCgoCaWQYASABKAkiOAoPR2V0U3BlY1Jlc3BvbnNlEiUKBHNwZWMYASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0MswBChBBcGlTZXJ2ZXJTZXJ2aWNlElgKBUhlbGxvEiYuYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLkhlbGxvUmVxdWVzdBonLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5IZWxsb1Jlc3BvbnNlEl4KB0dldFNwZWMSKC5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuR2V0U3BlY1JlcXVlc3QaKS5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuR2V0U3BlY1Jlc3BvbnNlYgZwcm90bzM", [file_google_protobuf_struct]);
 
 /**
  * @generated from message apiserver.workflowrun.v1.HelloRequest
@@ -47,6 +48,40 @@ export const HelloResponseSchema: GenMessage<HelloResponse> = /*@__PURE__*/
   messageDesc(file_apiserver_workflowrun_v1_workflowrun, 1);
 
 /**
+ * @generated from message apiserver.workflowrun.v1.GetSpecRequest
+ */
+export type GetSpecRequest = Message<"apiserver.workflowrun.v1.GetSpecRequest"> & {
+  /**
+   * @generated from field: string id = 1;
+   */
+  id: string;
+};
+
+/**
+ * Describes the message apiserver.workflowrun.v1.GetSpecRequest.
+ * Use `create(GetSpecRequestSchema)` to create a new message.
+ */
+export const GetSpecRequestSchema: GenMessage<GetSpecRequest> = /*@__PURE__*/
+  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 2);
+
+/**
+ * @generated from message apiserver.workflowrun.v1.GetSpecResponse
+ */
+export type GetSpecResponse = Message<"apiserver.workflowrun.v1.GetSpecResponse"> & {
+  /**
+   * @generated from field: google.protobuf.Struct spec = 1;
+   */
+  spec?: JsonObject;
+};
+
+/**
+ * Describes the message apiserver.workflowrun.v1.GetSpecResponse.
+ * Use `create(GetSpecResponseSchema)` to create a new message.
+ */
+export const GetSpecResponseSchema: GenMessage<GetSpecResponse> = /*@__PURE__*/
+  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 3);
+
+/**
  * @generated from service apiserver.workflowrun.v1.ApiServerService
  */
 export const ApiServerService: GenService<{
@@ -57,6 +92,14 @@ export const ApiServerService: GenService<{
     methodKind: "unary";
     input: typeof HelloRequestSchema;
     output: typeof HelloResponseSchema;
+  },
+  /**
+   * @generated from rpc apiserver.workflowrun.v1.ApiServerService.GetSpec
+   */
+  getSpec: {
+    methodKind: "unary";
+    input: typeof GetSpecRequestSchema;
+    output: typeof GetSpecResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_apiserver_workflowrun_v1_workflowrun, 0);

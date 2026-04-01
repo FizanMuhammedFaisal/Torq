@@ -19,7 +19,9 @@ function getProtoDirs(dir: string): string[] {
 		.filter((e: fs.Dirent) => e.isDirectory())
 		.map((e: fs.Dirent) => path.join(dir, e.name));
 
-	const hasProtos = fs.readdirSync(dir).some((f: string) => f.endsWith('_pb.js') || f.endsWith('_connect.js'));
+	const hasProtos = fs
+		.readdirSync(dir)
+		.some((f: string) => f.endsWith('_pb.js') || f.endsWith('_connect.js'));
 	const subDirs = dirs.flatMap(getProtoDirs);
 
 	return hasProtos ? [dir, ...subDirs] : subDirs;
@@ -37,7 +39,10 @@ function createBarrel(dir: string) {
 	// Write JS barrel
 	fs.writeFileSync(path.join(dir, 'index.js'), `${exports.join('\n')}\n`);
 	// Write TS declaration barrel (identical but without .js extensions in exports for TS)
-	fs.writeFileSync(path.join(dir, 'index.d.ts'), `${exports.map((e: string) => e.replace(".js';", "';")).join('\n')}\n`);
+	fs.writeFileSync(
+		path.join(dir, 'index.d.ts'),
+		`${exports.map((e: string) => e.replace(".js';", "';")).join('\n')}\n`,
+	);
 
 	console.log(`Created barrel: ${path.relative(packageRoot, dir)}`);
 }
@@ -70,7 +75,6 @@ function syncPackageExports(protoDirs: string[]) {
 	console.log(' Updated package.json exports');
 }
 
-
 console.log(' Generating barrel files...');
 
 // Scan and create barrels
@@ -96,7 +100,10 @@ for (const dir of allDirs) {
 
 if (rootExports.length > 0) {
 	fs.writeFileSync(path.join(rootGenDir, 'index.js'), `${rootExports.join('\n')}\n`);
-	fs.writeFileSync(path.join(rootGenDir, 'index.d.ts'), `${rootExports.map((e) => e.replace(".js';", "';")).join('\n')}\n`);
+	fs.writeFileSync(
+		path.join(rootGenDir, 'index.d.ts'),
+		`${rootExports.map((e) => e.replace(".js';", "';")).join('\n')}\n`,
+	);
 	console.log(' Generated root barrel');
 }
 

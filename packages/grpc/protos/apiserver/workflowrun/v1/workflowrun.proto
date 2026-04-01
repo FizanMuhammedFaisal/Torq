@@ -2,14 +2,36 @@ syntax = "proto3";
 
 package apiserver.workflowrun.v1;
 
-service ApiServerService{
-   rpc Hello(HelloRequest) returns (HelloResponse);
+service ApiServerService {
+  rpc Hello(HelloRequest) returns (HelloResponse);
+  rpc GetSpec(GetSpecRequest) returns (GetSpecResponse);
 }
 
-message HelloRequest{
-    string name = 1;
+message HelloRequest { string name = 1; }
+
+message HelloResponse { string message = 1; }
+
+message GetSpecRequest { string workflow_run_id = 1; }
+
+import "google/protobuf/struct.proto";
+
+message GetSpecResponse {
+  string workflow_id = 1;
+  string version_id = 2;
+  string torq_version = 3;
+  TriggerType triggerType = 4;
+  repeated Secrets secrets = 5;
+  google.protobuf.Struct spec = 6;
+  string created_at = 7;
+}
+enum TriggerType {
+  TRIGGER_TYPE_UNSPECIFIED = 0;
+  TRIGGER_TYPE_MANUAL = 1;
+  TRIGGER_TYPE_WEBHOOK = 2;
+  TRIGGER_TYPE_SCHEDULE = 3;
 }
 
-message HelloResponse{
-    string message = 1;
+message Secrets {
+  string name = 1;
+  string value = 2;
 }

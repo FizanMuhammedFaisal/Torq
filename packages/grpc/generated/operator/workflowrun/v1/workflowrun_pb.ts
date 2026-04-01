@@ -10,7 +10,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file operator/workflowrun/v1/workflowrun.proto.
  */
 export const file_operator_workflowrun_v1_workflowrun: GenFile = /*@__PURE__*/
-  fileDesc("CilvcGVyYXRvci93b3JrZmxvd3J1bi92MS93b3JrZmxvd3J1bi5wcm90bxIXb3BlcmF0b3Iud29ya2Zsb3dydW4udjEipgEKGVRyaWdnZXJXb3JrZmxvd1J1blJlcXVlc3QSEwoLd29ya2Zsb3dfaWQYASABKAkSDAoEc3BlYxgCIAEoCRI6Cgx0cmlnZ2VyX3R5cGUYAyABKA4yJC5vcGVyYXRvci53b3JrZmxvd3J1bi52MS5UcmlnZ2VyVHlwZRIZCgx0cmlnZ2VyZWRfYnkYBCABKAlIAIgBAUIPCg1fdHJpZ2dlcmVkX2J5IiwKGlRyaWdnZXJXb3JrZmxvd1J1blJlc3BvbnNlEg4KBnJ1bl9pZBgBIAEoCSp5CgtUcmlnZ2VyVHlwZRIcChhUUklHR0VSX1RZUEVfVU5TUEVDSUZJRUQQABIXChNUUklHR0VSX1RZUEVfTUFOVUFMEAESGAoUVFJJR0dFUl9UWVBFX1dFQkhPT0sQAhIZChVUUklHR0VSX1RZUEVfU0NIRURVTEUQAzKQAQoPT3BlcmF0b3JTZXJ2aWNlEn0KElRyaWdnZXJXb3JrZmxvd1J1bhIyLm9wZXJhdG9yLndvcmtmbG93cnVuLnYxLlRyaWdnZXJXb3JrZmxvd1J1blJlcXVlc3QaMy5vcGVyYXRvci53b3JrZmxvd3J1bi52MS5UcmlnZ2VyV29ya2Zsb3dSdW5SZXNwb25zZWIGcHJvdG8z");
+  fileDesc("CilvcGVyYXRvci93b3JrZmxvd3J1bi92MS93b3JrZmxvd3J1bi5wcm90bxIXb3BlcmF0b3Iud29ya2Zsb3dydW4udjEilgEKGVRyaWdnZXJXb3JrZmxvd1J1blJlcXVlc3QSEwoLd29ya2Zsb3dfaWQYASABKAkSEgoKdmVyc2lvbl9pZBgCIAEoCRIUCgx0b3JxX3ZlcnNpb24YAyABKAkSOgoMdHJpZ2dlcl90eXBlGAQgASgOMiQub3BlcmF0b3Iud29ya2Zsb3dydW4udjEuVHJpZ2dlclR5cGUiLAoaVHJpZ2dlcldvcmtmbG93UnVuUmVzcG9uc2USDgoGcnVuX2lkGAEgASgJKnkKC1RyaWdnZXJUeXBlEhwKGFRSSUdHRVJfVFlQRV9VTlNQRUNJRklFRBAAEhcKE1RSSUdHRVJfVFlQRV9NQU5VQUwQARIYChRUUklHR0VSX1RZUEVfV0VCSE9PSxACEhkKFVRSSUdHRVJfVFlQRV9TQ0hFRFVMRRADMpABCg9PcGVyYXRvclNlcnZpY2USfQoSVHJpZ2dlcldvcmtmbG93UnVuEjIub3BlcmF0b3Iud29ya2Zsb3dydW4udjEuVHJpZ2dlcldvcmtmbG93UnVuUmVxdWVzdBozLm9wZXJhdG9yLndvcmtmbG93cnVuLnYxLlRyaWdnZXJXb3JrZmxvd1J1blJlc3BvbnNlYgZwcm90bzM");
 
 /**
  * @generated from message operator.workflowrun.v1.TriggerWorkflowRunRequest
@@ -22,19 +22,23 @@ export type TriggerWorkflowRunRequest = Message<"operator.workflowrun.v1.Trigger
   workflowId: string;
 
   /**
-   * @generated from field: string spec = 2;
+   * workflowVersion that was triggered
+   *
+   * @generated from field: string version_id = 2;
    */
-  spec: string;
+  versionId: string;
 
   /**
-   * @generated from field: operator.workflowrun.v1.TriggerType trigger_type = 3;
+   * whihc is the torq version of this workflow
+   *
+   * @generated from field: string torq_version = 3;
+   */
+  torqVersion: string;
+
+  /**
+   * @generated from field: operator.workflowrun.v1.TriggerType trigger_type = 4;
    */
   triggerType: TriggerType;
-
-  /**
-   * @generated from field: optional string triggered_by = 4;
-   */
-  triggeredBy?: string;
 };
 
 /**
