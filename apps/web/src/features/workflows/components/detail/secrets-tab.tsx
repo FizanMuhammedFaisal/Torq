@@ -12,31 +12,55 @@ import {
 } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { toast } from 'react-hot-toast';
 import { useGetSecrets } from '@/features/workflows/hooks/use-get-secrets';
 import { useUpsertSecrets } from '@/features/workflows/hooks/use-upsert-secrets';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-
-dayjs.extend(relativeTime);
+import { useRevealSecret } from '@/features/workflows/hooks/use-reveal-secret';
+import { formatRelativeTime } from '@/lib/format';
 
 export function SecretsTab({ workflowId }: { workflowId: string }) {
 	const { data: existingSecrets, isLoading, isError } = useGetSecrets(workflowId);
 	const { mutate: upsertSecrets, isPending } = useUpsertSecrets(workflowId);
 
+	const { mutate: revealSecret } = useRevealSecret(workflowId);
+
 	const [isAdding, setIsAdding] = useState(false);
 	const [newKey, setNewKey] = useState('');
 	const [newValue, setNewValue] = useState('');
-	const [revealedIds, setRevealedIds] = useState<Set<string>>(new Set());
+    const [revealedValues, setRevealedValues] = useState<Record<string, string>>({});
+	const [revealingIds, setRevealingIds] = useState<Set<string>>(new Set());
 
 	const secrets = existingSecrets ?? [];
 	const hasSecrets = secrets.length > 0;
 
-	const toggleReveal = (id: string) => {
-		setRevealedIds((prev) => {
-			const next = new Set(prev);
-			if (next.has(id)) next.delete(id);
-			else next.add(id);
-			return next;
+	const handleToggleReveal = (id: string, key: string) => {
+		if (revealedValues[id]) {
+			setRevealedValues((prev) => {
+				const next = { ...prev };
+				delete next[id];
+				return next;
+			});
+			return;
+		}
+
+		setRevealingIds((prev) => new Set(prev).add(id));
+		revealSecret(key, {
+			onSuccess: (data) => {
+				setRevealedValues((prev) => ({ ...prev, [id]: data.value }));
+                setRevealingIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(id);
+                    return next;
+                });
+			},
+			onError: (error: any) => {
+				toast.error(error.response?.data?.message || 'Failed to reveal secret');
+                setRevealingIds((prev) => {
+                    const next = new Set(prev);
+                    next.delete(id);
+                    return next;
+                });
+			},
 		});
 	};
 
@@ -56,7 +80,6 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 
 	return (
 		<div className="space-y-12 pb-12">
-			{/* Hero stat */}
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
@@ -82,15 +105,13 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 				</p>
 			</motion.div>
 
-			{/* Main card */}
 			<motion.div
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6, delay: 0.1 }}
-				className="rounded-3xl border border-white/4 bg-[#0c0c0c] relative overflow-hidden"
+				className="rounded-3xl border border-white/4 bg-neutral-950 relative overflow-hidden"
 				style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
 			>
-				{/* Header */}
 				<div className="flex items-center justify-between p-6 pb-0">
 					<div>
 						<h3 className="text-[16px] font-semibold text-white/90">Secret Store</h3>
@@ -140,7 +161,6 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 						</div>
 					) : (
 						<AnimatePresence mode="popLayout">
-							{/* Inline Add Form — appears at the top */}
 							{isAdding && (
 								<motion.div
 									key="add-form"
@@ -271,30 +291,35 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 												</div>
 												<div className="text-[11px] text-white/25 mt-0.5">
 													Updated{' '}
-													{dayjs(sec.updatedAt).fromNow()}
+													{formatRelativeTime(sec.updatedAt)}
 												</div>
 											</div>
 
 											{/* Masked value */}
 											<div className="hidden sm:flex items-center gap-2">
-												<div className="h-8 flex items-center px-3 rounded-lg bg-black/30 border border-white/5 font-mono text-[12px] text-white/20 tracking-widest select-none">
-													{revealedIds.has(sec.id)
-														? '(encrypted)'
-														: '••••••••'}
+												<div className="h-8 flex items-center px-3 rounded-lg bg-black/30 border border-white/5 font-mono text-[12px] text-white/20 tracking-normal select-all overflow-hidden max-w-[200px]">
+													{revealingIds.has(sec.id) ? (
+                                                        <HugeiconsIcon icon={Loading03Icon as object} className="size-3 animate-spin mx-auto saturate-0 opacity-50" />
+                                                    ) : revealedValues[sec.id] ? (
+														<span className="text-emerald-400/90">{revealedValues[sec.id]}</span>
+													) : (
+														<span className="tracking-widest">••••••••</span>
+													)}
 												</div>
 												<button
 													type="button"
-													onClick={() => toggleReveal(sec.id)}
-													className="size-8 flex items-center justify-center rounded-lg text-white/20 hover:text-white/50 hover:bg-white/5 transition-colors"
+													onClick={() => handleToggleReveal(sec.id, sec.key)}
+                                                    disabled={revealingIds.has(sec.id)}
+													className="size-8 flex items-center justify-center rounded-lg text-white/20 hover:text-white/50 hover:bg-white/5 transition-colors disabled:opacity-50"
 													title={
-														revealedIds.has(sec.id)
+														revealedValues[sec.id]
 															? 'Hide'
 															: 'Show'
 													}
 												>
 													<HugeiconsIcon
 														icon={
-															(revealedIds.has(sec.id)
+															(revealedValues[sec.id]
 																? ViewOffSlashIcon
 																: EyeIcon) as object
 														}

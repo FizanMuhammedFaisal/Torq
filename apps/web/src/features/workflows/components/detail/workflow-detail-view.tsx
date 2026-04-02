@@ -3,25 +3,24 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { Loading03Icon, Alert02Icon } from '@hugeicons/core-free-icons';
 import toast from 'react-hot-toast';
-
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import type { ApiErrorBody } from '@/api/client';
-import { statusMap } from './mock-data';
-
-// Tabs
-import { OverviewTab } from './components/overview-tab';
-import { EditorTab } from './components/editor-tab';
-import { RunsTab } from './components/runs-tab';
-import { MetricsTab } from './components/metrics-tab';
-import { SecretsTab } from './components/secrets-tab';
+import { statusConfig as statusMap } from '@/features/workflows/config';
+import { OverviewTab } from '@/features/workflows/components/detail/overview-tab';
+import { EditorTab } from '@/features/workflows/components/detail/editor-tab';
+import { RunsTab } from '@/features/runs/components/runs-tab';
+import { MetricsTab } from '@/features/workflows/components/detail/metrics-tab';
+import { SecretsTab } from '@/features/workflows/components/detail/secrets-tab';
 import { useTriggerRun } from '@/features/workflows/hooks/use-trigger-run';
 import { useWorkflow } from '@/features/workflows/hooks/use-workflow';
+import { useRuns } from '@/features/runs/hooks/use-runs';
+
 
 const tabs = ['Overview', 'Editor', 'Runs', 'Metrics', 'Secrets'] as const;
 type Tab = (typeof tabs)[number];
 
-export function WorkflowDetailPage() {
+export function WorkflowDetailView() {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
 	const [activeTab, setActiveTab] = useState<Tab>('Overview');
@@ -29,12 +28,13 @@ export function WorkflowDetailPage() {
 
 	const triggerRun = useTriggerRun(id);
 	const { data: workflow, isLoading, error } = useWorkflow(id);
+	const { runs } = useRuns();
 
 	const cfg = workflow ? (statusMap[workflow.status as keyof typeof statusMap] || statusMap.idle) : statusMap.idle;
 
 	if (!id) {
 		return (
-			<div className="flex flex-col h-full bg-[#0a0a0a] items-center justify-center p-8">
+			<div className="flex flex-col h-full bg-zinc-950 items-center justify-center p-8">
 				<div className="border border-red-500/20 bg-red-500/2 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm max-w-md w-full">
 					<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
 						<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
@@ -55,7 +55,7 @@ export function WorkflowDetailPage() {
 
 	if (error) {
 		return (
-			<div className="flex flex-col h-full bg-[#0a0a0a] items-center justify-center p-8">
+			<div className="flex flex-col h-full bg-zinc-950 items-center justify-center p-8">
 				<div className="border border-red-500/20 bg-red-500/2 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm max-w-md w-full">
 					<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
 						<HugeiconsIcon icon={Alert02Icon} className="size-8 text-red-400" />
@@ -74,18 +74,18 @@ export function WorkflowDetailPage() {
 		);
 	}
 
-	if (isLoading) {
+	if (isLoading || !workflow) {
 		return (
-			<div className="flex flex-col h-full bg-[#0a0a0a] items-center justify-center p-8">
+			<div className="flex flex-col h-full bg-zinc-950 items-center justify-center p-8">
 				<HugeiconsIcon icon={Loading03Icon} className="size-8 text-white/20 animate-spin" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-[#0a0a0a]">
+		<div className="flex flex-col h-full bg-zinc-950">
 			{/* Top Header */}
-			<div className="border-b border-white/4 bg-[#0a0a0a]/50 backdrop-blur-md sticky top-0 z-30">
+			<div className="border-b border-white/4 bg-zinc-950/50 backdrop-blur-md sticky top-0 z-30">
 				<div className="max-w-[1400px] mx-auto px-8 h-20 flex items-center justify-between">
 					<div className="flex items-center gap-6">
 						<button
@@ -108,10 +108,10 @@ export function WorkflowDetailPage() {
 						</button>
 						<div>
 							<div className="flex items-center gap-3">
-								<h1 className="text-2xl font-bold tracking-tight text-white">{workflow?.name}</h1>
+								<h1 className="text-2xl font-bold tracking-tight text-white">{workflow.name}</h1>
 								<div className="flex items-center gap-1.5 rounded-full border border-white/6 px-2.5 py-1">
 									<span
-										className={`size-[6px] rounded-full ${workflow?.status === 'running' ? 'animate-pulse' : ''}`}
+										className={`size-[6px] rounded-full ${workflow.status === 'running' ? 'animate-pulse' : ''}`}
 										style={{ background: cfg.color }}
 									/>
 									<span className="text-[11px] font-medium" style={{ color: cfg.color }}>
@@ -119,7 +119,7 @@ export function WorkflowDetailPage() {
 									</span>
 								</div>
 							</div>
-							<p className="text-[14px] text-white/30 mt-1.5">{workflow?.description}</p>
+							<p className="text-[14px] text-white/30 mt-1.5">{workflow.description}</p>
 						</div>
 					</div>
 
@@ -194,17 +194,16 @@ export function WorkflowDetailPage() {
 			</div>
 
 			{/* Main Content Area */}
-			<div className="flex-1 overflow-auto bg-[#080808]">
+			<div className="flex-1 overflow-auto bg-black/95">
 				<div className="max-w-[1400px] mx-auto p-8">
-					{activeTab === 'Overview' && <OverviewTab />}
-					{activeTab === 'Editor' && <EditorTab />}
+					{activeTab === 'Overview' && <OverviewTab workflow={workflow} runs={runs} />}
+					{activeTab === 'Editor' && <EditorTab workflow={workflow} />}
 					{activeTab === 'Runs' && <RunsTab workflowId={id} />}
 					{activeTab === 'Metrics' && <MetricsTab workflowId={id} />}
-					{activeTab === 'Secrets' && <SecretsTab />}
+					{activeTab === 'Secrets' && <SecretsTab workflowId={id} />}
 				</div>
 			</div>
 
-			{/* Delete dialog */}
 			<ConfirmDialog
 				open={showDelete}
 				onOpenChange={setShowDelete}

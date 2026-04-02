@@ -3,7 +3,9 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { File02Icon, GearsIcon, GridIcon, Alert02Icon } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
-import { MOCK_WORKFLOW, MOCK_RUNS, statusMap } from '../mock-data';
+import { statusConfig as statusMap } from '@/features/workflows/config';
+import type { Workflow } from '@/features/workflows/types';
+import type { Run } from './types';
 
 function MetricCard({
 	label,
@@ -20,11 +22,11 @@ function MetricCard({
 }) {
 	const gradients = {
 		emerald:
-			'from-emerald-500/[0.06] to-emerald-500/[0.01] border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(16,185,129,0.15)]',
-		blue: 'from-blue-500/[0.06] to-blue-500/[0.02] border-blue-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(59,130,246,0.15)]',
-		red: 'from-red-500/[0.06] to-red-500/[0.02] border-red-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(239,68,68,0.15)]',
+			'from-emerald-500/6 to-emerald-500/1 border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(16,185,129,0.15)]',
+		blue: 'from-blue-500/6 to-blue-500/2 border-blue-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(59,130,246,0.15)]',
+		red: 'from-red-500/6 to-red-500/2 border-red-500/30 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(239,68,68,0.15)]',
 		white:
-			'from-white/[0.06] to-white/[0.01] border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(255,255,255,0.05)]',
+			'from-white/6 to-white/1 border-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_24px_-8px_rgba(255,255,255,0.05)]',
 	};
 
 	const bgThemes = {
@@ -39,7 +41,7 @@ function MetricCard({
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.5, delay, ease: [0.25, 1, 0.5, 1] }}
-			className={`rounded-xl border bg-gradient-to-br ${gradients[accent || 'white']} p-5 relative overflow-hidden flex flex-col justify-between min-h-[120px] group backdrop-blur-xl`}
+			className={`rounded-xl border bg-linear-to-br ${gradients[accent || 'white']} p-5 relative overflow-hidden flex flex-col justify-between min-h-[120px] group backdrop-blur-xl`}
 		>
 			<div
 				className={`absolute top-0 right-0 w-32 h-32 ${bgThemes[accent || 'white']}/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none transition-all duration-700 group-hover:${bgThemes[accent || 'white']}/15 group-hover:blur-2xl`}
@@ -78,8 +80,13 @@ function MetricCard({
 	);
 }
 
-export function OverviewTab() {
-	const wf = MOCK_WORKFLOW;
+export function OverviewTab({
+	workflow,
+	runs,
+}: {
+	workflow: Workflow;
+	runs: Run[];
+}) {
 
 	return (
 		<div className="space-y-8 pb-12">
@@ -87,29 +94,29 @@ export function OverviewTab() {
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 				<MetricCard
 					label="Total Runs"
-					value={MOCK_WORKFLOW.totalRuns}
+					value={runs.length}
 					accent="white"
 					icon={File02Icon}
 					delay={0.05}
 				/>
 				<MetricCard
 					label="Avg Duration"
-					value={MOCK_WORKFLOW.duration}
+					value="—"
 					accent="blue"
 					icon={GearsIcon}
 					delay={0.1}
 				/>
 				<MetricCard
 					label="Last Run"
-					value={MOCK_WORKFLOW.lastRun}
+					value={runs[0]?.date || '—'}
 					accent="blue"
 					icon={GridIcon}
 					delay={0.15}
 				/>
 				<MetricCard
 					label="Status"
-					value="Valid"
-					accent="emerald"
+					value={runs[0]?.status || 'idle'}
+					accent={(runs[0]?.status === 'success' ? 'emerald' : runs[0]?.status === 'failed' ? 'red' : 'blue') as any}
 					delay={0.2}
 				/>
 			</div>
@@ -120,7 +127,7 @@ export function OverviewTab() {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.25 }}
-					className="lg:col-span-1 rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8 flex flex-col relative overflow-hidden"
+					className="lg:col-span-1 rounded-3xl border border-white/4 bg-neutral-950 p-6 sm:p-8 flex flex-col relative overflow-hidden"
 					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
 				>
 					<div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
@@ -131,7 +138,7 @@ export function OverviewTab() {
 						<h3 className="text-[16px] font-semibold text-white/90">About Workflow</h3>
 					</div>
 					<p className="text-[14px] text-white/50 leading-relaxed font-light mb-6 flex-1 relative z-10">
-						{wf.description}
+						{workflow.description || 'No description provided.'}
 					</p>
 				</motion.div>
 
@@ -140,7 +147,7 @@ export function OverviewTab() {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.3 }}
-					className="lg:col-span-2 rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8"
+					className="lg:col-span-2 rounded-3xl border border-white/4 bg-neutral-950 p-6 sm:p-8"
 					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
 				>
 					<div className="flex items-center justify-between mb-6">
@@ -158,7 +165,7 @@ export function OverviewTab() {
 					</div>
 
 					<div className="space-y-3">
-						{MOCK_RUNS.slice(0, 4).map((run, i) => {
+						{runs.slice(0, 4).map((run, i) => {
 							const rc = statusMap[run.status];
 							const isSuccess = run.status === 'success';
 							return (
@@ -176,7 +183,7 @@ export function OverviewTab() {
 										<div
 											className={`size-10 rounded-full flex items-center justify-center border ${isSuccess ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}
 										>
-											<HugeiconsIcon icon={isSuccess ? GridIcon : Alert02Icon as any} className="size-5" />
+											<HugeiconsIcon icon={isSuccess ? GridIcon : Alert02Icon} className="size-5" />
 										</div>
 										<div>
 											<div className="flex items-center gap-2 mb-1">

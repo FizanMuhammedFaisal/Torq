@@ -4,10 +4,10 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Alert02Icon } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
 import { type ValidationError, YamlEditor } from '@/components/yaml-editor';
-import { MOCK_YAML } from '../mock-data';
+import type { Workflow } from '@/features/workflows/types';
 
-export function EditorTab() {
-	const [yamlContent, setYamlContent] = useState(MOCK_YAML);
+export function EditorTab({ workflow }: { workflow: Workflow }) {
+	const [yamlContent, setYamlContent] = useState('');
 	const [errors, setErrors] = useState<ValidationError[]>([]);
 	const [saved, setSaved] = useState(true);
 
@@ -56,7 +56,7 @@ export function EditorTab() {
 								variant="ghost"
 								className="rounded-full h-8 px-4 text-[12px] text-white/50 hover:text-white hover:bg-white/5 transition-all"
 								onClick={() => {
-									setYamlContent(MOCK_YAML);
+									setYamlContent('');
 									setSaved(true);
 								}}
 								disabled={saved}
@@ -111,13 +111,13 @@ export function EditorTab() {
 					<div className="absolute -inset-1.5 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-[28px] blur-xl opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 pointer-events-none" />
 
 					{/* Editor Pane */}
-					<div className="relative rounded-[24px] border border-white/[0.08] bg-[#080808] p-1.5 shadow-2xl overflow-hidden" style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.04)' }}>
+					<div className="relative rounded-[24px] border border-white/8 bg-black/95 p-1.5 shadow-2xl overflow-hidden" style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.04)' }}>
 						<YamlEditor
 							value={yamlContent}
 							onChange={handleChange}
 							onValidation={setErrors}
 							height="560px"
-							className="rounded-[20px] bg-[#0a0a0a] ring-1 ring-white/[0.02]"
+							className="rounded-[20px] bg-zinc-950 ring-1 ring-white/2"
 						/>
 					</div>
 				</motion.div>

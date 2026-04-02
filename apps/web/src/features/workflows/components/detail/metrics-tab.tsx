@@ -3,11 +3,13 @@ import { motion } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { GearsIcon, File02Icon } from '@hugeicons/core-free-icons';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
-import { MOCK_WORKFLOW } from '../mock-data';
+import { useRuns } from '@/features/runs/hooks/use-runs';
+
 
 export function MetricsTab({ workflowId }: { workflowId: string }) {
-	console.log('Metrics for:', workflowId);
-	const successRate = MOCK_WORKFLOW.successRate;
+	const { runs } = useRuns();
+	const successRate = runs.length > 0 ? Math.round((runs.filter(r => r.status === 'success').length / runs.length) * 100) : 0;
+	const totalRuns = runs.length;
 
 	// Generate mock historical run data for the histogram
 	const history = useMemo(() => {
@@ -52,7 +54,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 					<span className="text-2xl sm:text-3xl font-medium text-white/40 mb-1">m</span>
 				</div>
 				<p className="text-[14px] text-white/30 mt-4 max-w-sm">
-					Aggregated duration across <AnimatedCounter value={MOCK_WORKFLOW.totalRuns} /> total
+					Aggregated duration across <AnimatedCounter value={totalRuns} /> total
 					executions since creation.
 				</p>
 			</motion.div>
@@ -63,7 +65,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.1 }}
-					className="lg:col-span-2 rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8 flex flex-col"
+					className="lg:col-span-2 rounded-3xl border border-white/4 bg-neutral-950 p-6 sm:p-8 flex flex-col"
 					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
 				>
 					<div className="flex items-center justify-between mb-8">
@@ -81,7 +83,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 						</div>
 					</div>
 
-					<div className="flex-1 flex items-end justify-between gap-1.5 sm:gap-2 h-[180px] w-full pt-4 border-b border-white/[0.05] pb-2">
+					<div className="flex-1 flex items-end justify-between gap-1.5 sm:gap-2 h-[180px] w-full pt-4 border-b border-white/5 pb-2">
 						{history.map((run, i) => {
 							const heightPct = Math.max((run.durationSec / maxDuration) * 100, 4); // min 4% height
 							const isSuccess = run.status === 'success';
@@ -91,7 +93,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 									className="group relative flex-1 flex justify-center h-full items-end"
 								>
 									{/* Tooltip */}
-									<div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-[#1a1a1a] border border-white/10 text-white text-[11px] rounded-md px-2.5 py-1.5 pointer-events-none whitespace-nowrap z-10 shadow-xl">
+									<div className="absolute -top-12 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 border border-white/10 text-white text-[11px] rounded-md px-2.5 py-1.5 pointer-events-none whitespace-nowrap z-10 shadow-xl">
 										<div className="font-semibold">{run.label}</div>
 										<div className={`text-${isSuccess ? 'emerald' : 'red'}-400`}>
 											{Math.round(run.durationSec)}s
@@ -102,8 +104,8 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 										animate={{ height: `${heightPct}%` }}
 										transition={{ duration: 0.7, delay: i * 0.01 + 0.2, ease: 'easeOut' }}
 										className={`w-full rounded-sm opacity-80 hover:opacity-100 transition-opacity cursor-crosshair ${isSuccess
-												? 'bg-gradient-to-t from-emerald-600/60 to-emerald-400'
-												: 'bg-gradient-to-t from-red-600/80 to-red-400'
+											? 'bg-gradient-to-t from-emerald-600/60 to-emerald-400'
+											: 'bg-gradient-to-t from-red-600/80 to-red-400'
 											}`}
 									/>
 								</div>
@@ -121,7 +123,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.6, delay: 0.2 }}
-					className="rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden"
+					className="rounded-3xl border border-white/4 bg-neutral-950 p-6 sm:p-8 flex flex-col items-center justify-center relative overflow-hidden"
 					style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
 				>
 					<h3 className="text-[16px] font-semibold text-white/90 self-start w-full relative z-10">
@@ -183,7 +185,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.6, delay: 0.3 }}
-				className="rounded-3xl border border-white/4 bg-[#0c0c0c] p-6 sm:p-8"
+				className="rounded-3xl border border-white/4 bg-neutral-950 p-6 sm:p-8"
 				style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.02)' }}
 			>
 				<h3 className="text-[16px] font-semibold text-white/90 mb-1">Configuration History</h3>
@@ -192,7 +194,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 				</p>
 
 				<div className="space-y-4">
-					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/[0.02] border border-emerald-500/20 relative overflow-hidden">
+					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/2 border border-emerald-500/20 relative overflow-hidden">
 						<div className="absolute -right-10 -bottom-10 size-32 bg-emerald-500/10 rounded-full blur-[40px] pointer-events-none" />
 						<div className="size-10 shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30 text-emerald-400">
 							<HugeiconsIcon icon={File02Icon} className="size-5" />
@@ -215,7 +217,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 						</div>
 					</div>
 
-					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/3">
+					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/1 border border-white/3">
 						<div className="size-10 shrink-0 rounded-full bg-white/3 flex items-center justify-center border border-white/5 text-white/40">
 							<span className="font-mono text-[12px] font-bold">V2</span>
 						</div>
@@ -231,7 +233,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 						</div>
 					</div>
 
-					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/[0.01] border border-white/3">
+					<div className="flex flex-col sm:flex-row gap-4 p-5 rounded-2xl bg-white/1 border border-white/3">
 						<div className="size-10 shrink-0 rounded-full bg-white/3 flex items-center justify-center border border-white/5 text-white/40">
 							<span className="font-mono text-[12px] font-bold">V1</span>
 						</div>

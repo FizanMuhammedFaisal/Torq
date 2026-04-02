@@ -1,3 +1,5 @@
+import { PageHeader } from '@/components/ui/page-header';
+import { WorkflowHealthBar } from '@/features/workflows/components/workflow-health-bar';
 import {
 	Alert02Icon,
 	EyeIcon,
@@ -9,7 +11,7 @@ import {
 	Search01Icon,
 } from '@hugeicons/core-free-icons';
 import { HugeiconsIcon } from '@hugeicons/react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import type { ColumnDef } from '@tanstack/react-table';
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
@@ -28,11 +30,11 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { statusConfig } from '@/features/workflows/config';
-import { MOCK_WORKFLOWS } from '@/features/workflows/hooks/mock-data';
-import type { Workflow, WorkflowStatus } from '@/features/workflows/types';
+import { useWorkflows } from '@/features/workflows/hooks/use-workflows';
+import type { WorkflowWithLatestRun, WorkflowStatus } from '@/features/workflows/types';
 import { useAppConfig } from '@/lib/app-config';
+import { formatDuration, formatRelativeTime } from '@/lib/format';
 
-/* ── Page ─── */
 
 export function WorkflowListPage() {
 	const navigate = useNavigate();
@@ -44,42 +46,33 @@ export function WorkflowListPage() {
 	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>(
 		'all',
 	);
-	const [deleteTarget, setDeleteTarget] = useState<Workflow | null>(null);
+	const [deleteTarget, setDeleteTarget] = useState<WorkflowWithLatestRun | null>(null);
 
 	const {
-		data: workflows = [],
+		data,
 		isLoading,
 		error,
 		refetch: retry,
-	} = useQuery({
-		queryKey: ['workflows', 'list'],
-		queryFn: async () => {
-			await new Promise((resolve) => setTimeout(resolve, 800));
-			return Array.from({ length: 5 }).flatMap((_, i) =>
-				MOCK_WORKFLOWS.map((wf) => ({
-					...wf,
-					id: `${wf.id}-${i}`,
-					name: i === 0 ? wf.name : `${wf.name} (Copy ${i})`,
-				})),
-			);
-		},
-	});
+	} = useWorkflows();
+
+	const workflows = data?.workflows ?? [];
 
 	const filteredWorkflows = useMemo(() => {
 		return workflows.filter((wf) => {
+			const status = wf.lastRun?.status ?? 'idle';
 			const matchesStatus =
-				statusFilter === 'all' || wf.status === statusFilter;
-			return matchesStatus; // search handles name/desc natively via TanStack Table
+				statusFilter === 'all' || status === statusFilter;
+			return matchesStatus;
 		});
 	}, [workflows, statusFilter]);
 
 	const metrics = useMemo(() => {
 		return {
-			total: workflows.length,
-			running: workflows.filter((w) => w.status === 'running').length,
-			failed: workflows.filter((w) => w.status === 'failed').length,
+			total: data?.meta.totalItems ?? workflows.length,
+			running: workflows.filter((w) => w.lastRun?.status === 'running').length,
+			failed: workflows.filter((w) => w.lastRun?.status === 'failed').length,
 		};
-	}, [workflows]);
+	}, [workflows, data?.meta.totalItems]);
 
 	const { authEnabled } = useAppConfig();
 
@@ -87,26 +80,27 @@ export function WorkflowListPage() {
 		if (!deleteTarget) return;
 		queryClient.setQueryData(
 			['workflows', 'list'],
-			(old: Workflow[] | undefined) =>
-				old ? old.filter((w) => w.id !== deleteTarget.id) : [],
+			(old: { workflows: WorkflowWithLatestRun[] } | undefined) =>
+				old ? { ...old, workflows: old.workflows.filter((w) => w.id !== deleteTarget.id) } : old,
 		);
 		setDeleteTarget(null);
 	};
 
 	// ── Columns ──
-	const columns = useMemo<ColumnDef<Workflow>[]>(() => {
-		const cols: ColumnDef<Workflow>[] = [
+	const columns = useMemo<ColumnDef<WorkflowWithLatestRun>[]>(() => {
+		const cols: ColumnDef<WorkflowWithLatestRun>[] = [
 			{
 				id: 'name',
 				accessorFn: (row) => row.name, // Used for global filter
 				header: 'Workflow',
 				cell: ({ row }) => {
 					const wf = row.original;
-					const cfg = statusConfig[wf.status];
+					const status = wf.lastRun?.status ?? 'idle';
+					const cfg = statusConfig[status];
 					return (
 						<div className="flex items-center gap-4 min-w-0 pr-4">
 							<div className="relative flex items-center justify-center size-2.5 shrink-0 mt-0.5">
-								{wf.status === 'running' && (
+								{status === 'running' && (
 									<span
 										className="absolute size-[16px] rounded-full animate-ping opacity-30"
 										style={{ backgroundColor: cfg.color }}
@@ -127,44 +121,29 @@ export function WorkflowListPage() {
 									</span>
 									<span
 										className="text-[10px] font-bold px-1.5 py-0.5 rounded-sm whitespace-nowrap"
-										style={{ color: cfg.color, backgroundColor: cfg.bg }}
+										style={{ color: cfg.color, backgroundColor: `${cfg.color}15` }}
 									>
 										{cfg.label.toUpperCase()}
 									</span>
 								</div>
-								<span className="text-[13px] text-white/40 truncate pr-4">
-									{wf.description}
-								</span>
+								{wf.description && (
+									<span className="text-[13px] text-white/35 truncate pr-4">
+										{wf.description}
+									</span>
+								)}
 							</div>
 						</div>
 					);
 				},
 			},
 			{
-				accessorKey: 'namespace',
-				header: 'Namespace',
-				cell: ({ row }) => (
-					<div className="flex items-center min-w-0 text-[13px] text-white/60">
-						<div className="inline-flex items-center px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.05] truncate max-w-full font-mono text-[11.5px]">
-							{row.original.namespace}
-						</div>
-					</div>
-				),
-			},
-			{
 				id: 'health',
 				header: 'Health (10 runs)',
-				cell: ({ row }) => (
-					<div className="flex items-center gap-[2px]">
-						{row.original.successRate.map((isSuccess, idx) => (
-							<div
-								// biome-ignore lint/suspicious/noArrayIndexKey: fixed mock data length
-								key={idx}
-								className={`w-1.5 h-4 rounded-sm ${isSuccess ? 'bg-emerald-500/80 shadow-[0_0_4px_rgba(16,185,129,0.2)]' : 'bg-red-500/80 shadow-[0_0_4px_rgba(239,68,68,0.3)]'}`}
-							/>
-						))}
-					</div>
-				),
+				cell: ({ row }) => {
+					const health = row.original.health || [];
+					if (health.length === 0) return <span className="text-white/10 text-[11px] italic">No history</span>;
+					return <WorkflowHealthBar health={health} />;
+				}
 			},
 			{
 				accessorKey: 'lastRun',
@@ -172,26 +151,26 @@ export function WorkflowListPage() {
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2 text-[13px] text-white/60 whitespace-nowrap">
 						{row.original.lastRun ? (
-							row.original.lastRun
+							formatRelativeTime(row.original.lastRun.startedAt)
 						) : (
-							<span className="text-white/20">—</span>
+							<span className="text-white/10 italic">—</span>
 						)}
 					</div>
 				),
 			},
 			{
-				accessorKey: 'duration',
+				id: 'duration',
 				header: 'Duration',
-				cell: ({ row }) => (
-					<div className="flex flex-col gap-0.5 justify-center whitespace-nowrap">
-						<span className="text-[13px] font-mono text-white/80">
-							{row.original.duration || '—'}
-						</span>
-						<span className="text-[11.5px] text-white/30">
-							{row.original.steps} steps
-						</span>
-					</div>
-				),
+				cell: ({ row }) => {
+					const lastRun = row.original.lastRun;
+					return (
+						<div className="flex flex-col gap-0.5 justify-center whitespace-nowrap">
+							<span className="text-[13px] font-mono text-white/80">
+								{lastRun ? formatDuration(lastRun.duration ?? 0) : '—'}
+							</span>
+						</div>
+					);
+				},
 			},
 			{
 				id: 'actions',
@@ -205,7 +184,7 @@ export function WorkflowListPage() {
 									render={
 										<button
 											type="button"
-											className="shrink-0 size-8 rounded-full flex items-center justify-center text-white/30 hover:text-white hover:bg-white/[0.08] transition-colors border border-transparent hover:border-white/[0.05]"
+											className="shrink-0 size-8 rounded-full flex items-center justify-center text-white/30 hover:text-white hover:bg-white/8 transition-colors border border-transparent hover:border-white/5"
 											onClick={(e) => e.stopPropagation()}
 										/>
 									}
@@ -265,39 +244,36 @@ export function WorkflowListPage() {
 			},
 		];
 
-		// Remove Namespace column if running in Auth mode (namespace is an internal concern)
-		if (authEnabled) {
-			return cols.filter((c: any) => c.accessorKey !== 'namespace');
-		}
-
 		return cols;
-	}, [authEnabled, navigate]);
-
-	// Derived metrics removed, using metrics from useWorkflows
+	}, [navigate]);
 
 	return (
-		<div className="flex flex-col h-full bg-[#0a0a0a]">
+		<div className="flex flex-col h-full bg-zinc-950">
 			{/* Header */}
-			<div className="flex items-center justify-between px-6 lg:px-8 py-6 border-b border-white/[0.05] bg-[#0c0c0c]">
-				<div>
-					<h1 className="text-2xl font-bold tracking-tight text-white">
-						Workflows
-					</h1>
-					<p className="text-[13.5px] text-white/40 mt-1.5 flex items-center gap-2">
-						<span className="inline-flex size-2 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-						Connected to Torq Engine{' '}
-						{authEnabled ? `(Workspace)` : '(Default Namespace)'}
+			<PageHeader
+				title="Workflows"
+				subtitle={
+					<p className="text-[14px] text-white/40 mt-1.5 flex items-center gap-2 font-medium">
+						<span className="relative flex size-2.5 items-center justify-center">
+							<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-20" />
+							<span className="relative inline-flex size-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+						</span>
+						Torq Engine via {authEnabled ? 'Workspace' : 'Default Namespace'}
 					</p>
-				</div>
+				}
+			>
 				<AnimatePresence>
 					{isCollapsed && (
 						<motion.div
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, filter: 'blur(0px)', scale: [1.1, 1] }}
-							exit={{ opacity: 0, filter: 'blur(10px)', scale: 0.9 }}
+							initial={{ opacity: 0, filter: 'blur(8px)', scale: 0.95 }}
+							animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+							exit={{ opacity: 0, filter: 'blur(8px)', scale: 0.95 }}
 							transition={{ duration: 0.2 }}
 						>
-							<Button className="gap-2 rounded-full px-5 text-[13px] font-bold h-9 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.3)] bg-emerald-400 text-emerald-950 hover:bg-emerald-500 border-0">
+							<Button
+								onClick={() => navigate('/dashboard/workflows/create')}
+								className="gap-2 rounded-full px-5 text-[13px] font-bold h-9 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.3)] bg-emerald-400 text-emerald-950 hover:bg-emerald-500 border-0"
+							>
 								<HugeiconsIcon
 									icon={PlusSignIcon}
 									className="size-4"
@@ -308,7 +284,7 @@ export function WorkflowListPage() {
 						</motion.div>
 					)}
 				</AnimatePresence>
-			</div>
+			</PageHeader>
 
 			<div className="flex-1 overflow-hidden w-full p-6 lg:p-8">
 				<div className="w-full h-full max-w-7xl mx-auto flex flex-col space-y-6">
@@ -324,71 +300,82 @@ export function WorkflowListPage() {
 								placeholder="Search workflows by name..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
-								className="w-full bg-[#121212] border border-white/[0.08] rounded-full h-10 pl-10 pr-4 text-[13px] text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-colors"
+								className="w-full bg-neutral-900 border border-white/10 rounded-full h-10 pl-10 pr-4 text-[13px] text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-colors"
 							/>
 						</div>
 
-						<DropdownMenu>
-							<DropdownMenuTrigger
-								render={
-									<Button
-										variant="outline"
-										className="gap-2 h-10 rounded-full px-4 border-white/[0.08] bg-[#121212] hover:bg-white/[0.04]"
+						<div className="flex items-center gap-3">
+							<DropdownMenu>
+								<DropdownMenuTrigger
+									render={
+										<Button
+											variant="outline"
+											className="gap-2 h-10 rounded-full px-4 border-white/10 bg-neutral-900 hover:bg-white/5"
+										/>
+									}
+								>
+									<HugeiconsIcon
+										icon={FilterIcon}
+										className="size-4 text-white/50"
 									/>
-								}
+									<span className="text-[13px] font-medium text-white/80">
+										{' '}
+										Status: {statusFilter === 'all' ? 'All' : statusFilter}
+									</span>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-48">
+									<DropdownMenuGroup>
+										<DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+										<DropdownMenuSeparator />
+										<DropdownMenuCheckboxItem
+											checked={statusFilter === 'all'}
+											onCheckedChange={() => setStatusFilter('all')}
+										>
+											All Statuses
+										</DropdownMenuCheckboxItem>
+										<DropdownMenuCheckboxItem
+											checked={statusFilter === 'running'}
+											onCheckedChange={() => setStatusFilter('running')}
+										>
+											Running
+										</DropdownMenuCheckboxItem>
+										<DropdownMenuCheckboxItem
+											checked={statusFilter === 'failed'}
+											onCheckedChange={() => setStatusFilter('failed')}
+										>
+											Failed
+										</DropdownMenuCheckboxItem>
+										<DropdownMenuCheckboxItem
+											checked={statusFilter === 'success'}
+											onCheckedChange={() => setStatusFilter('success')}
+										>
+											Passed
+										</DropdownMenuCheckboxItem>
+										<DropdownMenuCheckboxItem
+											checked={statusFilter === 'idle'}
+											onCheckedChange={() => setStatusFilter('idle')}
+										>
+											Idle
+										</DropdownMenuCheckboxItem>
+									</DropdownMenuGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							<Button
+								onClick={() => retry()}
+								variant="outline"
+								size="icon"
+								className="size-10 rounded-full border-white/10 bg-neutral-900 hover:bg-white/5"
 							>
-								<HugeiconsIcon
-									icon={FilterIcon}
-									className="size-4 text-white/50"
-								/>
-								<span className="text-[13px] font-medium text-white/80">
-									{' '}
-									Status: {statusFilter === 'all' ? 'All' : statusFilter}
-								</span>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-48">
-								<DropdownMenuGroup>
-									<DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'all'}
-										onCheckedChange={() => setStatusFilter('all')}
-									>
-										All Statuses
-									</DropdownMenuCheckboxItem>
-									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'running'}
-										onCheckedChange={() => setStatusFilter('running')}
-									>
-										Running
-									</DropdownMenuCheckboxItem>
-									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'failed'}
-										onCheckedChange={() => setStatusFilter('failed')}
-									>
-										Failed
-									</DropdownMenuCheckboxItem>
-									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'success'}
-										onCheckedChange={() => setStatusFilter('success')}
-									>
-										Passed
-									</DropdownMenuCheckboxItem>
-									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'idle'}
-										onCheckedChange={() => setStatusFilter('idle')}
-									>
-										Idle
-									</DropdownMenuCheckboxItem>
-								</DropdownMenuGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+								<HugeiconsIcon icon={RefreshIcon} className="size-4" />
+							</Button>
+						</div>
 					</div>
 
 					{/* ── Main Data Area ── */}
 					<div className="flex-1 overflow-hidden">
 						{error ? (
-							<div className="border border-red-500/20 bg-red-500/[0.02] rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm">
+							<div className="border border-red-500/20 bg-red-500/2 rounded-2xl p-12 flex flex-col items-center justify-center text-center shadow-sm">
 								<div className="size-16 rounded-full bg-red-500/10 flex items-center justify-center mb-5">
 									<HugeiconsIcon
 										icon={Alert02Icon}
@@ -399,12 +386,12 @@ export function WorkflowListPage() {
 									Failed to load workflows
 								</h3>
 								<p className="text-[14px] text-white/50 max-w-sm mb-8">
-									{error.message}
+									{error instanceof Error ? error.message : 'Unknown error'}
 								</p>
 								<Button
 									onClick={() => retry()}
 									variant="outline"
-									className="gap-2 h-10 rounded-full px-6 border-white/[0.08] hover:bg-white/[0.04]"
+									className="gap-2 h-10 rounded-full px-6 border-white/8 hover:bg-white/4"
 								>
 									<HugeiconsIcon icon={RefreshIcon} className="size-4" />
 									Try Again
@@ -412,26 +399,22 @@ export function WorkflowListPage() {
 							</div>
 						) : isLoading ? (
 							<div className="w-full">
-								<div className="flex items-center px-4 h-11 border-b border-transparent">
-									<div className="w-24 h-3 bg-white/[0.03] rounded-sm animate-pulse" />
-									<div className="w-32 h-3 bg-white/[0.03] rounded-sm animate-pulse ml-auto" />
-								</div>
 								<div className="flex flex-col">
 									{[1, 2, 3, 4, 5].map((i) => (
 										<div
 											key={i}
-											className="flex items-center gap-6 px-4 py-3.5"
+											className="flex items-center gap-6 px-4 py-4 border-b border-white/5"
 										>
 											<div className="flex items-center gap-4 w-1/3">
-												<div className="size-2.5 rounded-full bg-white/[0.03] animate-pulse" />
+												<div className="size-2.5 rounded-full bg-white/3 animate-pulse" />
 												<div className="flex flex-col gap-2 w-full">
-													<div className="w-3/4 h-3.5 bg-white/[0.04] rounded animate-pulse" />
-													<div className="w-1/2 h-2.5 bg-white/[0.02] rounded animate-pulse" />
+													<div className="w-3/4 h-3.5 bg-white/4 rounded animate-pulse" />
+													<div className="w-1/2 h-2.5 bg-white/2 rounded animate-pulse" />
 												</div>
 											</div>
-											<div className="w-24 h-3 bg-white/[0.03] rounded animate-pulse" />
-											<div className="w-16 h-3 bg-white/[0.03] rounded animate-pulse ml-auto" />
-											<div className="size-8 rounded-full bg-white/[0.03] animate-pulse" />
+											<div className="w-24 h-4 bg-white/3 rounded-full animate-pulse" />
+											<div className="w-20 h-3 bg-white/3 rounded animate-pulse ml-auto" />
+											<div className="size-8 rounded-full bg-white/3 animate-pulse" />
 										</div>
 									))}
 								</div>
@@ -454,7 +437,7 @@ export function WorkflowListPage() {
 									your first workflow to start automating.
 								</p>
 								<Button
-									onClick={() => navigate('/dashboard/workflows/new')}
+									onClick={() => navigate('/dashboard/workflows/create')}
 									className="gap-2 h-10 rounded-full px-6 bg-emerald-500 hover:bg-emerald-400 text-black font-semibold shadow-[0_0_12px_rgba(16,185,129,0.4)]"
 								>
 									<HugeiconsIcon
@@ -477,13 +460,13 @@ export function WorkflowListPage() {
 										? 'Try adjusting your filters.'
 										: 'Get started by creating a new workflow.'
 								}
+								onRowClick={(row) => navigate(`/dashboard/workflows/${row.id}`)}
 							/>
 						)}
 					</div>
 				</div>
 			</div>
 
-			{/* Delete confirmation */}
 			<ConfirmDialog
 				open={!!deleteTarget}
 				onOpenChange={(open) => !open && setDeleteTarget(null)}
@@ -497,3 +480,4 @@ export function WorkflowListPage() {
 		</div>
 	);
 }
+

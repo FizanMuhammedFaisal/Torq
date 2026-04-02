@@ -9,7 +9,7 @@ export function SocialAuth({ isPending }: { isPending?: boolean }) {
 				<Button
 					variant="outline"
 					type="button"
-					className="w-full gap-2 text-white/60 border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:text-white"
+					className="w-full gap-2 text-white/60 border-white/8 bg-white/3 hover:bg-white/6 hover:text-white"
 					disabled={isPending}
 					onClick={() => authClient.signIn.social({ provider: 'google' })}
 				>
@@ -32,7 +32,7 @@ export function SocialAuth({ isPending }: { isPending?: boolean }) {
 				<Button
 					variant="outline"
 					type="button"
-					className="w-full gap-2 text-white/60 border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:text-white"
+					className="w-full gap-2 text-white/60 border-white/8 bg-white/3 hover:bg-white/6 hover:text-white"
 					disabled={isPending}
 				>
 					<svg

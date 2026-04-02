@@ -35,7 +35,7 @@ export function TemplateSelector({
 		>
 			<div className="flex items-center justify-between gap-4 mb-5">
 				<div className="flex items-center gap-4">
-					<div className="size-7 rounded-full bg-[#0c0c0c] border border-white/20 flex items-center justify-center text-white/70 shadow-[0_0_10px_rgba(255,255,255,0.05)] z-10">
+					<div className="size-7 rounded-full bg-neutral-950 border border-white/20 flex items-center justify-center text-white/70 shadow-[0_0_10px_rgba(255,255,255,0.05)] z-10">
 						<span className="text-[12px] font-medium">1</span>
 					</div>
 					<h2 className="text-lg font-medium tracking-tight">
@@ -47,7 +47,7 @@ export function TemplateSelector({
 					value={activeVersion}
 					onValueChange={(v) => setActiveVersion(v as TorqVersion)}
 				>
-					<SelectTrigger className="w-[120px] h-8 text-[12px] bg-[#0c0c0c] border-white/10 rounded-lg">
+					<SelectTrigger className="w-[120px] h-8 text-[12px] bg-neutral-950 border-white/10 rounded-lg">
 						<SelectValue placeholder="Version" />
 					</SelectTrigger>
 					<SelectContent>
@@ -76,12 +76,12 @@ export function TemplateSelector({
 							className={`relative group cursor-pointer rounded-2xl p-4 border transition-all duration-500 ease-out overflow-hidden ${
 								isSelected
 									? 'border-white/20 bg-white/5 shadow-[0_0_20px_rgba(255,255,255,0.03)]'
-									: 'border-white/5 bg-[#0c0c0c] hover:bg-white/3 hover:border-white/10'
+									: 'border-white/5 bg-neutral-950 hover:bg-white/3 hover:border-white/10'
 							}`}
 						>
 							<div
 								className={
-									'absolute inset-0 bg-gradient-to-br pointer-events-none transition-opacity duration-500 ease-out ' +
+									'absolute inset-0 bg-linear-to-br pointer-events-none transition-opacity duration-500 ease-out ' +
 									tmpl.color +
 									' ' +
 									(isSelected ? 'opacity-20' : 'opacity-0')

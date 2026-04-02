@@ -43,8 +43,8 @@ export function SecretsSection({
 			className="relative z-10 pb-4"
 		>
 			<div className="flex items-center justify-between mb-5">
-				<div className="flex items-center gap-4 bg-[#050505]">
-					<div className="size-7 rounded-full bg-[#0c0c0c] border border-white/20 flex items-center justify-center text-white/70 shadow-[0_0_10px_rgba(255,255,255,0.05)] z-10">
+				<div className="flex items-center gap-4 bg-black">
+					<div className="size-7 rounded-full bg-neutral-950 border border-white/20 flex items-center justify-center text-white/70 shadow-[0_0_10px_rgba(255,255,255,0.05)] z-10">
 						<span className="text-[12px] font-medium">3</span>
 					</div>
 					<h2 className="text-lg font-medium tracking-tight">
@@ -62,7 +62,7 @@ export function SecretsSection({
 				</Button>
 			</div>
 
-			<div className="rounded-2xl border border-white/5 bg-[#0c0c0c] p-1.5 space-y-0.5 overflow-hidden ml-0 sm:ml-11">
+			<div className="rounded-2xl border border-white/5 bg-neutral-950 p-1.5 space-y-0.5 overflow-hidden ml-0 sm:ml-11">
 				<AnimatePresence mode="popLayout">
 					{secrets.length === 0 ? (
 						<motion.div
@@ -73,7 +73,7 @@ export function SecretsSection({
 							transition={{ duration: 0.2 }}
 							className="py-10 text-center flex flex-col items-center"
 						>
-							<div className="size-12 rounded-full bg-white/[0.03] border border-white/[0.05] flex items-center justify-center mb-3">
+							<div className="size-12 rounded-full bg-white/3 border border-white/5 flex items-center justify-center mb-3">
 								<HugeiconsIcon
 									icon={Settings01Icon}
 									className="size-5 text-white/20"

@@ -77,7 +77,7 @@ export function WorkflowEditor({
 					</div>
 				) : (
 					<div
-						className="h-12 border border-white/[0.04] rounded-t-[12px] flex items-center justify-between px-4 shrink-0 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
+						className="h-12 border border-white/4 rounded-t-[12px] flex items-center justify-between px-4 shrink-0 transition-all shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
 						style={{ backgroundColor: 'oklch(0.09 0.005 285)' }}
 					>
 						{/* Left: Back / Close Action */}

@@ -1,19 +1,16 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/protected-route';
-
-import { AuthLayout } from '@/pages/auth-layout';
-import { DashboardPage } from '@/pages/dashboard/index';
+import { AuthLayout } from '@/pages/auth/auth-layout';
 import { DashboardLayout } from '@/pages/dashboard/layout';
-import { RunsPage } from '@/pages/dashboard/runs';
 import { SettingsPage } from '@/pages/dashboard/settings';
 import { WorkflowCreatePage } from '@/pages/dashboard/workflow-create';
-import { WorkflowDetailPage } from '@/pages/dashboard/workflow-detail/index';
+import { WorkflowDetailPage } from '@/pages/dashboard/workflow-detail';
 import { WorkflowListPage } from '@/pages/dashboard/workflow-list';
 import { DocsPage } from '@/pages/docs';
-import { ForgotPasswordPage } from '@/pages/forgot-password';
+import { ForgotPasswordPage } from '@/pages/auth/forgot-password';
 import { HomePage } from '@/pages/home';
-import { LoginPage } from '@/pages/login';
-import { SignupPage } from '@/pages/signup';
+import { LoginPage } from '@/pages/auth/login';
+import { SignupPage } from '@/pages/auth/signup';
 
 const router = createBrowserRouter([
 	{ path: '/', Component: HomePage },
@@ -45,6 +42,8 @@ const router = createBrowserRouter([
 
 import { Toaster } from '@/components/ui/toaster';
 import { useAppInit } from '@/hooks/use-app-init';
+import { DashboardPage } from './pages/dashboard/dashboard';
+import { RunsPage } from './pages/dashboard/runs';
 
 export function App() {
 	useAppInit();

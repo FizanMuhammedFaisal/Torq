@@ -11,7 +11,6 @@ export function AuthLayout() {
 			className="relative flex min-h-svh flex-col items-center"
 			style={{ background: 'oklch(0.08 0.005 285)' }}
 		>
-			{/* Ambient glow */}
 			<div
 				className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 -translate-y-[10%]"
 				style={{
@@ -24,7 +23,6 @@ export function AuthLayout() {
 				}}
 			/>
 
-			{/* Top bar — back link */}
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
@@ -48,9 +46,7 @@ export function AuthLayout() {
 				</Link>
 			</motion.div>
 
-			{/* Center area */}
 			<div className="relative z-10 flex flex-1 flex-col items-center justify-center w-full px-6 py-12">
-				{/* Logo */}
 				<motion.div
 					initial={{ opacity: 0, y: -8 }}
 					animate={{ opacity: 1, y: 0 }}
