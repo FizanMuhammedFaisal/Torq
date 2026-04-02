@@ -2,7 +2,7 @@ import { z } from 'zod';
 import type { AuthUser } from '@/presentation/http/macros/auth.macro';
 
 export const RevealSecretSchema = z.object({
-	workflowId: z.ulid('Invalid workflow ID format'),
+	id: z.ulid('Invalid workflow ID format'),
 	key: z.string().min(1, 'Secret key cannot be empty'),
 });
 

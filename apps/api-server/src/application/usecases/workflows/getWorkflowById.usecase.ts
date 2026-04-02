@@ -23,13 +23,15 @@ export class GetWorkflowByIdUseCase implements IGetWorkflowByIdUseCase {
 		if (!aggregate) {
 			throw new ResourceNotFoundError('Workflow', input.id);
 		}
-
 		return {
 			id: aggregate.workflow.id,
 			name: aggregate.workflow.name,
 			description: aggregate.workflow.description,
 			createdAt: aggregate.workflow.createdAt,
-			status: aggregate.status as GetWorkflowByIdOutputDto['status'],
+			status: aggregate.latestRun?.status,
+			// latestRun: aggregate.latestRun,
+			// totalRuns: aggregate.totalRuns,
+			// averageDuration: aggregate.averageDuration,
 		};
 	}
 }

@@ -24,15 +24,15 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 		@inject(TOKENS.SpecValidationService) private specValidationService: ISpecParser,
 		@inject(TOKENS.UnitOfWork) private unitOfWork: IUnitOfWork,
 		@inject(TOKENS.UpsertSecretsUseCase) private upsertSecretsUseCase: UpsertSecretsUseCase,
-	) {}
+	) { }
 	// validate json--> validate torq schema as version--> validate semantics per version (DAG)
 	// create the version artifact
 	// create the workflow itself
 	// save encrypted secrects
 	async execute(data: CreateWorkflowInputDto): Promise<CreateWorkflowOutputDto> {
 		const dslPipeline = new DSLPipeline(this.specValidationService);
-		const spec = await dslPipeline.process(data.workflowSpec, data.specFormat);
-
+		const [spec, torqVersion] = await dslPipeline.process(data.workflowSpec, data.specFormat);
+		console.log(spec, torqVersion);
 		const workflow = Workflow.create({
 			id: ulid(),
 			name: data.name,
@@ -47,6 +47,7 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 			raw: data.workflowSpec,
 			workflowId: workflow.id,
 			version: 1,
+			torqVersion: torqVersion,
 			createdAt: new Date(),
 		});
 
@@ -57,11 +58,15 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 		});
 
 		if (data.secrets) {
-			await this.upsertSecretsUseCase.execute({
-				workflowId: workflow.id,
-				secrets: data.secrets,
-				req: data.req,
-			});
+			try {
+				await this.upsertSecretsUseCase.execute({
+					id: workflow.id,
+					secrets: data.secrets,
+					req: data.req,
+				});
+			} catch (error) {
+				throw new Error('Workflow created but failed to save secrets. Please try again.');
+			}
 		}
 		return {
 			id: savedWorkflow.id,

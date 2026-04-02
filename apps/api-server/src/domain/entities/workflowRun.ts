@@ -1,32 +1,34 @@
-export type WorkflowRunStatus = 'pending' | 'running' | 'success' | 'failed' | 'idle';
-export type WorkflowTriggerType = 'manual' | 'webhook' | 'schedule';
 
-export const RUN_STATUS = {
-	PENDING: 'pending',
-	RUNNING: 'running',
-	SUCCESS: 'success',
-	FAILED: 'failed',
-	IDLE: 'idle',
-} as const satisfies Record<string, WorkflowRunStatus>;
 
-export const TRIGGER_TYPE = {
-	MANUAL: 'manual',
-	WEBHOOK: 'webhook',
-	SCHEDULE: 'schedule',
-} as const satisfies Record<string, WorkflowTriggerType>;
+export const RunStatus = {
+	PENDING: 'PENDING',
+	RUNNING: 'RUNNING',
+	SUCCESS: 'SUCCESS',
+	FAILED: 'FAILED',
+	IDLE: 'IDLE',
+} as const
+export type RunStatus = typeof RunStatus[keyof typeof RunStatus];
+
+export const TriggerType = {
+	MANUAL: 'MANUAL',
+	WEBHOOK: 'WEBHOOK',
+	SCHEDULE: 'SCHEDULE',
+} as const
+
+export type TriggerType = typeof TriggerType[keyof typeof TriggerType];
 
 export class WorkflowRun {
 	constructor(
 		public readonly id: string,
 		public readonly workflowId: string,
 		public readonly workflowVersionId: string,
-		public readonly status: WorkflowRunStatus,
-		public readonly triggerType: WorkflowTriggerType,
+		public readonly status: RunStatus,
+		public readonly triggerType: TriggerType,
 		public readonly triggeredBy: string,
 		public readonly startedAt: Date,
 		public readonly completedAt: Date | null,
 		public readonly duration: number | null,
-	) {}
+	) { }
 
 	static create(props: {
 		id: string;

@@ -8,8 +8,7 @@ type WorkflowVersionInsert = typeof workflowVersion.$inferInsert;
 
 @injectable()
 export class WorkflowVersionMapper
-	implements IMapper<WorkflowVersion, WorkflowVersionInsert, WorkflowVersionTable>
-{
+	implements IMapper<WorkflowVersion, WorkflowVersionInsert, WorkflowVersionTable> {
 	toDomain(row: WorkflowVersionTable): WorkflowVersion {
 		return WorkflowVersion.create({
 			id: row.id,
@@ -18,6 +17,7 @@ export class WorkflowVersionMapper
 			spec: row.spec,
 			raw: row.raw,
 			createdAt: row.createdAt,
+			torqVersion: row.troqVersion,
 		});
 	}
 
@@ -29,6 +29,7 @@ export class WorkflowVersionMapper
 			spec: entity.spec,
 			raw: entity.raw,
 			createdAt: entity.createdAt,
+			troqVersion: entity.torqVersion,
 		};
 	}
 }

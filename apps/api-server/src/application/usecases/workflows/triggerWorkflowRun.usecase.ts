@@ -12,8 +12,9 @@ import { GeneralDomainError } from '@/domain/errors/generalDomainError';
 import { WorkflowTriggerError } from '@/application/errors/workflowTriggerError';
 import { AppError } from '@/application/errors/appError.abstract';
 import { DomainError } from '@/domain/errors/domainError.abstract';
-import { RUN_STATUS, TRIGGER_TYPE } from '@/domain/entities/workflowRun';
+import { RunStatus, TriggerType } from '@/domain/entities/workflowRun';
 import type { IOperatorService } from '@/application/port/services/operatorService.interface';
+import { logger } from '@/infrastructure/logger/logger';
 
 /**
  * Will be calling the operator system to execute this workflow
@@ -44,18 +45,21 @@ export class TriggerWorkflowRunUseCase implements ITriggerWorkflowRunUseCase {
 			workflowId,
 			workflowVersionId: workflowVersion.id,
 			identityId: req.id,
-			status: RUN_STATUS.PENDING,
-			triggerType: TRIGGER_TYPE.MANUAL,
+			status: RunStatus.PENDING,
+			triggerType: TriggerType.MANUAL, // for now we only have manual
 			triggeredBy: req.id,
 		});
 
 		try {
 			await this.operatorService.triggerWorkflowRun({
 				workflowId,
-				spec: JSON.stringify(workflowVersion.spec),
+				torqVersion: workflowVersion.torqVersion,
+				versionId: workflowVersion.id,
+				triggerType: TriggerType.MANUAL,
 			});
 		} catch (error) {
-			await this.workflowRunRepository.updateStatus(run.id, RUN_STATUS.FAILED);
+			logger.error({ 'Error triggering workflow run': error, runId: run.id });
+			await this.workflowRunRepository.updateStatus(run.id, RunStatus.FAILED);
 
 			if (error instanceof AppError || error instanceof DomainError) {
 				throw error;

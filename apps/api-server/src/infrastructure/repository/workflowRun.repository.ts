@@ -9,7 +9,7 @@ import type {
 	IWorkflowRunRepository,
 	PersistRunDto,
 } from '@/application/port/repositories/workflowRunRepository.interface';
-import type { WorkflowRun, WorkflowRunStatus } from '@/domain/entities/workflowRun';
+import type { WorkflowRun, RunStatus } from '@/domain/entities/workflowRun';
 import type { WorkflowRunMapper } from './mappers/workflowRun.mapper';
 import { TOKENS } from '@/config/di/tokens';
 
@@ -50,13 +50,13 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 		}
 	}
 
-	async updateStatus(id: string, status: WorkflowRunStatus): Promise<void> {
+	async updateStatus(id: string, status: RunStatus): Promise<void> {
 		try {
 			await getExecutor()
 				.update(workflowRun)
 				.set({
 					status,
-					completedAt: status === 'failed' || status === 'success' ? new Date() : null,
+					completedAt: status === 'FAILED' || status === 'SUCCESS' ? new Date() : null,
 				})
 				.where(eq(workflowRun.id, id));
 		} catch (error) {

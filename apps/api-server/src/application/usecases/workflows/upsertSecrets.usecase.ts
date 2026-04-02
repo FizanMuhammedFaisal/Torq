@@ -18,7 +18,7 @@ export class UpsertSecretsUseCase implements IUpsertSecretsUseCase {
 		@inject(TOKENS.SecretManagementService)
 		private secretManagementService: ISecretManagementService,
 		@inject(TOKENS.UnitOfWork) private unitOfWork: IUnitOfWork,
-	) {}
+	) { }
 
 	async execute(data: UpsertSecretsInputDto): Promise<UpsertSecretsOutputDto> {
 		const secretsParams = Array.isArray(data.secrets) ? data.secrets : [data.secrets];
@@ -35,7 +35,7 @@ export class UpsertSecretsUseCase implements IUpsertSecretsUseCase {
 
 				const secretEntity = Secret.create({
 					id: ulid(),
-					workflowId: data.workflowId,
+					workflowId: data.id,
 					key: secretParam.key,
 					ciphertext,
 					iv,
