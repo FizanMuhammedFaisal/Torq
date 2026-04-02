@@ -26,7 +26,7 @@ export class WorkflowController implements IWorkflowRunController {
 		const res = await this.triggerRunUseCase.execute(workflow);
 
 		return create(TriggerWorkflowRunResponseSchema, {
-			runId: res.runId,
+			success: res.success,
 		});
 	}
 }

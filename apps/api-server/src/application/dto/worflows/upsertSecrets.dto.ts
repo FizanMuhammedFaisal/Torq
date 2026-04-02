@@ -15,10 +15,10 @@ export const UpsertSecretsSchema = z.object({
 });
 
 export type UpsertSecretsInputDto = {
-	id: z.infer<typeof UpsertSecretsQuerySchema>['id']
-	secrets: z.infer<typeof UpsertSecretsSchema>['secrets']
+	id: z.infer<typeof UpsertSecretsQuerySchema>['id'];
+	secrets: z.infer<typeof UpsertSecretsSchema>['secrets'];
 } & {
-	req: AuthUser
+	req: AuthUser;
 };
 
 export type UpsertSecretsOutputDto = {

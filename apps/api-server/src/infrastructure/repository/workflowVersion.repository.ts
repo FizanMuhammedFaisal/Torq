@@ -14,7 +14,7 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	constructor(
 		@inject(TOKENS.WorkflowVersionMapper)
 		private readonly mapper: WorkflowVersionMapper,
-	) { }
+	) {}
 
 	async findLatestByWorkflowId(workflowId: string): Promise<WorkflowVersion | null> {
 		try {
@@ -37,7 +37,10 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	): Promise<WorkflowVersion | null> {
 		try {
 			const result = await getExecutor().query.workflowVersion.findFirst({
-				where: and(eq(workflowVersion.workflowId, workflowId), eq(workflowVersion.version, version)),
+				where: and(
+					eq(workflowVersion.workflowId, workflowId),
+					eq(workflowVersion.version, version),
+				),
 			});
 
 			if (!result) return null;
@@ -63,7 +66,6 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	}
 
 	async save(entity: WorkflowVersion): Promise<WorkflowVersion> {
-
 		try {
 			const persistenceModel = this.mapper.toPersistence(entity);
 			const result = await getExecutor()

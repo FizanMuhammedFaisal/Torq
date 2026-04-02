@@ -4,7 +4,6 @@ import type { DomainError } from '@domain/errors/domainError.abstract';
 import type { InfraError } from '@infrastructure/errors/infraError.abstract';
 import { logger } from '@/infrastructure/logger/logger';
 
-
 export class PostgresErrorMapper {
 	static mapError(error: unknown, context: { entity: string }): DomainError | InfraError {
 		const pgError = error as {
@@ -16,11 +15,11 @@ export class PostgresErrorMapper {
 			};
 		};
 		logger.error({
-			errorFrom: "Postgres",
+			errorFrom: 'Postgres',
 			code: pgError?.cause?.code ?? pgError?.code,
 			message: pgError?.cause?.message ?? pgError?.message,
 			context,
-			rawError: error
+			rawError: error,
 		});
 		// Postgres unique violation error code
 		if (pgError?.code === '23505') {

@@ -28,7 +28,7 @@ export class TriggerWorkflowRunUseCase implements ITriggerWorkflowRunUseCase {
 		private readonly workflowRunRepository: IWorkflowRunRepository,
 		@inject(TOKENS.OperatorService)
 		private readonly operatorService: IOperatorService,
-	) { }
+	) {}
 
 	async execute(data: TriggerWorkflowRunInputDto): Promise<TriggerWorkflowRunOutputDto> {
 		const { workflowId, version, req } = data;

@@ -12,7 +12,7 @@ export class GetSecretsUseCase implements IGetSecretsUseCase {
 	constructor(
 		@inject(TOKENS.SecretRepository)
 		private readonly secretRepository: ISecrectRepository,
-	) { }
+	) {}
 
 	async execute(data: GetSecretsInputDto): Promise<GetSecretsOutputDto> {
 		const secrets = await this.secretRepository.findByWorkflowId(data.id);

@@ -14,15 +14,15 @@ export const WorkflowRunSummarySchema = z.object({
 export type WorkflowRunSummary = z.infer<typeof WorkflowRunSummarySchema>;
 
 export const GetWorkflowsInputSchema = z.object({
-	sortBy: z.enum(["createdAt", "name", "lastRunAt"]).default("createdAt"),
-	sortOrder: z.enum(["asc", "desc"]).default("desc"),
+	sortBy: z.enum(['createdAt', 'name', 'lastRunAt']).default('createdAt'),
+	sortOrder: z.enum(['asc', 'desc']).default('desc'),
 	page: z.number().int().min(1).default(1).optional(),
 	pageSize: z.number().int().min(1).max(100).default(20).optional(),
 	status: z.array(WorkflowRunStatusSchema).optional(),
 	search: z.string().optional(),
 });
 
-export type GetWorkflowsQueryInputDto = z.infer<typeof GetWorkflowsInputSchema>
+export type GetWorkflowsQueryInputDto = z.infer<typeof GetWorkflowsInputSchema>;
 export interface GetWorkflowsInputDto {
 	req: AuthUser;
 	query: GetWorkflowsQueryInputDto;
@@ -36,7 +36,7 @@ export interface GetWorkflowsOutputDto {
 		createdAt: Date;
 		health: (boolean | null)[];
 		lastRun: WorkflowRunSummary | null;
-	}[],
+	}[];
 	meta: {
 		totalItems: number;
 		page: number;

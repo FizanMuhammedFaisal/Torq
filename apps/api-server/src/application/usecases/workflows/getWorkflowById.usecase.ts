@@ -1,8 +1,6 @@
 import { injectable, inject } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
-import type {
-	IGetWorkflowByIdUseCase,
-} from '@/application/port/usecases/workflows/getWorkflowById.interface';
+import type { IGetWorkflowByIdUseCase } from '@/application/port/usecases/workflows/getWorkflowById.interface';
 import type {
 	GetWorkflowByIdInputDto,
 	GetWorkflowByIdOutputDto,
@@ -15,7 +13,7 @@ export class GetWorkflowByIdUseCase implements IGetWorkflowByIdUseCase {
 	constructor(
 		@inject(TOKENS.WorkflowAggregateRepository)
 		private readonly aggregateRepository: IWorkflowAggregateRepository,
-	) { }
+	) {}
 
 	async execute(input: GetWorkflowByIdInputDto): Promise<GetWorkflowByIdOutputDto> {
 		const aggregate = await this.aggregateRepository.findByIdWithLatestRun(input.id);

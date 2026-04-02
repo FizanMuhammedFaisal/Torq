@@ -8,12 +8,11 @@ import { logger } from '@/infrastructure/logger/logger';
 import { TOKENS } from '@/config/di/tokens';
 import { rpcConfig } from '@/config/rpc.config';
 
-
 @injectable()
 export class GRpcServer {
 	private server: http2.Http2Server | null = null;
 
-	constructor(@inject(TOKENS.RPCRouter) private readonly rpcRouter: IRPCRouter) { }
+	constructor(@inject(TOKENS.RPCRouter) private readonly rpcRouter: IRPCRouter) {}
 
 	async start(): Promise<void> {
 		const { port, host } = rpcConfig;

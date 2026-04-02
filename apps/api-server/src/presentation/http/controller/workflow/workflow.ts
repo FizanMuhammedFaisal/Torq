@@ -33,14 +33,14 @@ export class WorkflowController implements IWorkflowController {
 		private revealSecretUseCase: IRevealSecretUseCase,
 		@inject(TOKENS.TriggerWorkflowRunUseCase)
 		private triggerWorkflowRunUseCase: ITriggerWorkflowRunUseCase,
-	) { }
+	) {}
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
 		const query = validate(GetWorkflowsInputSchema, ctx.query);
 		return this.getWorkflowsUseCase.execute({
 			req: ctx.user,
-			query: query
-		})
+			query: query,
+		});
 	};
 	getWorkflowById = async (ctx: AuthenticatedContext) => {
 		const id = ctx.params.id;
@@ -49,7 +49,9 @@ export class WorkflowController implements IWorkflowController {
 
 	triggerWorkflowRun = async (ctx: AuthenticatedContext) => {
 		const workflowId = ctx.params.id;
-		const version = ctx.query.version ? Number.parseInt(ctx.query.version as string, 10) : undefined;
+		const version = ctx.query.version
+			? Number.parseInt(ctx.query.version as string, 10)
+			: undefined;
 		return this.triggerWorkflowRunUseCase.execute({ workflowId, version, req: ctx.user });
 	};
 

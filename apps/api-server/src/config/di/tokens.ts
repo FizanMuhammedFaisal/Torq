@@ -33,12 +33,13 @@ export const TOKENS = {
 	ErrorMacro: Symbol.for('ErrorMacro'),
 	RPCRouter: Symbol.for('RPCRouter'),
 	GrpcClient: Symbol.for('GrpcClient'),
-	WorkflowAggregateRepository: Symbol.for("WorkflowAggregateRepository"),
-	WorkflowRunMapper: Symbol.for("WorkflowRunMapper"),
+	WorkflowAggregateRepository: Symbol.for('WorkflowAggregateRepository'),
+	WorkflowRunMapper: Symbol.for('WorkflowRunMapper'),
 
 	// usecases
 	GetWorkflowSpecUseCase: Symbol.for('GetWorkflowSpecUseCase'),
 
 	//
-	IWorkflowRPCController: Symbol.for('IWorkflowRPCController'),
+	WorkflowRPCMapper: Symbol.for('WorkflowRPCMapper'),
+	WorkflowRPCController: Symbol.for('WorkflowRPCController'),
 } as const;

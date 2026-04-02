@@ -8,9 +8,9 @@ export class WorkflowWithLatestRun {
 	private constructor(
 		public readonly workflow: Workflow,
 		public readonly latestRun: WorkflowRun | null,
-	) { }
+	) {}
 
-	static create({ workflow, latestRun }: { workflow: Workflow, latestRun: WorkflowRun | null }) {
-		return new WorkflowWithLatestRun(workflow, latestRun)
+	static create({ workflow, latestRun }: { workflow: Workflow; latestRun: WorkflowRun | null }) {
+		return new WorkflowWithLatestRun(workflow, latestRun);
 	}
 }

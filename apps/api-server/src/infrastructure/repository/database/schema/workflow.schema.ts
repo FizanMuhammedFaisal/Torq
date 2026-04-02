@@ -50,7 +50,6 @@ export const workflowRelations = relations(workflow, ({ one, many }) => ({
 	runs: many(workflowRun),
 }));
 
-
 export const workflowVersionRelations = relations(workflowVersion, ({ one }) => ({
 	workflow: one(workflow, {
 		fields: [workflowVersion.workflowId],
@@ -74,7 +73,9 @@ export const workflowRun = pgTable('workflow_run', {
 	workflowVersionId: text('workflow_version_id')
 		.notNull()
 		.references(() => workflowVersion.id),
-	status: text('status', { enum: ['PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'IDLE', "NOT_SUPPORTED_RUN"] }).notNull(),
+	status: text('status', {
+		enum: ['PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'IDLE', 'NOT_SUPPORTED_RUN'],
+	}).notNull(),
 	triggerType: text('trigger_type', { enum: ['MANUAL', 'WEBHOOK', 'SCHEDULE'] }).notNull(),
 	triggeredBy: text('triggered_by').notNull(),
 	startedAt: timestamp('started_at').defaultNow().notNull(),

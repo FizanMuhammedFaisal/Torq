@@ -28,7 +28,7 @@ export class CRDWatcher extends BaseWatcher {
 		logger.info({
 			'[crd-watcher] starting watch': { path, resourceVersion: this.lastResourceVersion },
 		});
-
+		logger.info(`[crd-watcher] watching path: ${path} with resourceVersion: ${this.lastResourceVersion}`);
 		this.watch.watch(
 			path,
 			this.lastResourceVersion ? { resourceVersion: this.lastResourceVersion } : {},
@@ -43,7 +43,7 @@ export class CRDWatcher extends BaseWatcher {
 	 * accordance with how we need to move currect status to given spec
 	 */
 	private async handler(phase: string, apiObj: unknown, _watchObj?: unknown) {
-		console.log(phase, JSON.stringify(apiObj));
+		logger.trace("HEY");
 		if (!this.isWorkflowRunK8s(apiObj)) {
 			logger.warn({
 				'[crd - watcher] received unexpected object shape': apiObj,
@@ -55,7 +55,9 @@ export class CRDWatcher extends BaseWatcher {
 		}
 		if (phase !== 'ADDED' && phase !== 'MODIFIED') return;
 		try {
+
 			const run = toDomainWorkflowRun(apiObj);
+			console.log(run)
 			await this.reconciler.reconcile(run);
 		} catch (err) {
 			logger.error({ '[crd-watcher] reconcile error': err });

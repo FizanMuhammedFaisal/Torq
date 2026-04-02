@@ -1,21 +1,19 @@
-
-
 export const RunStatus = {
 	PENDING: 'PENDING',
 	RUNNING: 'RUNNING',
 	SUCCESS: 'SUCCESS',
 	FAILED: 'FAILED',
 	IDLE: 'IDLE',
-} as const
-export type RunStatus = typeof RunStatus[keyof typeof RunStatus];
+} as const;
+export type RunStatus = (typeof RunStatus)[keyof typeof RunStatus];
 
 export const TriggerType = {
 	MANUAL: 'MANUAL',
 	WEBHOOK: 'WEBHOOK',
 	SCHEDULE: 'SCHEDULE',
-} as const
+} as const;
 
-export type TriggerType = typeof TriggerType[keyof typeof TriggerType];
+export type TriggerType = (typeof TriggerType)[keyof typeof TriggerType];
 
 export class WorkflowRun {
 	constructor(
@@ -28,7 +26,7 @@ export class WorkflowRun {
 		public readonly startedAt: Date,
 		public readonly completedAt: Date | null,
 		public readonly duration: number | null,
-	) { }
+	) {}
 
 	static create(props: {
 		id: string;

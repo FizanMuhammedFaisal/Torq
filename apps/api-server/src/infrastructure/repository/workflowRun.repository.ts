@@ -18,7 +18,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 	constructor(
 		@inject(TOKENS.WorkflowRunMapper)
 		private readonly mapper: WorkflowRunMapper,
-	) { }
+	) {}
 
 	async create(data: PersistRunDto): Promise<WorkflowRun> {
 		try {

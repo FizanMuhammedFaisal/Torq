@@ -10,7 +10,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 	constructor(@inject(TOKENS.SpecRepository) private specRepository: ISpecRepository) { }
 	async reconcile(run: WorkflowRunSnapshot): Promise<void> {
 		// get the spec from api server
-		const spec = await this.specRepository.getSpec(run.spec.workflowId);
+		const spec = await this.specRepository.getSpec(run.spec.workflowId, run.spec.versionId);
 		if (!spec) {
 			// TODO: Retry mechanish and updation of status to failed after retry
 			logger.error({ workflowRunId: run.spec.versionId }, 'Failed to fetch spec from repository');

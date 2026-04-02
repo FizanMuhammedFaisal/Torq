@@ -16,12 +16,12 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 		private readonly workflowMapper: WorkflowMapper,
 		@inject(TOKENS.WorkflowRunMapper)
 		private readonly runMapper: WorkflowRunMapper,
-	) { }
+	) {}
 	async findCount(identityId: string): Promise<number> {
 		try {
-			const result = await getExecutor().select(
-				{ total: count() }
-			).from(workflowSchema)
+			const result = await getExecutor()
+				.select({ total: count() })
+				.from(workflowSchema)
 				.where(eq(workflowSchema.identityId, identityId));
 
 			return result[0]?.total ?? 0;
@@ -29,7 +29,11 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 			throw PostgresErrorMapper.mapError(error, { entity: 'Workflow' });
 		}
 	}
-	async findAllWithLatestRun(identityId: string, limit: number, skip: number): Promise<WorkflowWithLatestRun[]> {
+	async findAllWithLatestRun(
+		identityId: string,
+		limit: number,
+		skip: number,
+	): Promise<WorkflowWithLatestRun[]> {
 		console.log(limit, skip);
 		try {
 			const result = await getExecutor().query.workflow.findMany({

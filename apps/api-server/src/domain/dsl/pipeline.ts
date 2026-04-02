@@ -10,8 +10,11 @@ import { handler } from './versions/v1apha/handler';
 export class DSLPipeline {
 	private specParser = new SpecParser();
 	private versionDetector = new VersionDetector();
-	constructor(private parser: ISpecParser) { }
-	async process(raw: string, format: SpecType): Promise<[Record<string, unknown>, torqVersion: string]> {
+	constructor(private parser: ISpecParser) {}
+	async process(
+		raw: string,
+		format: SpecType,
+	): Promise<[Record<string, unknown>, torqVersion: string]> {
 		try {
 			const parsedSpec = this.specParser.validate(this.parser, format, raw);
 			const version = this.versionDetector.detect(parsedSpec);

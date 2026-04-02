@@ -4,13 +4,19 @@ import { TOKENS } from '@/config/di/tokens';
 import type { IWorkflowController } from '@/presentation/http/interfaces/controller/workflow.interface';
 import type { Router } from '@/presentation/http/interfaces/routes';
 import { CreateWorkflowSchema } from '@/application/dto/worflows/createWorkflow.dto';
-import { UpsertSecretsQuerySchema, UpsertSecretsSchema } from '@/application/dto/worflows/upsertSecrets.dto';
+import {
+	UpsertSecretsQuerySchema,
+	UpsertSecretsSchema,
+} from '@/application/dto/worflows/upsertSecrets.dto';
 import { TriggerWorkflowRunSchema } from '@/application/dto/worflows/triggerWorkflowRun.dto';
 import { GetSecretsSchema } from '@/application/dto/worflows/getSecrets.dto';
 import { RevealSecretSchema } from '@/application/dto/worflows/revealSecret.dto';
 import type { AuthMacro } from '@/presentation/http/macros/auth.macro';
 import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows.dto';
-import { GetWorkflowByIdInputParamsSchema, GetWorkflowByIdInputQuerySchema } from '@/application/dto/worflows/getWorkflowById.dto';
+import {
+	GetWorkflowByIdInputParamsSchema,
+	GetWorkflowByIdInputQuerySchema,
+} from '@/application/dto/worflows/getWorkflowById.dto';
 
 @injectable()
 export class WorkflowRouter implements Router {
@@ -21,7 +27,7 @@ export class WorkflowRouter implements Router {
 		private workflowController: IWorkflowController,
 		@inject(TOKENS.AuthMacro)
 		private authMacro: AuthMacro,
-	) { }
+	) {}
 
 	register() {
 		return new Elysia({ prefix: this.prefix })
@@ -43,7 +49,7 @@ export class WorkflowRouter implements Router {
 			{
 				auth: true,
 				query: GetWorkflowByIdInputQuerySchema,
-				params: GetWorkflowByIdInputParamsSchema
+				params: GetWorkflowByIdInputParamsSchema,
 			},
 		);
 	}

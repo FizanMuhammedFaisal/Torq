@@ -7,7 +7,7 @@ export class WorkflowVersion {
 		public spec: Record<string, unknown>,
 		public raw: string,
 		public createdAt: Date,
-	) { }
+	) {}
 
 	static create({
 		id,

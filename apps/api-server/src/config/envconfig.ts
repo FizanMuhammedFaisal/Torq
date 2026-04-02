@@ -27,12 +27,12 @@ export const Envconfig = {
 		grpc: {
 			operator: {
 				baseUrl: process.env.OPERATOR_GRPC_URL || 'http://localhost:50051',
-			}
-		}
+			},
+		},
 	},
 	grpc: {
 		PORT: process.env.GRPC_PORT || 50052,
 		HOST: process.env.GRPC_HOST || 'localhost',
-	}
+	},
 };
 export type Envconfig = typeof Envconfig;

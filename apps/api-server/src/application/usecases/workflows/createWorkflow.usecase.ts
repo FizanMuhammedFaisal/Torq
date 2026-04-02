@@ -24,7 +24,7 @@ export class CreateWorkflowUseCase implements ICreateWorkflowUseCase {
 		@inject(TOKENS.SpecValidationService) private specValidationService: ISpecParser,
 		@inject(TOKENS.UnitOfWork) private unitOfWork: IUnitOfWork,
 		@inject(TOKENS.UpsertSecretsUseCase) private upsertSecretsUseCase: UpsertSecretsUseCase,
-	) { }
+	) {}
 	// validate json--> validate torq schema as version--> validate semantics per version (DAG)
 	// create the version artifact
 	// create the workflow itself

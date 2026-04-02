@@ -12,6 +12,7 @@ export const Envconfig = {
 		cors: {
 			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:4000'],
 		},
+		nodeEnv: process.env.NODE_ENV || 'development',
 	},
 
 	services: {

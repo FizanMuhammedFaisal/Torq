@@ -16,7 +16,7 @@ export class RevealSecretUseCase implements IRevealSecretUseCase {
 		private readonly secretRepository: ISecrectRepository,
 		@inject(TOKENS.SecretManagementService)
 		private readonly secretService: ISecretManagementService,
-	) { }
+	) {}
 
 	async execute(data: RevealSecretInputDto): Promise<RevealSecretOutputDto> {
 		const secrets = await this.secretRepository.findByWorkflowId(data.id);
