@@ -53,8 +53,9 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
                     return next;
                 });
 			},
-			onError: (error: any) => {
-				toast.error(error.response?.data?.message || 'Failed to reveal secret');
+			onError: (error) => {
+				const err = error as any;
+				toast.error(err.response?.data?.message || 'Failed to reveal secret');
                 setRevealingIds((prev) => {
                     const next = new Set(prev);
                     next.delete(id);

@@ -16,6 +16,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { DataTable } from '@/components/ui/data-table';
@@ -30,6 +31,7 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { statusConfig } from '@/features/workflows/config';
+import { useTriggerRun } from '@/features/workflows/hooks/use-trigger-run';
 import { useWorkflows } from '@/features/workflows/hooks/use-workflows';
 import type { WorkflowWithLatestRun, WorkflowStatus } from '@/features/workflows/types';
 import { useAppConfig } from '@/lib/app-config';
@@ -46,6 +48,7 @@ export function WorkflowListPage() {
 	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>(
 		'all',
 	);
+	const triggerRun = useTriggerRun();
 	const [deleteTarget, setDeleteTarget] = useState<WorkflowWithLatestRun | null>(null);
 
 	const {
@@ -200,6 +203,24 @@ export function WorkflowListPage() {
 										<DropdownMenuItem
 											onClick={(e) => {
 												e.stopPropagation();
+												const p = triggerRun.mutateAsync({ id: wf.id });
+												toast.promise(p, {
+													loading: 'Triggering workflow...',
+													success: 'Workflow execution started!',
+													error: (err: any) => err.response?.data?.message || 'Failed to trigger workflow',
+												});
+											}}
+											disabled={triggerRun.isPending}
+										>
+											<svg className="size-4" viewBox="0 0 24 24" fill="currentColor">
+												<title>Run</title>
+												<polygon points="6 3 20 12 6 21 6 3" />
+											</svg>
+											Run Workflow
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											onClick={(e) => {
+												e.stopPropagation();
 												navigate(`/dashboard/workflows/${wf.id}`);
 											}}
 										>
@@ -245,7 +266,7 @@ export function WorkflowListPage() {
 		];
 
 		return cols;
-	}, [navigate]);
+	}, [navigate, triggerRun]);
 
 	return (
 		<div className="flex flex-col h-full bg-zinc-950">

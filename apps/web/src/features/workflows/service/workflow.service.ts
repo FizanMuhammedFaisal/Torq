@@ -4,6 +4,7 @@ import type {
 	CreateWorkflowPayload,
 	CreateWorkflowResponse,
 	GetWorkflowsResponse,
+	GetWorkflowByIdQuery,
 	GetWorkflowByIdResponse,
 	UpsertSecretsPayload,
 	UpsertSecretsResponse,
@@ -29,9 +30,10 @@ export const workflowService = {
 		return data;
 	},
 
-	getById: async (id: string): Promise<GetWorkflowByIdResponse> => {
+	getById: async (id: string, params?: GetWorkflowByIdQuery): Promise<GetWorkflowByIdResponse> => {
 		const { data } = await apiClient.get<GetWorkflowByIdResponse>(
 			API_ROUTES.WORKFLOWS.BY_ID(id),
+			{ params },
 		);
 		return data;
 	},

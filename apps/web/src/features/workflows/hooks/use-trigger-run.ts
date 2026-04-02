@@ -3,15 +3,14 @@ import type { ApiErrorBody, AxiosError } from '@/api/client';
 import { workflowService } from '../service/workflow.service';
 import type { TriggerWorkflowResponse } from '../schema/api.dto';
 
-export function useTriggerRun(workflowId: string | undefined): UseMutationResult<
+export function useTriggerRun(): UseMutationResult<
 	TriggerWorkflowResponse,
 	AxiosError<ApiErrorBody>,
-	number | undefined
+	{ id: string; version?: number }
 > {
 	return useMutation({
-		mutationFn: (version?: number) => {
-			if (!workflowId) throw new Error('Workflow ID is required');
-			return workflowService.trigger(workflowId, { version });
+		mutationFn: ({ id, version }) => {
+			return workflowService.trigger(id, { version });
 		},
 	});
 }

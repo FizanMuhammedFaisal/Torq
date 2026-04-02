@@ -1,4 +1,4 @@
-import type { WorkflowWithLatestRun, WorkflowStatus } from '../types';
+import type { WorkflowWithLatestRun, WorkflowStatus, WorkflowRunSummary } from '../types';
 
 
 export interface PaginationMeta {
@@ -42,12 +42,19 @@ export interface GetWorkflowsResponse {
 	meta: PaginationMeta;
 }
 
+export interface GetWorkflowByIdQuery {
+	expand?: ('latestRun' | 'totalRuns' | 'averageDuration')[];
+}
+
 export interface GetWorkflowByIdResponse {
 	id: string;
 	name: string;
 	description?: string;
 	createdAt: string;
-	status: WorkflowStatus;
+	status?: WorkflowStatus;
+	latestRun?: WorkflowRunSummary;
+	totalRuns?: number;
+	averageDuration?: number;
 }
 
 // sercts endpoint

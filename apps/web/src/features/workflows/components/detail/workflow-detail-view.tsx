@@ -5,7 +5,6 @@ import { Loading03Icon, Alert02Icon } from '@hugeicons/core-free-icons';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
-import type { ApiErrorBody } from '@/api/client';
 import { statusConfig as statusMap } from '@/features/workflows/config';
 import { OverviewTab } from '@/features/workflows/components/detail/overview-tab';
 import { EditorTab } from '@/features/workflows/components/detail/editor-tab';
@@ -26,7 +25,7 @@ export function WorkflowDetailView() {
 	const [activeTab, setActiveTab] = useState<Tab>('Overview');
 	const [showDelete, setShowDelete] = useState(false);
 
-	const triggerRun = useTriggerRun(id);
+	const triggerRun = useTriggerRun();
 	const { data: workflow, isLoading, error } = useWorkflow(id);
 	const { runs } = useRuns();
 
@@ -144,28 +143,27 @@ export function WorkflowDetailView() {
 						</Button>
 						<Button
 							size="sm"
-							className="rounded-full gap-1.5 px-5"
-							onClick={() => triggerRun.mutate(undefined, {
-								onSuccess: () => {
-									toast.success('Workflow triggered successfully');
-									setActiveTab('Runs');
-								},
-								onError: (error) => {
-									const body = error.response?.data as ApiErrorBody;
-									toast.error(body?.message || 'Failed to trigger workflow run');
-								}
-							})}
+							className="rounded-full gap-2 px-5 shadow-[0_4px_12px_rgba(16,185,129,0.2)]"
+							onClick={() => {
+								const triggerPromise = triggerRun.mutateAsync({ id });
+								toast.promise(triggerPromise, {
+									loading: 'Triggering workflow execution...',
+									success: 'Workflow execution started!',
+									error: (err) => err.response?.data?.message || 'Failed to trigger workflow',
+								});
+								triggerPromise.then(() => setActiveTab('Runs')).catch(() => { });
+							}}
 							disabled={triggerRun.isPending}
 						>
 							{triggerRun.isPending ? (
-								<HugeiconsIcon icon={Loading03Icon} className="size-3 animate-spin" />
+								<HugeiconsIcon icon={Loading03Icon} className="size-3.5 animate-spin" />
 							) : (
-								<svg className="size-3" viewBox="0 0 24 24" fill="currentColor">
-									<title>Run workflow</title>
+								<svg className="size-3.5" viewBox="0 0 24 24" fill="currentColor">
+									<title>Trigger run</title>
 									<polygon points="6 3 20 12 6 21 6 3" />
 								</svg>
 							)}
-							{triggerRun.isPending ? 'Triggering...' : 'Run'}
+							{triggerRun.isPending ? 'Starting...' : 'Trigger'}
 						</Button>
 					</div>
 				</div>

@@ -11,41 +11,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file apiserver/workflowrun/v1/workflowrun.proto.
  */
 export const file_apiserver_workflowrun_v1_workflowrun: GenFile = /*@__PURE__*/
-  fileDesc("CiphcGlzZXJ2ZXIvd29ya2Zsb3dydW4vdjEvd29ya2Zsb3dydW4ucHJvdG8SGGFwaXNlcnZlci53b3JrZmxvd3J1bi52MSIcCgxIZWxsb1JlcXVlc3QSDAoEbmFtZRgBIAEoCSIgCg1IZWxsb1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiPQoOR2V0U3BlY1JlcXVlc3QSFwoPd29ya2Zsb3dfcnVuX2lkGAEgASgJEhIKCnZlcnNpb25faWQYAiABKAkiqQEKD0dldFNwZWNSZXNwb25zZRITCgt3b3JrZmxvd19pZBgBIAEoCRISCgp2ZXJzaW9uX2lkGAIgASgJEjIKB3NlY3JldHMYBSADKAsyIS5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuU2VjcmV0cxIlCgRzcGVjGAYgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBISCgpjcmVhdGVkX2F0GAcgASgJIiYKB1NlY3JldHMSDAoEbmFtZRgBIAEoCRINCgV2YWx1ZRgCIAEoCTLMAQoQQXBpU2VydmVyU2VydmljZRJYCgVIZWxsbxImLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5IZWxsb1JlcXVlc3QaJy5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuSGVsbG9SZXNwb25zZRJeCgdHZXRTcGVjEiguYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLkdldFNwZWNSZXF1ZXN0GikuYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLkdldFNwZWNSZXNwb25zZWIGcHJvdG8z", [file_google_protobuf_struct]);
-
-/**
- * @generated from message apiserver.workflowrun.v1.HelloRequest
- */
-export type HelloRequest = Message<"apiserver.workflowrun.v1.HelloRequest"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
-};
-
-/**
- * Describes the message apiserver.workflowrun.v1.HelloRequest.
- * Use `create(HelloRequestSchema)` to create a new message.
- */
-export const HelloRequestSchema: GenMessage<HelloRequest> = /*@__PURE__*/
-  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 0);
-
-/**
- * @generated from message apiserver.workflowrun.v1.HelloResponse
- */
-export type HelloResponse = Message<"apiserver.workflowrun.v1.HelloResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
-};
-
-/**
- * Describes the message apiserver.workflowrun.v1.HelloResponse.
- * Use `create(HelloResponseSchema)` to create a new message.
- */
-export const HelloResponseSchema: GenMessage<HelloResponse> = /*@__PURE__*/
-  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 1);
+  fileDesc("CiphcGlzZXJ2ZXIvd29ya2Zsb3dydW4vdjEvd29ya2Zsb3dydW4ucHJvdG8SGGFwaXNlcnZlci53b3JrZmxvd3J1bi52MSI9Cg5HZXRTcGVjUmVxdWVzdBIXCg93b3JrZmxvd19ydW5faWQYASABKAkSEgoKdmVyc2lvbl9pZBgCIAEoCSKpAQoPR2V0U3BlY1Jlc3BvbnNlEhMKC3dvcmtmbG93X2lkGAEgASgJEhIKCnZlcnNpb25faWQYAiABKAkSMgoHc2VjcmV0cxgFIAMoCzIhLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5TZWNyZXRzEiUKBHNwZWMYBiABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0EhIKCmNyZWF0ZWRfYXQYByABKAkiJgoHU2VjcmV0cxIMCgRuYW1lGAEgASgJEg0KBXZhbHVlGAIgASgJMnIKEEFwaVNlcnZlclNlcnZpY2USXgoHR2V0U3BlYxIoLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5HZXRTcGVjUmVxdWVzdBopLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5HZXRTcGVjUmVzcG9uc2ViBnByb3RvMw", [file_google_protobuf_struct]);
 
 /**
  * @generated from message apiserver.workflowrun.v1.GetSpecRequest
@@ -67,7 +33,7 @@ export type GetSpecRequest = Message<"apiserver.workflowrun.v1.GetSpecRequest"> 
  * Use `create(GetSpecRequestSchema)` to create a new message.
  */
 export const GetSpecRequestSchema: GenMessage<GetSpecRequest> = /*@__PURE__*/
-  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 2);
+  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 0);
 
 /**
  * @generated from message apiserver.workflowrun.v1.GetSpecResponse
@@ -104,7 +70,7 @@ export type GetSpecResponse = Message<"apiserver.workflowrun.v1.GetSpecResponse"
  * Use `create(GetSpecResponseSchema)` to create a new message.
  */
 export const GetSpecResponseSchema: GenMessage<GetSpecResponse> = /*@__PURE__*/
-  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 3);
+  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 1);
 
 /**
  * @generated from message apiserver.workflowrun.v1.Secrets
@@ -126,20 +92,12 @@ export type Secrets = Message<"apiserver.workflowrun.v1.Secrets"> & {
  * Use `create(SecretsSchema)` to create a new message.
  */
 export const SecretsSchema: GenMessage<Secrets> = /*@__PURE__*/
-  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 4);
+  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 2);
 
 /**
  * @generated from service apiserver.workflowrun.v1.ApiServerService
  */
 export const ApiServerService: GenService<{
-  /**
-   * @generated from rpc apiserver.workflowrun.v1.ApiServerService.Hello
-   */
-  hello: {
-    methodKind: "unary";
-    input: typeof HelloRequestSchema;
-    output: typeof HelloResponseSchema;
-  },
   /**
    * @generated from rpc apiserver.workflowrun.v1.ApiServerService.GetSpec
    */

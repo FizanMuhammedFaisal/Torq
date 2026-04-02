@@ -1,6 +1,6 @@
 {
   "name": "@torq-system/grpc",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Generated TypeScript gRPC definitions for Torq protos",
   "private": false,
   "publishConfig": {
