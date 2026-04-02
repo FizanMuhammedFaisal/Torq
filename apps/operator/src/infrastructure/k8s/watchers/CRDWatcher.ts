@@ -32,7 +32,7 @@ export class CRDWatcher extends BaseWatcher {
 		this.watch.watch(
 			path,
 			this.lastResourceVersion ? { resourceVersion: this.lastResourceVersion } : {},
-			this.handler,
+			this.handler.bind(this),
 			this.hanldeDisconnect.bind(this),
 		);
 	}
@@ -43,6 +43,7 @@ export class CRDWatcher extends BaseWatcher {
 	 * accordance with how we need to move currect status to given spec
 	 */
 	private async handler(phase: string, apiObj: unknown, _watchObj?: unknown) {
+		console.log(phase, JSON.stringify(apiObj));
 		if (!this.isWorkflowRunK8s(apiObj)) {
 			logger.warn({
 				'[crd - watcher] received unexpected object shape': apiObj,

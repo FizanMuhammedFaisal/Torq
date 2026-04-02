@@ -1,4 +1,4 @@
-import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
 
 export type ICleanUpService = {
 	handle(run: WorkflowRunSnapshot): Promise<void>;

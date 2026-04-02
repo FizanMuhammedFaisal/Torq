@@ -2,14 +2,14 @@ import type { IWorkflowRunRepository } from '@/application/port/repository/workf
 import type { IWorkflowRunDispatcherService } from '@/application/port/services/workflowRunDispatcher.interface';
 import { TOKENS } from '@/config/di/tokens';
 import type * as k8s from '@kubernetes/client-node';
-import type { Workflow } from '@/domain/entities/workflowRun';
-import { inject } from 'tsyringe';
+import type { Workflow } from '@/domain/entities/workflow';
+import { inject, injectable } from 'tsyringe';
 import { Envconfig } from '@/config/envconfig';
-
+@injectable()
 export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherService {
 	constructor(
 		@inject(TOKENS.WorkflowRunRepository) private workflowRunRepository: IWorkflowRunRepository,
-	) {}
+	) { }
 	async create(run: Workflow): Promise<void> {
 		// https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.28/#objectmeta-v1-meta
 		interface WorkflowRunCustomResource extends k8s.KubernetesObject {
@@ -23,8 +23,9 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 			apiVersion: `${Envconfig.k8s.group}/${Envconfig.k8s.version}`,
 			kind: Envconfig.k8s.kind,
 			metadata: {
+				// https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
 				// Perfect typing for K8s metadata!
-				name: `run-${run.workflowId}`,
+				name: `run-${run.workflowId.toLowerCase()}`,
 				namespace: Envconfig.k8s.namespace,
 				labels: {
 					'torq.dev/workflow': run.workflowId,

@@ -3,7 +3,9 @@ import { Envconfig } from '@/config/envconfig';
 import { customObjectsClient } from '@/infrastructure/k8s/client';
 import type { HttpError } from '@/presentation/error/httpError';
 import type { CustomObjectsApi } from '@kubernetes/client-node';
+import { injectable } from 'tsyringe';
 
+@injectable()
 export class WorkflowRunRepository implements IWorkflowRunRepository {
 	private customObjectsClient: CustomObjectsApi;
 	constructor() {

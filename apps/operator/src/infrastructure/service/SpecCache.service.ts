@@ -8,6 +8,20 @@ export class SpecCacheService implements ICacheService {
 		this.cache = new LRUCache<string, Record<string, unknown>>({
 			max: 500,
 			maxSize: 50 * 1024 * 1024, // 50 MB hard limit
+			// a size calculation function for the cache 
+			sizeCalculation: (value) => {
+				try {
+					const str = JSON.stringify(value);
+					if (!str) return 2; // Size of empty brackets/quotes
+					// in V8 engine, characters generally take up 2 bytes.
+					// miuch faster than Buffer.byteLength and very close to accurate.
+					return str.length * 2;
+				} catch (error) {
+					// THE SAFETY NET: If stringify fails (e.g., circular reference), 
+					// This ensures bad objects quickly get kicked out of the 50MB cache 
+					return 50 * 1024;
+				}
+			}
 		});
 	}
 	async get<T>(

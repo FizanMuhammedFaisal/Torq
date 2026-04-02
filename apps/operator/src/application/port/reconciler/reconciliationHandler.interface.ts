@@ -1,4 +1,4 @@
-import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
 
 // every versions hanlder must implement this
 export interface IReconciliationHandler {

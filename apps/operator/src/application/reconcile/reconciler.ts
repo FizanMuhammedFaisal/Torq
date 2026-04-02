@@ -1,20 +1,24 @@
-import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
 import type { IReconciler } from '../port/reconciler/reconciler.interface';
 import { logger } from '@/infrastructure/logger/logger';
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
 import type { ICleanUpService } from '../port/services/cleanUp.inerface';
 import type { IReconcilerVersionRouter } from '../port/reconciler/versionRouter.interface';
+
+
+
 /**
  * The root reconciler refer Loop1 from core.md
  * this loop does not throw error it handle exeptions gracefully
  * unexpected cases willl be hanlded via marking unsucessfull and auditing to db
  */
+@injectable()
 export class Reconciler implements IReconciler {
 	constructor(
 		@inject(TOKENS.CleanupService) private cleanupService: ICleanUpService,
 		@inject(TOKENS.ReconcilerVersionRouter) private router: IReconcilerVersionRouter,
-	) {}
+	) { }
 	async reconcile(run: WorkflowRunSnapshot): Promise<void> {
 		try {
 			logger.trace({ run: run });
@@ -39,7 +43,7 @@ export class Reconciler implements IReconciler {
 			}
 			await handler.reconcile(run);
 			// check hanlder if not supprted hanlde it via marking unsupprted
-		} catch (error) {}
+		} catch (error) { }
 	}
 	private async markUnsupportedVersion(run: WorkflowRunSnapshot) {
 		//makr on kuber as failed

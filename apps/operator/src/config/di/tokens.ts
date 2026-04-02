@@ -28,4 +28,5 @@ export const TOKENS = {
 	//RPC
 	IWorkflowRunController: Symbol('IWorkflowRunController'),
 	//reconcilation hanlders
+	V1AlphaReconciliationHandler: Symbol('V1AlphaReconciliationHandler'),
 } as const;

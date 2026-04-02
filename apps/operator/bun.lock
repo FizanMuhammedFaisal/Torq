@@ -9,7 +9,7 @@
         "@connectrpc/connect": "^2.1.1",
         "@connectrpc/connect-node": "^2.1.1",
         "@kubernetes/client-node": "^1.4.0",
-        "@torq-system/grpc": "0.0.8",
+        "@torq-system/grpc": "0.0.10",
         "@types/pg": "^8.18.0",
         "drizzle-kit": "^0.31.10",
         "drizzle-orm": "^0.45.1",
@@ -144,7 +144,7 @@
 
     "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
 
-    "@torq-system/grpc": ["@torq-system/grpc@0.0.8", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0", "@torq-system/grpc": "0.0.7" } }, "sha512-FkIU4E2bCPHznC/rxWM4AX4pUL9tqoebDq35euA11GvDSXBx7/vim+/P6j3QRzmsQRM3plhILjVLffHTdou36A=="],
+    "@torq-system/grpc": ["@torq-system/grpc@0.0.10", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0", "@torq-system/grpc": "0.0.7" } }, "sha512-m7Bimwi2kTFRrmbKoc0qm3KPFsbeP/UJ/od7FqulWYsITi7sRoNkpfZGwREmt28K3UX5opjs55k3YCh680Lhgw=="],
 
     "@types/bun": ["@types/bun@1.3.10", "", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
 

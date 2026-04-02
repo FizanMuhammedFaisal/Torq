@@ -13,5 +13,5 @@ export type TriggerType = z.infer<typeof triggerType>;
 export type TriggerRunInput = z.infer<typeof triggerRunSchema>;
 
 export type TriggerRunOutput = {
-	runId: string;
+	success: boolean;
 };

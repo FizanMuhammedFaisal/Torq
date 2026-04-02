@@ -1,10 +1,12 @@
 import type { ICleanUpService } from '@/application/port/services/cleanUp.inerface';
 
 import { logger } from '../logger/logger';
-import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
+import { injectable } from 'tsyringe';
 
+@injectable()
 export class CleanUpService implements ICleanUpService {
-	constructor() {}
+	constructor() { }
 	handle(run: WorkflowRunSnapshot): Promise<void> {
 		logger.trace({ run });
 		// check if jobs are done

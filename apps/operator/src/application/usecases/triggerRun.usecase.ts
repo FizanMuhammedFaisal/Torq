@@ -1,17 +1,21 @@
-import { inject } from 'tsyringe';
-import type { ITriggerRun } from '../port/usecases/triggerRun.interface';
+import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
 import type { IWorkflowRunDispatcherService } from '../port/services/workflowRunDispatcher.interface';
 import type { TriggerRunInput, TriggerRunOutput } from '../dto/triggerRun';
+import type { ITriggerRunUseCase } from '../port/usecases/triggerRun.interface';
+import { logger } from '@/infrastructure/logger/logger';
 /**
  * Would call the workflowDispatcher to trigger the run
  */
-export class TriggerRun implements ITriggerRun {
+@injectable()
+export class TriggerRunUseCase implements ITriggerRunUseCase {
 	constructor(
-		@inject(TOKENS.IWorkflowRunDispatcherService)
+		@inject(TOKENS.WorkflowRunDispatcherService)
 		private workflowRunDispatcherService: IWorkflowRunDispatcherService,
-	) {}
-	execute(data: TriggerRunInput): Promise<TriggerRunOutput> {
-		this.workflowRunDispatcherService.create(data);
+	) { }
+	async execute(data: TriggerRunInput): Promise<TriggerRunOutput> {
+		await this.workflowRunDispatcherService.create(data);
+		logger.info(`Workflow run triggered for workflowId: ${data.workflowId}, versionId: ${data.versionId}`);
+		return { success: true };
 	}
 }
