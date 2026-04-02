@@ -24,7 +24,7 @@
 		"@elysiajs/cors": "^1.4.1",
 		"@elysiajs/openapi": "^1.4.14",
 		"@elysiajs/opentelemetry": "^1.4.10",
-		"@torq-system/grpc": "^0.0.9",
+		"@torq-system/grpc": "^0.0.12",
 		"better-auth": "1.5.0",
 		"dotenv": "^17.3.1",
 		"drizzle-orm": "^0.45.1",

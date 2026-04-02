@@ -34,6 +34,11 @@ export const TOKENS = {
 	RPCRouter: Symbol.for('RPCRouter'),
 	GrpcClient: Symbol.for('GrpcClient'),
 	WorkflowAggregateRepository: Symbol.for("WorkflowAggregateRepository"),
-	WorkflowRunMapper: Symbol.for("WorkflowRunMapper")
+	WorkflowRunMapper: Symbol.for("WorkflowRunMapper"),
 
+	// usecases
+	GetWorkflowSpecUseCase: Symbol.for('GetWorkflowSpecUseCase'),
+
+	//
+	IWorkflowRPCController: Symbol.for('IWorkflowRPCController'),
 } as const;

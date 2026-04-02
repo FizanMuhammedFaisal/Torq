@@ -12,7 +12,7 @@
         "@elysiajs/cors": "^1.4.1",
         "@elysiajs/openapi": "^1.4.14",
         "@elysiajs/opentelemetry": "^1.4.10",
-        "@torq-system/grpc": "0.0.9",
+        "@torq-system/grpc": "0.0.12",
         "better-auth": "1.5.0",
         "dotenv": "^17.3.1",
         "drizzle-orm": "^0.45.1",
@@ -373,7 +373,7 @@
 
     "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
 
-    "@torq-system/grpc": ["@torq-system/grpc@0.0.9", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0", "@torq-system/grpc": "0.0.7" } }, "sha512-j/rhfSllFm3Hi3sMg/YkNgXfI05kJqbzmLj1OIV39neImMB9ngr41yuHBU7JK2JeRLflEfPMBZm9f8tUcq35BA=="],
+    "@torq-system/grpc": ["@torq-system/grpc@0.0.12", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-xooNk/2FmUV04CH0ZQ0/s1b8XnDRW3xcIzmCBBqF2Y4H90UNmOzr0V0TaPNMmifZvn+38nr4cIxgwCQ5S8yzVA=="],
 
     "@types/bun": ["@types/bun@1.3.10", "", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
 
@@ -880,8 +880,6 @@
     "@torq-system/grpc/@connectrpc/connect": ["@connectrpc/connect@1.7.0", "", { "peerDependencies": { "@bufbuild/protobuf": "^1.10.0" } }, "sha512-iNKdJRi69YP3mq6AePRT8F/HrxWCewrhxnLMNm0vpqXAR8biwzRtO6Hjx80C6UvtKJ5sFmffQT7I4Baecz389w=="],
 
     "@torq-system/grpc/@connectrpc/connect-node": ["@connectrpc/connect-node@1.7.0", "", { "dependencies": { "undici": "^5.28.4" }, "peerDependencies": { "@bufbuild/protobuf": "^1.10.0", "@connectrpc/connect": "1.7.0" } }, "sha512-6vaPIkG/NyhxlYgytLoR9KYbPhczEboFB2OYWkA9qvUz1K7efXfeGrlRxoLtpa+r8VxyIOw73w5ktNe743nD+A=="],
-
-    "@torq-system/grpc/@torq-system/grpc": ["@torq-system/grpc@0.0.7", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-phitY9MbzNuw3x5ArktHGD9PNNnr3wb1LeLDAal2JzGYXJOGKOyRA3lRjQY0uBe4axoUozTDt7iklwomKt2wQg=="],
 
     "better-auth/@better-auth/core": ["@better-auth/core@1.5.0", "", { "dependencies": { "@standard-schema/spec": "^1.1.0", "zod": "^4.3.6" }, "peerDependencies": { "@better-auth/utils": "0.3.1", "@better-fetch/fetch": "1.1.21", "@cloudflare/workers-types": ">=4", "better-call": "1.3.2", "jose": "^6.1.0", "kysely": "^0.28.5", "nanostores": "^1.0.1" }, "optionalPeers": ["@cloudflare/workers-types"] }, "sha512-nDPmW7I9VGRACEei31fHaZxGwD/yICraDllZ/f25jbWXYaxDaW88RuH1ZhbOUKmGJlZtDxcjN1+YmcVIc1ioNw=="],
 

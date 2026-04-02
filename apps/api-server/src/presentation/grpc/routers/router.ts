@@ -1,14 +1,22 @@
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import type { IRPCRouter } from '../interfaces/router.interface';
 import type { ConnectRouter } from '@connectrpc/connect';
+import { TOKENS } from '@/config/di/tokens';
+import { ApiServerService } from '@torq-system/grpc';
+import { type IWorkflowRPCController } from '../interfaces/controllers/workflow.interface';
 
-import { create } from '@bufbuild/protobuf';
 
 @injectable()
 export class RPCRouter implements IRPCRouter {
-	constructor() { }
+
+	constructor(
+		@inject(TOKENS.WorkflowController) private workflowController: IWorkflowRPCController
+
+	) { }
 
 	public register(router: ConnectRouter): void {
-
+		router.service(ApiServerService, {
+			getSpec: (req, context) => this.workflowController.triggerRun(req, context)
+		})
 	}
 }
