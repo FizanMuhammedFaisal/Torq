@@ -2,8 +2,8 @@
 // @generated from file apiserver/workflowrun/v1/workflowrun.proto (package apiserver.workflowrun.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
 import { file_google_protobuf_struct } from "@bufbuild/protobuf/wkt";
 import type { JsonObject, Message } from "@bufbuild/protobuf";
 
@@ -11,7 +11,7 @@ import type { JsonObject, Message } from "@bufbuild/protobuf";
  * Describes the file apiserver/workflowrun/v1/workflowrun.proto.
  */
 export const file_apiserver_workflowrun_v1_workflowrun: GenFile = /*@__PURE__*/
-  fileDesc("CiphcGlzZXJ2ZXIvd29ya2Zsb3dydW4vdjEvd29ya2Zsb3dydW4ucHJvdG8SGGFwaXNlcnZlci53b3JrZmxvd3J1bi52MSIcCgxIZWxsb1JlcXVlc3QSDAoEbmFtZRgBIAEoCSIgCg1IZWxsb1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiHAoOR2V0U3BlY1JlcXVlc3QSCgoCaWQYASABKAkiOAoPR2V0U3BlY1Jlc3BvbnNlEiUKBHNwZWMYASABKAsyFy5nb29nbGUucHJvdG9idWYuU3RydWN0MswBChBBcGlTZXJ2ZXJTZXJ2aWNlElgKBUhlbGxvEiYuYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLkhlbGxvUmVxdWVzdBonLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5IZWxsb1Jlc3BvbnNlEl4KB0dldFNwZWMSKC5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuR2V0U3BlY1JlcXVlc3QaKS5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuR2V0U3BlY1Jlc3BvbnNlYgZwcm90bzM", [file_google_protobuf_struct]);
+  fileDesc("CiphcGlzZXJ2ZXIvd29ya2Zsb3dydW4vdjEvd29ya2Zsb3dydW4ucHJvdG8SGGFwaXNlcnZlci53b3JrZmxvd3J1bi52MSIcCgxIZWxsb1JlcXVlc3QSDAoEbmFtZRgBIAEoCSIgCg1IZWxsb1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiKQoOR2V0U3BlY1JlcXVlc3QSFwoPd29ya2Zsb3dfcnVuX2lkGAEgASgJIvwBCg9HZXRTcGVjUmVzcG9uc2USEwoLd29ya2Zsb3dfaWQYASABKAkSEgoKdmVyc2lvbl9pZBgCIAEoCRIUCgx0b3JxX3ZlcnNpb24YAyABKAkSOwoMdHJpZ2dlcl90eXBlGAQgASgOMiUuYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLlRyaWdnZXJUeXBlEjIKB3NlY3JldHMYBSADKAsyIS5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuU2VjcmV0cxIlCgRzcGVjGAYgASgLMhcuZ29vZ2xlLnByb3RvYnVmLlN0cnVjdBISCgpjcmVhdGVkX2F0GAcgASgJIiYKB1NlY3JldHMSDAoEbmFtZRgBIAEoCRINCgV2YWx1ZRgCIAEoCSp5CgtUcmlnZ2VyVHlwZRIcChhUUklHR0VSX1RZUEVfVU5TUEVDSUZJRUQQABIXChNUUklHR0VSX1RZUEVfTUFOVUFMEAESGAoUVFJJR0dFUl9UWVBFX1dFQkhPT0sQAhIZChVUUklHR0VSX1RZUEVfU0NIRURVTEUQAzLMAQoQQXBpU2VydmVyU2VydmljZRJYCgVIZWxsbxImLmFwaXNlcnZlci53b3JrZmxvd3J1bi52MS5IZWxsb1JlcXVlc3QaJy5hcGlzZXJ2ZXIud29ya2Zsb3dydW4udjEuSGVsbG9SZXNwb25zZRJeCgdHZXRTcGVjEiguYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLkdldFNwZWNSZXF1ZXN0GikuYXBpc2VydmVyLndvcmtmbG93cnVuLnYxLkdldFNwZWNSZXNwb25zZWIGcHJvdG8z", [file_google_protobuf_struct]);
 
 /**
  * @generated from message apiserver.workflowrun.v1.HelloRequest
@@ -52,9 +52,9 @@ export const HelloResponseSchema: GenMessage<HelloResponse> = /*@__PURE__*/
  */
 export type GetSpecRequest = Message<"apiserver.workflowrun.v1.GetSpecRequest"> & {
   /**
-   * @generated from field: string id = 1;
+   * @generated from field: string workflow_run_id = 1;
    */
-  id: string;
+  workflowRunId: string;
 };
 
 /**
@@ -69,9 +69,39 @@ export const GetSpecRequestSchema: GenMessage<GetSpecRequest> = /*@__PURE__*/
  */
 export type GetSpecResponse = Message<"apiserver.workflowrun.v1.GetSpecResponse"> & {
   /**
-   * @generated from field: google.protobuf.Struct spec = 1;
+   * @generated from field: string workflow_id = 1;
+   */
+  workflowId: string;
+
+  /**
+   * @generated from field: string version_id = 2;
+   */
+  versionId: string;
+
+  /**
+   * @generated from field: string torq_version = 3;
+   */
+  torqVersion: string;
+
+  /**
+   * @generated from field: apiserver.workflowrun.v1.TriggerType trigger_type = 4;
+   */
+  triggerType: TriggerType;
+
+  /**
+   * @generated from field: repeated apiserver.workflowrun.v1.Secrets secrets = 5;
+   */
+  secrets: Secrets[];
+
+  /**
+   * @generated from field: google.protobuf.Struct spec = 6;
    */
   spec?: JsonObject;
+
+  /**
+   * @generated from field: string created_at = 7;
+   */
+  createdAt: string;
 };
 
 /**
@@ -80,6 +110,59 @@ export type GetSpecResponse = Message<"apiserver.workflowrun.v1.GetSpecResponse"
  */
 export const GetSpecResponseSchema: GenMessage<GetSpecResponse> = /*@__PURE__*/
   messageDesc(file_apiserver_workflowrun_v1_workflowrun, 3);
+
+/**
+ * @generated from message apiserver.workflowrun.v1.Secrets
+ */
+export type Secrets = Message<"apiserver.workflowrun.v1.Secrets"> & {
+  /**
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string value = 2;
+   */
+  value: string;
+};
+
+/**
+ * Describes the message apiserver.workflowrun.v1.Secrets.
+ * Use `create(SecretsSchema)` to create a new message.
+ */
+export const SecretsSchema: GenMessage<Secrets> = /*@__PURE__*/
+  messageDesc(file_apiserver_workflowrun_v1_workflowrun, 4);
+
+/**
+ * @generated from enum apiserver.workflowrun.v1.TriggerType
+ */
+export enum TriggerType {
+  /**
+   * @generated from enum value: TRIGGER_TYPE_UNSPECIFIED = 0;
+   */
+  UNSPECIFIED = 0,
+
+  /**
+   * @generated from enum value: TRIGGER_TYPE_MANUAL = 1;
+   */
+  MANUAL = 1,
+
+  /**
+   * @generated from enum value: TRIGGER_TYPE_WEBHOOK = 2;
+   */
+  WEBHOOK = 2,
+
+  /**
+   * @generated from enum value: TRIGGER_TYPE_SCHEDULE = 3;
+   */
+  SCHEDULE = 3,
+}
+
+/**
+ * Describes the enum apiserver.workflowrun.v1.TriggerType.
+ */
+export const TriggerTypeSchema: GenEnum<TriggerType> = /*@__PURE__*/
+  enumDesc(file_apiserver_workflowrun_v1_workflowrun, 0);
 
 /**
  * @generated from service apiserver.workflowrun.v1.ApiServerService

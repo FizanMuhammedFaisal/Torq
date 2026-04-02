@@ -19,7 +19,7 @@ message GetSpecResponse {
   string workflow_id = 1;
   string version_id = 2;
   string torq_version = 3;
-  TriggerType triggerType = 4;
+  TriggerType trigger_type = 4;
   repeated Secrets secrets = 5;
   google.protobuf.Struct spec = 6;
   string created_at = 7;
