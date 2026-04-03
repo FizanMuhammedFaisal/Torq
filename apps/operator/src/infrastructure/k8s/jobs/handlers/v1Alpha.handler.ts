@@ -1,24 +1,26 @@
-import { V1Job } from "@kubernetes/client-node";
-import { IJobBuilder } from "../interface/jobBuilderHanlder.interface";
-import { TorqJob } from "@/domain/entities/job/job";
-import { ReconcilerFailureError } from "@/infrastructure/errors/FailureError";
+import type { V1Container, V1Job, V1Volume } from '@kubernetes/client-node';
+import type { IJobBuilder } from '../interface/jobBuilderHanlder.interface';
+import type { TorqJob, TorqJobSteps } from '@/domain/entities/job/job';
+import { ReconcilerFailureError } from '@/infrastructure/errors/FailureError';
 
 export class V1AlphaJobBuilder implements IJobBuilder {
     buildJob(job: TorqJob): V1Job {
-
-        if (job.torqVersion !== "v1alpha") {
-            throw new ReconcilerFailureError(`Unsupported torqVersion ${job.torqVersion} for job builder`, "UNSUPPORTED_VERSION");
+        if (job.torqVersion !== 'v1alpha') {
+            throw new ReconcilerFailureError(
+                `Unsupported torqVersion ${job.torqVersion} for job builder`,
+                'UNSUPPORTED_VERSION',
+            );
         }
-        const jobName = this.jobName(job)
+        const jobName = this.jobName(job);
         return {
-            apiVersion: "batch/v1",
-            kind: "Job",
+            apiVersion: 'batch/v1',
+            kind: 'Job',
             metadata: {
                 name: jobName,
                 namespace: job.namespace,
                 labels: this.labels(job),
                 annotations: {}, //skipping for now
-                ownerReferences: [], // TODO: set to WorkflowRun CRD — enables cascade delete
+                ownerReferences: [], // TODO: set to WorkflowRun8 CRD — enables cascade delete
             },
             spec: {
                 backoffLimit: 2,
@@ -29,17 +31,19 @@ export class V1AlphaJobBuilder implements IJobBuilder {
                         labels: this.labels(job),
                     },
                     spec: {
-                        restartPolicy: "OnFailure",
+                        restartPolicy: 'OnFailure',
                         serviceAccountName: 'torq-job-runner',
-                        containers: []
+                        initContainers: [
+                            this.buildLogSidecarContainer(job),
+                            ...this.InitStepContainers(job)
+                        ],
+                        containers: [this.completionContainer()], // alteast one is reqruied
+                        volumes: this.volumes(job)
+                    },
 
-                    }
-                }
-
-            }
-
-
-        }
+                },
+            },
+        };
     }
     private jobName(job: TorqJob): string {
         // must be DNS-1123 compliant, unique per run+job
@@ -57,5 +61,81 @@ export class V1AlphaJobBuilder implements IJobBuilder {
             'torq/job-id': job.id,
         };
         // job watcher loop filters on managed-by=torq
+    }
+    private buildLogSidecarContainer(job: TorqJob): V1Container {
+        return {
+            name: 'torq-log-aggregator',
+            image: "image of the service",//TODO
+            restartPolicy: 'Always',// this is waht makes this a sidecar
+            env: [
+                { name: 'WORKFLOW_RUN_ID', value: job.workflowRunId },
+                {
+                    name: 'REDIS_URL',
+                    valueFrom: {
+                        // need to add as secrect to cluster
+                        secretKeyRef: { name: 'torq-secrets', key: 'redis-url' },
+                    },
+                },
+            ],
+            volumeMounts: [
+                { name: 'logs', mountPath: '/var/log/torq' },
+            ],
+            resources: {
+                requests: { cpu: '50m', memory: '64Mi' },
+                limits: { cpu: '100m', memory: '128Mi' },
+            },
+        }
+    }
+    private completionContainer(): V1Container {
+        // writes DONE sentinel so sidecar knows to flush and exit
+        return {
+            name: 'done',
+            image: 'alpine:latest',
+            command: ['sh', '-c', 'echo done > /var/log/torq/DONE && sleep 5'],
+            volumeMounts: [
+                { name: 'logs', mountPath: '/var/log/torq' },
+            ],
+        };
+    }
+    private volumes(job: TorqJob): V1Volume[] {
+        return [
+            {
+                name: 'workspace',
+                emptyDir: {
+                    sizeLimit: '1Gi', // hardcoded for now later can be dynamic
+                },
+            },
+            {
+                name: 'logs',
+                emptyDir: {
+                    sizeLimit: '500Mi',
+                },
+            },
+        ]
+    }
+    private InitStepContainers(job: TorqJob): V1Container[] {
+        return job.steps.map((step) => this.makeInitStepContainer(job, step))
+    }
+    private makeInitStepContainer(job: TorqJob, step: TorqJobSteps): V1Container {
+        return {
+            name: `step-${step.index}`,
+            image: job.image,
+            volumeMounts: [
+                { name: 'workspace', mountPath: '/workspace' },
+                { name: 'logs', mountPath: '/var/log/torq' },
+            ],
+            resources: {
+                requests: { cpu: '100m', memory: '256Mi' },
+                limits: { cpu: '500m', memory: '512Mi' },
+            },
+            env: [
+                ...Object.entries(job.envs).map(([name, value]) => ({ name, value })),
+                ...job.secrets.map((s) => ({
+                    name: s.name,
+                    value: s.envVar
+                })),
+            ],
+            workingDir: '/workspace',
+        }
     }
 }

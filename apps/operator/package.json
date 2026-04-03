@@ -11,7 +11,8 @@
 		"check": "bun x biome check --write .",
 		"db:migrate": "bun run drizzle-kit migrate --config ./drizzle.config.ts",
 		"db:generate": "bun run drizzle-kit generate --config ./drizzle.config.ts",
-		"kubernetes:delete:crd": "kubectl delete crd workflowruns.torq.dev"
+		"kubernetes:delete:crd": "kubectl delete crd workflowruns.torq.dev",
+		"test": "bun test"
 	},
 	"type": "module",
 	"dependencies": {
@@ -31,6 +32,7 @@
 		"redis": "^5.11.0",
 		"reflect-metadata": "^0.2.2",
 		"tsyringe": "^4.10.0",
+		"vitest": "^4.1.2",
 		"zod": "^4.3.6"
 	},
 	"devDependencies": {
