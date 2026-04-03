@@ -4,9 +4,9 @@ import {
 	ApiException,
 	type ApiextensionsV1ApiCreateCustomResourceDefinitionRequest,
 } from '@kubernetes/client-node';
-import { apiExtensionsClient } from './client';
+import { apiExtensionsClient } from '../client';
 
-import { logger } from '../logger/logger';
+import { logger } from '../../logger/logger';
 import { injectable } from 'tsyringe';
 import { Envconfig } from '@/config/envconfig';
 import { CRD_DEFINITION, CRD_NAME } from './CrdDefenition';

@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import { container } from './config/di/container';
-import type { ICRDManager } from './infrastructure/k8s/ensureCrd';
+import type { ICRDManager } from './infrastructure/k8s/crd/ensureCrd';
 import type { GRpcServer } from './presentation/grpc/rpcServer';
 import { TOKENS } from './config/di/tokens';
 import type { IHealthServer } from './presentation/http/health';

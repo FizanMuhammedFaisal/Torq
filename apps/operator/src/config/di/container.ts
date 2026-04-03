@@ -2,7 +2,7 @@ import { container, Lifecycle } from 'tsyringe';
 import { TOKENS } from './tokens';
 import { GRpcServer } from '@/presentation/grpc/rpcServer';
 import { RPCRouter } from '@/presentation/grpc/routers/router';
-import { CRDManager } from '@/infrastructure/k8s/ensureCrd';
+import { CRDManager } from '@/infrastructure/k8s/crd/ensureCrd';
 import { CRDWatcher } from '@/infrastructure/k8s/watchers/CRDWatcher';
 import { JobWatcher } from '@/infrastructure/k8s/watchers/jobWatcher';
 import { K8sWatchManager } from '@/infrastructure/k8s/watch';

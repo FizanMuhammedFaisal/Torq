@@ -9,7 +9,7 @@
         "@connectrpc/connect": "^2.1.1",
         "@connectrpc/connect-node": "^2.1.1",
         "@kubernetes/client-node": "^1.4.0",
-        "@torq-system/grpc": "0.0.11",
+        "@torq-system/grpc": "0.0.14",
         "@types/pg": "^8.18.0",
         "drizzle-kit": "^0.31.10",
         "drizzle-orm": "^0.45.1",
@@ -144,7 +144,7 @@
 
     "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
 
-    "@torq-system/grpc": ["@torq-system/grpc@0.0.11", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-nNJ2BZu+CQdyi8LA7JgfSQim9g0ZwO75yBhr9t4LgRIKWk70jqp9jtIkfgkKnYa/Gabv/6K5TlZpRFM64tiMsQ=="],
+    "@torq-system/grpc": ["@torq-system/grpc@0.0.14", "", { "dependencies": { "@bufbuild/protobuf": "^2.11.0", "@connectrpc/connect": "^1.4.0", "@connectrpc/connect-node": "^1.4.0" } }, "sha512-E2X23gfTP4dz/Hu8KAPJJKdUo+YmyAZIyYhpaqjuJ2me+lEpFXHGI8JNxH6EsfgHmjce7ha0cELVGwSmJ60NUQ=="],
 
     "@types/bun": ["@types/bun@1.3.10", "", { "dependencies": { "bun-types": "1.3.10" } }, "sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ=="],
 

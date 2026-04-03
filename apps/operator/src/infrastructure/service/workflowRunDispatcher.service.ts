@@ -20,11 +20,11 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 		}
 
 		const manifest: WorkflowRunCustomResource = {
+			// https://github.com/kubernetes/community/blob/main/contributors/devel/sig-architecture/api-conventions.md#resources
 			apiVersion: `${Envconfig.k8s.group}/${Envconfig.k8s.version}`,
 			kind: Envconfig.k8s.kind,
 			metadata: {
 				// https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
-				// Perfect typing for K8s metadata!
 				name: `run-${run.workflowId.toLowerCase()}`,
 				namespace: Envconfig.k8s.namespace,
 				labels: {
