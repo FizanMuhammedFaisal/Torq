@@ -38,7 +38,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
                             ...this.InitStepContainers(job)
                         ],
                         containers: [this.completionContainer()], // alteast one is reqruied
-                        volumes: this.volumes(job)
+                        volumes: this.volumes()
                     },
 
                 },
@@ -97,7 +97,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
             ],
         };
     }
-    private volumes(job: TorqJob): V1Volume[] {
+    private volumes(): V1Volume[] {
         return [
             {
                 name: 'workspace',

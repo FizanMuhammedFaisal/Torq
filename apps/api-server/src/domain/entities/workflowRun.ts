@@ -26,14 +26,14 @@ export class WorkflowRun {
 		public readonly startedAt: Date,
 		public readonly completedAt: Date | null,
 		public readonly duration: number | null,
-	) {}
+	) { }
 
 	static create(props: {
 		id: string;
 		workflowId: string;
 		workflowVersionId: string;
-		status: WorkflowRunStatus;
-		triggerType: WorkflowTriggerType;
+		status: RunStatus;
+		triggerType: TriggerType;
 		triggeredBy: string;
 		startedAt: Date;
 		completedAt: Date | null;

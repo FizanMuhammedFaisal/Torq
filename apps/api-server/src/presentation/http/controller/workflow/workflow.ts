@@ -33,7 +33,7 @@ export class WorkflowController implements IWorkflowController {
 		private revealSecretUseCase: IRevealSecretUseCase,
 		@inject(TOKENS.TriggerWorkflowRunUseCase)
 		private triggerWorkflowRunUseCase: ITriggerWorkflowRunUseCase,
-	) {}
+	) { }
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
 		const query = validate(GetWorkflowsInputSchema, ctx.query);
@@ -58,7 +58,7 @@ export class WorkflowController implements IWorkflowController {
 	revealSecret = async (ctx: AuthenticatedContext) => {
 		const workflowId = ctx.params.id;
 		const key = ctx.params.key as string;
-		return this.revealSecretUseCase.execute({ workflowId, key, req: ctx.user });
+		return this.revealSecretUseCase.execute({ id: workflowId, key, req: ctx.user });
 	};
 
 	createWorkflow = async (ctx: AuthenticatedContext): Promise<CreateWorkflowOutputDto> => {
@@ -74,7 +74,7 @@ export class WorkflowController implements IWorkflowController {
 		const body = ctx.body as UpsertSecretsInputDto;
 		return this.upsertSecretsUseCase.execute({
 			...body,
-			workflowId,
+			id: workflowId,
 			req: ctx.user,
 		});
 	};
@@ -82,7 +82,7 @@ export class WorkflowController implements IWorkflowController {
 	getSecrets = async (ctx: AuthenticatedContext): Promise<GetSecretsOutputDto> => {
 		const workflowId = ctx.params.id;
 		return this.getSecretsUseCase.execute({
-			workflowId,
+			id: workflowId,
 			req: ctx.user,
 		});
 	};

@@ -24,6 +24,7 @@ export class OperatorService implements IOperatorService {
 
 	async triggerWorkflowRun(params: TriggerWorkflowRunParams): Promise<void> {
 		await this.client.triggerWorkflowRun({
+			workflowRunId: params.workflowRunId,
 			workflowId: params.workflowId,
 			torqVersion: params.torqVersion,
 			triggerType: this.mapTriggerType(params.triggerType),

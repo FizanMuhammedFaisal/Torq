@@ -5,12 +5,11 @@ import type { ISpecParser, SpecType } from './types';
 import { VersionDetector } from './versionDetector';
 import { isObject } from './versions/common/base';
 import { getTorqValidationHanlder } from './versions/registry';
-import { handler } from './versions/v1apha/handler';
 
 export class DSLPipeline {
 	private specParser = new SpecParser();
 	private versionDetector = new VersionDetector();
-	constructor(private parser: ISpecParser) {}
+	constructor(private parser: ISpecParser) { }
 	async process(
 		raw: string,
 		format: SpecType,
@@ -23,7 +22,8 @@ export class DSLPipeline {
 			//schema validation
 			const validSpec = torqValidator.schemaValidate(parsedSpec);
 			//semantics validator
-			const spec = handler.semanticValidate(validSpec);
+
+			const spec = torqValidator.semanticValidate(validSpec);
 			if (!isObject(spec)) {
 				throw new SpecValidationError('Invalid spec');
 			}

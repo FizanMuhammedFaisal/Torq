@@ -1,24 +1,24 @@
 import type {
 	WorkflowRun,
-	WorkflowRunStatus,
-	WorkflowTriggerType,
+	RunStatus,
+	TriggerType,
 } from '@/domain/entities/workflowRun';
 import type { IBaseRepository } from './baseRepository.interface';
 
 export type PersistRunDto = {
-	status: WorkflowRunStatus;
+	status: RunStatus;
 	startedAt?: string;
 	completedAt?: string | null;
 	duration?: number | null;
 	workflowId: string;
 	workflowVersionId: string;
 	identityId: string;
-	triggerType: WorkflowTriggerType;
+	triggerType: TriggerType;
 	triggeredBy: string;
 };
 
 export interface IWorkflowRunRepository extends IBaseRepository<WorkflowRun> {
 	create(data: PersistRunDto): Promise<WorkflowRun>;
-	updateStatus(id: string, status: WorkflowRunStatus): Promise<void>;
+	updateStatus(id: string, status: RunStatus): Promise<void>;
 	findByWorkflowId(workflowId: string, options?: { limit?: number }): Promise<WorkflowRun[]>;
 }
