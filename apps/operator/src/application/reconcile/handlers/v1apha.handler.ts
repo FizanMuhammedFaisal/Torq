@@ -16,7 +16,10 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			logger.error({ workflowRunId: run.spec.versionId }, 'Failed to fetch spec from repository');
 		} else {
 
-			logger.trace({ workflowRunId: run.spec.versionId, spec: spec }, 'Fetched spec from repository');
+			//  sort them topologically , get the steps that i can run without
+			// depedecy run them in parallell. 
+			//
+
 		}
 		// make secret and schedule jobs
 	}
