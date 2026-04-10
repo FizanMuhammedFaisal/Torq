@@ -14,7 +14,9 @@ export const Envconfig = {
 		},
 		nodeEnv: process.env.NODE_ENV || 'development',
 	},
-
+	images: {
+		fluentBit: ""
+	},
 	services: {
 		grpc: {
 			apiServer: {

@@ -34,7 +34,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
                         restartPolicy: 'OnFailure',
                         serviceAccountName: 'torq-job-runner',
                         initContainers: [
-                            this.buildLogSidecarContainer(job),
+                            // this.buildLogSidecarContainer(job), // moved to deamonset node wide
                             ...this.InitStepContainers(job)
                         ],
                         containers: [this.completionContainer()], // alteast one is reqruied
@@ -59,33 +59,34 @@ export class V1AlphaJobBuilder implements IJobBuilder {
             'app.kubernetes.io/managed-by': 'torq',
             'torq/workflow-run-id': job.workflowRunId,
             'torq/job-id': job.id,
+            'collect-logs': "true"
         };
         // job watcher loop filters on managed-by=torq
     }
-    private buildLogSidecarContainer(job: TorqJob): V1Container {
-        return {
-            name: 'torq-log-aggregator',
-            image: "image of the service",//TODO
-            restartPolicy: 'Always',// this is waht makes this a sidecar
-            env: [
-                { name: 'WORKFLOW_RUN_ID', value: job.workflowRunId },
-                {
-                    name: 'REDIS_URL',
-                    valueFrom: {
-                        // need to add as secrect to cluster
-                        secretKeyRef: { name: 'torq-secrets', key: 'redis-url' },
-                    },
-                },
-            ],
-            volumeMounts: [
-                { name: 'logs', mountPath: '/var/log/torq' },
-            ],
-            resources: {
-                requests: { cpu: '50m', memory: '64Mi' },
-                limits: { cpu: '100m', memory: '128Mi' },
-            },
-        }
-    }
+    // private buildLogSidecarContainer(job: TorqJob): V1Container {
+    //     return {
+    //         name: 'torq-log-aggregator',
+    //         image: "image of the service",//TODO
+    //         restartPolicy: 'Always',// this is waht makes this a sidecar
+    //         env: [
+    //             { name: 'WORKFLOW_RUN_ID', value: job.workflowRunId },
+    //             {
+    //                 name: 'REDIS_URL',
+    //                 valueFrom: {
+    //                     // need to add as secrect to cluster
+    //                     secretKeyRef: { name: 'torq-secrets', key: 'redis-url' },
+    //                 },
+    //             },
+    //         ],
+    //         volumeMounts: [
+    //             { name: 'logs', mountPath: '/var/log/torq' },
+    //         ],
+    //         resources: {
+    //             requests: { cpu: '50m', memory: '64Mi' },
+    //             limits: { cpu: '100m', memory: '128Mi' },
+    //         },
+    //     }
+    // }
     private completionContainer(): V1Container {
         // writes DONE sentinel so sidecar knows to flush and exit
         return {
