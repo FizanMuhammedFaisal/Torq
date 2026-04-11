@@ -20,6 +20,7 @@ import { V1AlphaReconciliationHandler } from '@/application/reconcile/handlers/v
 import { SpecRepository } from '@/infrastructure/repository/grpc/spec.repository';
 import { GrpcClient } from '@/infrastructure/grpc/client';
 import { RedisClient } from '@/infrastructure/messageBroker/client';
+import { LogForwarder } from '@/infrastructure/k8s/deamonSet/logForwarder/ensureDeamonSet';
 
 
 container.register(TOKENS.GRPCServer, { useClass: GRpcServer }, { lifecycle: Lifecycle.Singleton });
@@ -45,6 +46,7 @@ container.register(TOKENS.SpecRepository, { useClass: SpecRepository }, { lifecy
 container.register(TOKENS.SpecCache, { useClass: SpecCacheService }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.GRPCClient, { useClass: GrpcClient }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.RedisClient, { useClass: RedisClient }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.LogForwarderManager, { useClass: LogForwarder }, { lifecycle: Lifecycle.Singleton });
 
 
 container.register(

@@ -4,7 +4,8 @@ export class HttpError extends Error {
 		public response: http.IncomingMessage,
 		// biome-ignore lint/suspicious/noExplicitAny: from docs
 		public body: any,
-		public statusCode?: number,
+		public code?: number,
+
 	) {
 		super('HTTP request failed');
 		this.name = 'HttpError';

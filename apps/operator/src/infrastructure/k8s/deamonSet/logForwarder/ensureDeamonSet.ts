@@ -1,9 +1,9 @@
 import { injectable } from "tsyringe";
 import { apiAppsV1Client, coreClient, rbacV1Client, } from "../../client";
 import { logger } from "@/infrastructure/logger/logger";
-import { HttpError } from "@/presentation/error/httpError";
 import { CONFIG_MAP_DEFINITION } from "./raw/configmap";
 import { DEAMON_SET_DEFINITION } from "./raw/deamonSet";
+import { ApiException } from "@kubernetes/client-node";
 
 export interface ILogForwarderManager {
     ensureDeamonSet(): Promise<void>
@@ -16,14 +16,19 @@ export class LogForwarder implements ILogForwarderManager {
     private name = 'fluent-bit';
     async ensureDeamonSet(): Promise<void> {
         try {
+            logger.info('[LogForwarder]: TRYING Fluent Bit DaemonSet exists, skipping');
+
             await apiAppsV1Client.readNamespacedDaemonSet({
                 name: this.name,
                 namespace: this.namespace
             })
             logger.info('[LogForwarder]: Fluent Bit DaemonSet exists, skipping');
         } catch (err) {
-            const error = err as HttpError
-            if (error.response?.statusCode !== 404) throw err;
+            if (err instanceof ApiException) {
+                if (err.code !== 404) throw err;
+                return
+            }
+            throw err
         }
         //make sure that namespace is present
         this.ensureNamespace()
@@ -49,35 +54,45 @@ export class LogForwarder implements ILogForwarderManager {
         try {
             await coreClient.readNamespace({ name: this.namespace });
         } catch (err) {
-            const error = err as HttpError
-            if (error.response?.statusCode !== 404) throw err;
-            await coreClient.createNamespace({
-                body: {
-                    apiVersion: 'v1',
-                    kind: 'Namespace',
-                    metadata: { name: this.namespace }
-                }
-            });
-            logger.info(`[LogForwarder]: Created namespace: ${this.namespace}`);
+            if (err instanceof ApiException) {
+                if (err.code !== 404) throw err;
+                await coreClient.createNamespace({
+                    body: {
+                        apiVersion: 'v1',
+                        kind: 'Namespace',
+                        metadata: { name: this.namespace }
+                    }
+                });
+                logger.info(`[LogForwarder]: Created namespace: ${this.namespace}`);
+                return
+            }
+
+            throw err
         }
+
     }
     private async applyServiceAccount() {
 
         try {
             await coreClient.readNamespacedServiceAccount({ name: this.name, namespace: this.namespace });
         } catch (err) {
-            const error = err as HttpError
-            if (error.response?.statusCode !== 404) throw err;
-            await coreClient.createNamespacedServiceAccount({
-                namespace: this.namespace,
-                body: {
-                    apiVersion: 'v1',
-                    kind: 'ServiceAccount',
-                    metadata: { name: this.name, namespace: this.namespace }
-                }
-            });
+            if (err instanceof ApiException) {
+                if (err.code !== 404) throw err;
+                await coreClient.createNamespacedServiceAccount({
+                    namespace: this.namespace,
+                    body: {
+                        apiVersion: 'v1',
+                        kind: 'ServiceAccount',
+                        metadata: { name: this.name, namespace: this.namespace }
+                    }
+                });
+                logger.info(`[LogForwarder]: service account exits`);
+                return
+            }
+            throw err
         }
-        logger.info(`[LogForwarder]: service account exits`);
+
+
     }
     private async applyClusterRole() {
         const body = {
@@ -101,11 +116,15 @@ export class LogForwarder implements ILogForwarderManager {
                 body,
             });
         } catch (err) {
-            const error = err as HttpError
-            if (error.response?.statusCode !== 404) throw err;
-            await rbacV1Client.createClusterRole({ body });
+            if (err instanceof ApiException) {
+                if (err.code !== 404) throw err;
+                await rbacV1Client.createClusterRole({ body });
+                logger.info(`[LogForwarder]: Cluster Role Exits`);
+                return
+            }
+            throw err
         }
-        logger.info(`[LogForwarder]: Cluster Role Exits`);
+
 
     }
     private async applyClusterRoleBinding() {
@@ -135,9 +154,12 @@ export class LogForwarder implements ILogForwarderManager {
                 body
             });
         } catch (err) {
-            const error = err as HttpError
-            if (error.response?.statusCode !== 404) throw err;
-            await rbacV1Client.createClusterRoleBinding({ body });
+            if (err instanceof ApiException) {
+                if (err.code !== 404) throw err;
+                await rbacV1Client.createClusterRoleBinding({ body });
+                return
+            }
+            throw err
         }
         logger.info(`[LogForwarder]: Cluster Role Binding Exits`);
 
@@ -154,9 +176,12 @@ export class LogForwarder implements ILogForwarderManager {
                 name, namespace: this.namespace, body: CONFIG_MAP_DEFINITION,
             });
         } catch (error) {
-            const err = error as HttpError
-            if (err.response?.statusCode !== 404) throw err;
-            await coreClient.createNamespacedConfigMap({ namespace: this.name, body: CONFIG_MAP_DEFINITION });
+            if (error instanceof ApiException) {
+                if (error.code !== 404) throw error;
+                await coreClient.createNamespacedConfigMap({ namespace: this.name, body: CONFIG_MAP_DEFINITION });
+                return
+            }
+            throw error
         }
     }
     private getDaemonSetManifest() {

@@ -31,4 +31,5 @@ export const TOKENS = {
 	V1AlphaReconciliationHandler: Symbol('V1AlphaReconciliationHandler'),
 	JobBuilderVersionRouter: Symbol('JobBuilderVersionRouter'),
 	V1AlphaJobBuilder: Symbol('V1AlphaJobBuilder'),
+	LogForwarderManager: Symbol('LogForwarderManager'),
 } as const;
