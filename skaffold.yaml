@@ -6,3 +6,5 @@ metadata:
 requires:
   - configs: ["torq-log-ingestor"]
     path: ./apps/log-ingestor
+  - configs: ["torq-operator"]
+    path: ./apps/operator

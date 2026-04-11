@@ -15,7 +15,7 @@ export const Envconfig = {
 		nodeEnv: process.env.NODE_ENV || 'development',
 	},
 	images: {
-		fluentBit: ""
+		fluentBit: "fluent/fluent-bit:4.2.4"
 	},
 	services: {
 		grpc: {

@@ -22,10 +22,10 @@ async function Main() {
 	await crdManager.ensureCrd();
 	await logForwarderManager.ensureDeamonSet()
 	//  start grpc server
-	await grpcServer.start();
+	// await grpcServer.start();
 
-	// connect to message queue
-	await redisClient.getClient();
+	// // connect to message queue
+	// await redisClient.getClient();
 	// start watchers right before marking as ready
 	// await k8sWatchManager.startWatchers();
 

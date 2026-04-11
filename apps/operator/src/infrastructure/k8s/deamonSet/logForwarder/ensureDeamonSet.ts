@@ -16,8 +16,6 @@ export class LogForwarder implements ILogForwarderManager {
     private name = 'fluent-bit';
     async ensureDeamonSet(): Promise<void> {
         try {
-            logger.info('[LogForwarder]: TRYING Fluent Bit DaemonSet exists, skipping');
-
             await apiAppsV1Client.readNamespacedDaemonSet({
                 name: this.name,
                 namespace: this.namespace
@@ -26,22 +24,23 @@ export class LogForwarder implements ILogForwarderManager {
         } catch (err) {
             if (err instanceof ApiException) {
                 if (err.code !== 404) throw err;
-                return
+            } else {
+                throw err
             }
-            throw err
         }
-        //make sure that namespace is present
-        this.ensureNamespace()
 
-        //For giving fluent bit access
-        this.applyServiceAccount()
-        this.applyClusterRole()
-        this.applyClusterRoleBinding()
+        //make sure that namespace is present
+        await this.ensureNamespace()
+
+        // //For giving fluent bit access
+        await this.applyServiceAccount()
+        await this.applyClusterRole()
+        await this.applyClusterRoleBinding()
 
         //  Create ConfigMap with Fluent Bit config
         await this.applyConfigMap();
 
-        //  Create the DaemonSet
+        // //  Create the DaemonSet
         await apiAppsV1Client.createNamespacedDaemonSet({
             namespace: this.namespace,
             body: this.getDaemonSetManifest()  // returns the manifest object
@@ -53,6 +52,7 @@ export class LogForwarder implements ILogForwarderManager {
     private async ensureNamespace() {
         try {
             await coreClient.readNamespace({ name: this.namespace });
+            logger.info(`[LogForwarder]: namespace: ${this.namespace} Exits`);
         } catch (err) {
             if (err instanceof ApiException) {
                 if (err.code !== 404) throw err;
@@ -64,10 +64,9 @@ export class LogForwarder implements ILogForwarderManager {
                     }
                 });
                 logger.info(`[LogForwarder]: Created namespace: ${this.namespace}`);
-                return
+            } else {
+                throw err
             }
-
-            throw err
         }
 
     }
@@ -75,6 +74,7 @@ export class LogForwarder implements ILogForwarderManager {
 
         try {
             await coreClient.readNamespacedServiceAccount({ name: this.name, namespace: this.namespace });
+            logger.info(`[LogForwarder]: service account exits`);
         } catch (err) {
             if (err instanceof ApiException) {
                 if (err.code !== 404) throw err;
@@ -86,7 +86,7 @@ export class LogForwarder implements ILogForwarderManager {
                         metadata: { name: this.name, namespace: this.namespace }
                     }
                 });
-                logger.info(`[LogForwarder]: service account exits`);
+                logger.info(`[LogForwarder]: service account Created`);
                 return
             }
             throw err
@@ -111,15 +111,16 @@ export class LogForwarder implements ILogForwarderManager {
         try {
             await rbacV1Client.readClusterRole({ name: this.name });
             // already exists - just patch it 
-            await rbacV1Client.patchClusterRole({
-                name: this.name,
-                body,
-            });
+            // await rbacV1Client.patchClusterRole({
+            //     name: this.name,
+            //     body,
+            // });
+            logger.info(`[LogForwarder]: Cluster Role Exits`);
         } catch (err) {
             if (err instanceof ApiException) {
                 if (err.code !== 404) throw err;
                 await rbacV1Client.createClusterRole({ body });
-                logger.info(`[LogForwarder]: Cluster Role Exits`);
+                logger.info(`[LogForwarder]: Cluster Role Created`);
                 return
             }
             throw err
@@ -149,19 +150,21 @@ export class LogForwarder implements ILogForwarderManager {
 
         try {
             await rbacV1Client.readClusterRoleBinding({ name: this.name });
-            await rbacV1Client.patchClusterRoleBinding({
-                name: this.name,
-                body
-            });
+            // await rbacV1Client.patchClusterRoleBinding({
+            //     name: this.name,
+            //     body
+            // });
+            logger.info(`[LogForwarder]: Cluster Role Binding Exits`);
         } catch (err) {
             if (err instanceof ApiException) {
                 if (err.code !== 404) throw err;
                 await rbacV1Client.createClusterRoleBinding({ body });
+                logger.info(`[LogForwarder]: Cluster Role Binding Created`);
                 return
             }
             throw err
         }
-        logger.info(`[LogForwarder]: Cluster Role Binding Exits`);
+
 
     }
     private async applyConfigMap() {
@@ -172,13 +175,13 @@ export class LogForwarder implements ILogForwarderManager {
                 namespace: this.namespace,
                 name
             })
-            await coreClient.patchNamespacedConfigMap({
-                name, namespace: this.namespace, body: CONFIG_MAP_DEFINITION,
-            });
+            // await coreClient.patchNamespacedConfigMap({
+            //     name, namespace: this.namespace, body: CONFIG_MAP_DEFINITION,
+            // });
         } catch (error) {
             if (error instanceof ApiException) {
                 if (error.code !== 404) throw error;
-                await coreClient.createNamespacedConfigMap({ namespace: this.name, body: CONFIG_MAP_DEFINITION });
+                await coreClient.createNamespacedConfigMap({ namespace: this.namespace, body: CONFIG_MAP_DEFINITION });
                 return
             }
             throw error
