@@ -24,11 +24,26 @@ rules:
   - apiGroups: ["apps"]
     resources: ["daemonsets"]
     verbs: ["get", "create", "update", "patch", "delete", "list", "watch"]
-  # Events
+  # For managing fluent-bit's RBAC (operator creates these dynamically)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs:
+      [
+        "get",
+        "create",
+        "update",
+        "patch",
+        "delete",
+        "list",
+        "watch",
+        "bind",
+        "escalate",
+      ]
+    #  for operator to grand permission to fluentbit it needs then first
   - apiGroups: [""]
-    resources: ["events"]
-    verbs: ["create", "patch"]
-
+    resources:
+      ["namespaces", "events", "serviceaccounts", "configmaps", "pods", "nodes"]
+    verbs: ["get", "create", "update", "patch", "list", "watch"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

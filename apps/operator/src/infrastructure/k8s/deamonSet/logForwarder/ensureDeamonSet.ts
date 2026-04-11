@@ -21,6 +21,7 @@ export class LogForwarder implements ILogForwarderManager {
                 namespace: this.namespace
             })
             logger.info('[LogForwarder]: Fluent Bit DaemonSet exists, skipping');
+            return
         } catch (err) {
             if (err instanceof ApiException) {
                 if (err.code !== 404) throw err;
@@ -111,10 +112,10 @@ export class LogForwarder implements ILogForwarderManager {
         try {
             await rbacV1Client.readClusterRole({ name: this.name });
             // already exists - just patch it 
-            // await rbacV1Client.patchClusterRole({
-            //     name: this.name,
-            //     body,
-            // });
+            await rbacV1Client.replaceClusterRole({
+                name: this.name,
+                body,
+            });
             logger.info(`[LogForwarder]: Cluster Role Exits`);
         } catch (err) {
             if (err instanceof ApiException) {
@@ -150,10 +151,11 @@ export class LogForwarder implements ILogForwarderManager {
 
         try {
             await rbacV1Client.readClusterRoleBinding({ name: this.name });
-            // await rbacV1Client.patchClusterRoleBinding({
-            //     name: this.name,
-            //     body
-            // });
+            await rbacV1Client.replaceClusterRoleBinding({
+                name: this.name,
+                body,
+
+            });
             logger.info(`[LogForwarder]: Cluster Role Binding Exits`);
         } catch (err) {
             if (err instanceof ApiException) {
@@ -175,9 +177,9 @@ export class LogForwarder implements ILogForwarderManager {
                 namespace: this.namespace,
                 name
             })
-            // await coreClient.patchNamespacedConfigMap({
-            //     name, namespace: this.namespace, body: CONFIG_MAP_DEFINITION,
-            // });
+            await coreClient.replaceNamespacedConfigMap({
+                name, namespace: this.namespace, body: CONFIG_MAP_DEFINITION,
+            });
         } catch (error) {
             if (error instanceof ApiException) {
                 if (error.code !== 404) throw error;
