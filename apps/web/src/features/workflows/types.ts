@@ -1,10 +1,10 @@
 
 export type WorkflowStatus =
-	| 'idle'
-	| 'queued'
-	| 'running'
-	| 'success'
-	| 'failed';
+	| 'IDLE'
+	| 'QUEUED'
+	| 'RUNNING'
+	| 'SUCCESS'
+	| 'FAILED';
 
 
 export type TriggerType = 'MANUAL' | 'WEBHOOK' | 'SCHEDULE';

@@ -1,0 +1,8 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: torq-dev-infra
+
+requires:
+  - configs: ["torq-log-ingestor"]
+    path: ./apps/log-ingestor

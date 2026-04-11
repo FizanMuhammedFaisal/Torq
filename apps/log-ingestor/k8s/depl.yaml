@@ -13,8 +13,8 @@ spec:
         app: log-ingestor
     spec:
       containers:
-        - name: fizanmuhammedfaisal/torq-log-ingestor
-          image: torq:log-ingestor
+        - name: log-ingestor
+          image: fizanmuhammedfaisal/torq-log-ingestor
           ports:
             - containerPort: 3000
 ---

@@ -98,12 +98,12 @@ export function WorkflowListPage() {
 				header: 'Workflow',
 				cell: ({ row }) => {
 					const wf = row.original;
-					const status = wf.lastRun?.status ?? 'idle';
+					const status = wf.lastRun?.status ?? 'IDLE';
 					const cfg = statusConfig[status];
 					return (
 						<div className="flex items-center gap-4 min-w-0 pr-4">
 							<div className="relative flex items-center justify-center size-2.5 shrink-0 mt-0.5">
-								{status === 'running' && (
+								{status === 'RUNNING' && (
 									<span
 										className="absolute size-[16px] rounded-full animate-ping opacity-30"
 										style={{ backgroundColor: cfg.color }}
@@ -355,26 +355,26 @@ export function WorkflowListPage() {
 											All Statuses
 										</DropdownMenuCheckboxItem>
 										<DropdownMenuCheckboxItem
-											checked={statusFilter === 'running'}
-											onCheckedChange={() => setStatusFilter('running')}
+											checked={statusFilter === 'RUNNING'}
+											onCheckedChange={() => setStatusFilter('RUNNING')}
 										>
 											Running
 										</DropdownMenuCheckboxItem>
 										<DropdownMenuCheckboxItem
-											checked={statusFilter === 'failed'}
-											onCheckedChange={() => setStatusFilter('failed')}
+											checked={statusFilter === 'FAILED'}
+											onCheckedChange={() => setStatusFilter('FAILED')}
 										>
 											Failed
 										</DropdownMenuCheckboxItem>
 										<DropdownMenuCheckboxItem
-											checked={statusFilter === 'success'}
-											onCheckedChange={() => setStatusFilter('success')}
+											checked={statusFilter === 'SUCCESS'}
+											onCheckedChange={() => setStatusFilter('SUCCESS')}
 										>
 											Passed
 										</DropdownMenuCheckboxItem>
 										<DropdownMenuCheckboxItem
-											checked={statusFilter === 'idle'}
-											onCheckedChange={() => setStatusFilter('idle')}
+											checked={statusFilter === 'IDLE'}
+											onCheckedChange={() => setStatusFilter('IDLE')}
 										>
 											Idle
 										</DropdownMenuCheckboxItem>
