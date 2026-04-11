@@ -2,6 +2,8 @@ import { injectable } from "tsyringe";
 import { apiAppsV1Client, coreClient, rbacV1Client, } from "../../client";
 import { logger } from "@/infrastructure/logger/logger";
 import { HttpError } from "@/presentation/error/httpError";
+import { CONFIG_MAP_DEFINITION } from "./raw/configmap";
+import { DEAMON_SET_DEFINITION } from "./raw/deamonSet";
 
 export interface ILogForwarderManager {
     ensureDeamonSet(): Promise<void>
@@ -140,15 +142,25 @@ export class LogForwarder implements ILogForwarderManager {
         logger.info(`[LogForwarder]: Cluster Role Binding Exits`);
 
     }
-    private applyConfigMap() {
-
+    private async applyConfigMap() {
+        const name = 'fluent-bit-config';
+        try {
+            //checkinf if this config exits
+            await coreClient.readNamespacedConfigMap({
+                namespace: this.namespace,
+                name
+            })
+            await coreClient.patchNamespacedConfigMap({
+                name, namespace: this.namespace, body: CONFIG_MAP_DEFINITION,
+            });
+        } catch (error) {
+            const err = error as HttpError
+            if (err.response?.statusCode !== 404) throw err;
+            await coreClient.createNamespacedConfigMap({ namespace: this.name, body: CONFIG_MAP_DEFINITION });
+        }
     }
     private getDaemonSetManifest() {
-
+        return DEAMON_SET_DEFINITION
     }
 }
-
-
-
-
 

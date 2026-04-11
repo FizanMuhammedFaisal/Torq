@@ -48,6 +48,16 @@ it give the correct controll for the consumer, not overbloating like option 1 an
 
 
 
+### fluent bit redis problem 
 
+since fluetbut doesnt have a output redis option, we will also have another option even if it had that is to push each workflow as a stream to redis streams,
 
+A possible solution is a ingesion process that can be http endpoint thata takees all of this output from fluent bit and then push to corresponding redis stream 
 
+this can be great since we can do transformatoin also here in this process
+
+since we can deply this as stateless pod it wouldnt be much of a problem unless either redis or fluentbit have isssues
+
+anyway if either redis or logs proecessor is down we will reject the injectin request from fleunt bit and it wil have to buffer the logs in memery with a limit we set so that it can be in the cluster untill both of them comes back up 
+
+the backpressure issues can be avoidded with correct congition on fluent bit and a injetion process which hanldes this correclu

@@ -1,5 +1,5 @@
 import { V1ConfigMap } from "@kubernetes/client-node";
-const name = "fluentbut"
+const name = 'fluent-bit-config';
 const namespace = 'logging'
 // needs cahnging 
 export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
@@ -10,7 +10,7 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
         'fluent-bit.conf': `
           
             [SERVICE]
-                Flush         1
+                Flush         3
                 Log_Level     info
                 Parsers_File  parsers.conf
                 HTTP_Server   On
@@ -19,13 +19,16 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
                 storage.path              /var/log/flb-storage/
                 storage.sync              normal
                 storage.checksum          off
+                storage.max_chunks_up     128
+                storage.backlog.mem_limit 50M
 
             [INPUT]
                 Name              tail
                 Path              /var/log/containers/*.log
                 multiline.parser  cri
+                DB                /var/log/flb_kube.db
                 Tag               kube.*
-                Refresh_Interval  5
+                Refresh_Interval  8
                 Mem_Buf_Limit     50MB
                 Skip_Long_Lines   On
                 storage.type      filesystem
@@ -37,28 +40,23 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
                 Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                 Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
                 Merge_Log           On
-                Keep_Log            Off
-
+                Keep_Log            On
+                Buffer_Size         64k
+                Kube_Tag_Prefix     kube.var.log.containers.
             [FILTER]
                 Name    grep
                 Match   kube.*
                 Regex   $kubernetes['labels']['collect-logs'] ^true$
 
             [OUTPUT]
-                Name        redis
-                Match       *
-                Host        redis.logging.svc.cluster.local
-                Port        6379
-                Stream_Key  pod-logs
+                Name    http
+                Format  json_stream
+                Match   kube.*
+                Host    log-ingestor.torq-system.svc.cluster.local
+                Port    3000
+                URI     /ingest
+                storage.total_limit_size 2G
                 Retry_Limit False
-        `  ,
-        'parsers.conf': `
-            [PARSER]
-                Name        cri
-                Format      regex
-                Regex       ^(?<time>[^ ]+) (?<stream>stdout|stderr) (?<logtag>[^ ]*) (?<log>.*)$
-                Time_Key    time
-                Time_Format %Y-%m-%dT%H:%M:%S.%L%z
         `
     }
 };
