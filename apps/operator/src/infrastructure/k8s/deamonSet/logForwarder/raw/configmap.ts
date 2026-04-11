@@ -7,56 +7,53 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
     kind: "ConfigMap",
     metadata: { name, namespace },
     data: {
-        'fluent-bit.conf': `
-          
-            [SERVICE]
-                Flush         3
-                Log_Level     info
-                Parsers_File  parsers.conf
-                HTTP_Server   On
-                HTTP_Listen   0.0.0.0
-                HTTP_Port     2020
-                storage.path              /var/log/flb-storage/
-                storage.sync              normal
-                storage.checksum          off
-                storage.max_chunks_up     128
-                storage.backlog.mem_limit 50M
+        'fluent-bit.conf': `[SERVICE]
+    Flush         3
+    Log_Level     info
+    HTTP_Server   On
+    HTTP_Listen   0.0.0.0
+    HTTP_Port     2020
+    storage.path              /var/log/flb-storage/
+    storage.sync              normal
+    storage.checksum          off
+    storage.max_chunks_up     128
+    storage.backlog.mem_limit 50M
 
-            [INPUT]
-                Name              tail
-                Path              /var/log/containers/*.log
-                multiline.parser  cri
-                DB                /var/log/flb_kube.db
-                Tag               kube.*
-                Refresh_Interval  8
-                Mem_Buf_Limit     50MB
-                Skip_Long_Lines   On
-                storage.type      filesystem
+[INPUT]
+    Name              tail
+    Path              /var/log/containers/*.log
+    multiline.parser  cri
+    DB                /var/log/flb-storage/flb_kube.db
+    Tag               kube.*
+    Refresh_Interval  8
+    Mem_Buf_Limit     50MB
+    Skip_Long_Lines   On
+    storage.type      filesystem
 
-            [FILTER]
-                Name                kubernetes
-                Match               kube.*
-                Kube_URL            https://kubernetes.default.svc:443
-                Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
-                Merge_Log           On
-                Keep_Log            On
-                Buffer_Size         64k
-                Kube_Tag_Prefix     kube.var.log.containers.
-            [FILTER]
-                Name    grep
-                Match   kube.*
-                Regex   $kubernetes['labels']['collect-logs'] ^true$
+[FILTER]
+    Name                kubernetes
+    Match               kube.*
+    Kube_URL            https://kubernetes.default.svc:443
+    Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+    Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+    Merge_Log           On
+    Keep_Log            On
+    Buffer_Size         64k
+    Kube_Tag_Prefix     kube.var.log.containers.
 
-            [OUTPUT]
-                Name    http
-                Format  json_stream
-                Match   kube.*
-                Host    log-ingestor.torq-system.svc.cluster.local
-                Port    3000
-                URI     /ingest
-                storage.total_limit_size 2G
-                Retry_Limit False
-        `
+[FILTER]
+    Name    grep
+    Match   kube.*
+    Regex   $kubernetes['labels']['collect-logs'] ^true$
+
+[OUTPUT]
+    Name    http
+    Format  json_stream
+    Match   kube.*
+    Host    log-ingestor-service.default.svc.cluster.local
+    Port    3000
+    URI     /ingest
+    storage.total_limit_size 2G
+    Retry_Limit False`
     }
 };
