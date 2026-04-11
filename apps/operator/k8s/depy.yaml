@@ -12,6 +12,7 @@ spec:
       labels:
         app: torq-operator
     spec:
+      serviceAccountName: torq-operator
       containers:
         - name: torq-operator
           image: fizanmuhammedfaisal/torq-operator

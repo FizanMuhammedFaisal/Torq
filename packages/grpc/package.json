@@ -45,16 +45,16 @@
   ],
   "dependencies": {
     "@bufbuild/protobuf": "^2.11.0",
-    "@connectrpc/connect": "^1.4.0",
-    "@connectrpc/connect-node": "^1.4.0"
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-node": "^1.7.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.7",
-    "@bufbuild/buf": "^1.57.2",
-    "@bufbuild/protoc-gen-es": "^2.2.3",
-    "@connectrpc/protoc-gen-connect-es": "^1.4.0",
-    "@types/node": "^25.5.0",
-    "tsx": "^4.7.1",
-    "typescript": "^5.3.3"
+    "@biomejs/biome": "^2.4.11",
+    "@bufbuild/buf": "^1.67.0",
+    "@bufbuild/protoc-gen-es": "^2.11.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.7.0",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

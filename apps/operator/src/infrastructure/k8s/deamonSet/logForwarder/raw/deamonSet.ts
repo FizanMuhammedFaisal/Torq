@@ -30,15 +30,6 @@ export const DEAMON_SET_DEFINITION: V1DaemonSet = {
                     image: Envconfig.images.fluentBit,
                     imagePullPolicy: 'IfNotPresent',
                     ports: [{ containerPort: 2020 }],
-                    env: [
-                        {
-                            name: 'REDIS_PASSWORD',
-                            valueFrom: {
-                                // load from env
-                                secretKeyRef: { name: 'redis-credentials', key: 'password' }
-                            }
-                        }
-                    ],
                     livenessProbe: {
                         httpGet: { path: '/api/v1/health', port: 2020 },
                         initialDelaySeconds: 10,
