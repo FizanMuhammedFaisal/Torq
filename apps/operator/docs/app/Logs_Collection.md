@@ -60,4 +60,20 @@ since we can deply this as stateless pod it wouldnt be much of a problem unless 
 
 anyway if either redis or logs proecessor is down we will reject the injectin request from fleunt bit and it wil have to buffer the logs in memery with a limit we set so that it can be in the cluster untill both of them comes back up 
 
-the backpressure issues can be avoidded with correct congition on fluent bit and a injetion process which hanldes this correclu
+the backpressure issues can be avoidded with correct congition on fluent bit and a injetion process which hanldes this correctly
+
+
+#### How does logs travel from pod to client side
+
+so in a node we have a container run time engine (eg:docker)
+
+When a container writes to stdout/stderr, the runtime captures that and writes it to a file on the node's filesystem not inside the container on the actual host disk
+
+
+Fluent Bit runs as a DaemonSet, one pod per node. It needs to read those log files which are on the node's disk.
+ not inside its own container filesystem. So when we mount the node's /var/log directory into the Fluent Bit container. Now Fluent Bit can see all the log files for every pod on that node as if they were local files.
+
+
+From here the logs are went to the ingestor enpoint which will take all logsand pushes to the correct stream and from there workflow logs are consumed by a woker for pushing to database and apiserver of torq to show to clients live if asked
+else query from db
+
