@@ -56,7 +56,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
     }
     private labels(job: TorqJob): Record<string, string> {
         return {
-            'app.kubernetes.io/managed-by': 'torq', m 
+            'app.kubernetes.io/managed-by': 'torq',
             'torq/workflow-run-id': job.workflowRunId,
             'torq/job-id': job.id,
             'collect-logs': "true"
