@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: log-ingestor
+  namespace: torq
 spec:
   replicas: 1
   selector:
@@ -17,6 +18,11 @@ spec:
           image: fizanmuhammedfaisal/torq-log-ingestor
           ports:
             - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: log-ingestor-config
+          # - secretRef:
+          #     name: log-ingestor-secret
 ---
 apiVersion: v1
 kind: Service
@@ -29,3 +35,4 @@ spec:
     - port: 3000
       targetPort: 3000
   type: ClusterIP
+

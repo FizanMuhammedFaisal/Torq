@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["bun", "run", "--watch", "main.ts"]
+CMD ["bun", "run", "dev"]

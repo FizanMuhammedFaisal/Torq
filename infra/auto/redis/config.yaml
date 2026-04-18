@@ -5,57 +5,40 @@ metadata:
   namespace: torq
   labels:
     app: redis
-    component: message-broker
 data:
   redis.conf: |
-    # -- Network 
+    # Network
     bind 0.0.0.0
-    protected-mode no          # inside the cluster, no need; 
+    protected-mode no
     port 6379
     tcp-backlog 511
     timeout 0
     tcp-keepalive 300
 
-    # -- General 
-    daemonize no               # must be no inside a container
+    # General
+    daemonize no
     loglevel notice
     databases 16
 
-    # -- Memory 
-    # noeviction is intentional for Streams
+    # Memory
     maxmemory 256mb
     maxmemory-policy noeviction
 
-    # --- Persistence
-    # AOF gives you the best durability for Streams. RDB alone loses acked but
-    # not-yet-flushed messages on a crash.
+    # Persistence (AOF only, no RDB)
     appendonly yes
     appendfilename "appendonly.aof"
-    appendfsync everysec       # balance: fsync every second (safe enough for dev)
+    appendfsync everysec
     no-appendfsync-on-rewrite no
     auto-aof-rewrite-percentage 100
     auto-aof-rewrite-min-size 64mb
-
-    # Disable RDB snapshots
-    # Uncomment if you want RDB
-    # save 3600 1
-    # save 300 100
-    # save 60 10000
     save ""
 
-    # ── Streams
-    # Max entries PER stream before Redis starts trimming (MAXLEN).
-    # This is a global soft cap; your XADD calls should also use MAXLEN ~ for trimming.
-    # 0 = unlimited (rely on your app-level MAXLEN). Set a number if you want a safety net.
-    # stream-node-max-bytes 4096
-    # stream-node-max-entries 100
-
-    # ── Slow Log -
-    slowlog-log-slower-than 10000   # microseconds
+    # Slow log
+    slowlog-log-slower-than 10000
     slowlog-max-len 128
 
-    # ── Latency -
-    latency-monitor-threshold 100   # ms; surfaces in LATENCY HISTORY
+    # Latency
+    latency-monitor-threshold 100
 
-    # ── Client limits ─
+    # Clients
     maxclients 100
