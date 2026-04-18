@@ -64,7 +64,7 @@ export class Server {
                         if (queued) { accepted++; } else { dropped++; }
                     }
 
-                    console.log(`[ingestor] POST /ingest — accepted: ${accepted} dropped: ${dropped} buffer: ${buffer.length}`);
+                    console.log(`[ingestor] POST /ingest — accepted: ${accepted} dropped: ${dropped} buffer: ${this.buffer.length}`);
                     res.writeHead(200);
                     res.end('OK');
                 });

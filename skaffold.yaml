@@ -3,8 +3,17 @@ kind: Config
 metadata:
   name: torq-dev-infra
 
+manifests:
+  rawYaml:
+    - infra/auto/redis/config.yaml
+    - infra/auto/redis/service.yaml
+    - infra/auto/redis/redis.yaml
+
+deploy:
+  kubectl: {}
+
 requires:
-  - configs: ["torq-log-ingestor"]
+  - configs: [ "torq-log-ingestor" ]
     path: ./apps/log-ingestor
-  - configs: ["torq-operator"]
+  - configs: [ "torq-operator" ]
     path: ./apps/operator
