@@ -25,6 +25,7 @@ import { LogForwarder } from '@/infrastructure/k8s/deamonSet/logForwarder/ensure
 import { JobService } from '@/infrastructure/service/job.service';
 import { JobBuilderRouter } from '@/infrastructure/k8s/jobs/jobBuilderRouter';
 import { V1AlphaJobBuilder } from '@/infrastructure/k8s/jobs/handlers/v1Alpha.handler';
+import { RedisPublisher } from '@/infrastructure/messageBroker/redisMessageBroker';
 import { WorkflowRunRepository } from '@/infrastructure/repository/k8s/workflowRun.repository';
 
 const singleton = { lifecycle: Lifecycle.Singleton };
@@ -46,10 +47,10 @@ container.register(TOKENS.V1AlphaJobBuilder, { useClass: V1AlphaJobBuilder }, si
 container.register(TOKENS.JobBuilderVersionRouter, { useClass: JobBuilderRouter }, singleton);
 
 // repos
+container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, singleton);
 container.register(TOKENS.JobRepository, { useClass: JobRepository }, singleton);
 container.register(TOKENS.WorkflowRunStatusRepository, { useClass: WorkflowRunStatusRepository }, singleton);
 container.register(TOKENS.SpecRepository, { useClass: SpecRepository }, singleton);
-
 
 // services
 container.register(TOKENS.WorkflowRunDispatcherService, { useClass: WorkflowRunDispatcherService }, singleton);
@@ -60,12 +61,14 @@ container.register(TOKENS.SpecCache, { useClass: SpecCacheService }, singleton);
 // clients
 container.register(TOKENS.GRPCClient, { useClass: GrpcClient }, singleton);
 container.register(TOKENS.RedisClient, { useClass: RedisClient }, singleton);
+container.register(TOKENS.RedisPublisher, { useClass: RedisPublisher }, singleton);
 
+// reconciliation 
 container.register(TOKENS.V1AlphaReconciliationHandler, { useClass: V1AlphaReconciliationHandler }, singleton);
 container.register(TOKENS.ReconcilerVersionRouter, { useClass: ReconcilerVersionRouter }, singleton);
 container.register(TOKENS.Reconciler, { useClass: Reconciler }, singleton);
 
+// use-cases
 container.register(TOKENS.TriggerRunUseCase, { useClass: TriggerRunUseCase }, singleton);
-container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, singleton);
 
 export { container };

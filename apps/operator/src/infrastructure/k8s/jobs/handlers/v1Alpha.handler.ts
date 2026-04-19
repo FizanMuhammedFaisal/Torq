@@ -57,10 +57,11 @@ export class V1AlphaJobBuilder implements IJobBuilder {
     private labels(job: TorqJob): Record<string, string> {
         return {
             'app.kubernetes.io/managed-by': 'torq',
-            'torq/workflow-run-id':   job.workflowRunId,
+            'torq/workflow-run-id': job.workflowRunId,
             'torq/workflow-run-name': job.workflowRunName,
-            'torq/job-id':           job.id,
-            'collect-logs':          'true',
+            'torq/job-id': job.id,
+            'torq/version': job.torqVersion,
+            'collect-logs': 'true',
         };
         // job watcher filters on managed-by=torq
         // torq/workflow-run-name is the CRD name — used by JobWatcher to patch step status

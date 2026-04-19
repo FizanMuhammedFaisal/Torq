@@ -30,4 +30,11 @@ export class JobRepository implements IJobRepository {
 			throw err;
 		}
 	}
+	async listByRun(workflowRunId: string, namespace: string): Promise<V1Job[]> {
+		const result = await batchClient.listNamespacedJob({
+			namespace,
+			labelSelector: `torq/workflow-run-id=${workflowRunId}`,
+		});
+		return result.items ?? [];
+	}
 }

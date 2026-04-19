@@ -31,6 +31,10 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 					'torq.dev/workflow': run.workflowId,
 					'torq.dev/version': run.versionId,
 				},
+				// Finalizer keeps the CRD alive until CleanUpService removes it.
+				// K8s sets deletionTimestamp instead of immediately deleting,
+				// which triggers MODIFIED event → Reconciler → CleanUpService → removeFinalizer.
+				finalizers: ['torq.dev/cleanup'],
 			},
 			spec: {
 				workflowId: run.workflowId,

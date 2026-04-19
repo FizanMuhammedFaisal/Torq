@@ -5,27 +5,24 @@ import { Envconfig } from '@/config/envconfig';
 import { logger } from '@/infrastructure/logger/logger';
 import { BaseWatcher } from './baseWatcher';
 import { TOKENS } from '@/config/di/tokens';
-import type { IWorkflowRunStatusRepository } from '@/application/port/repository/workflowRunStatus.interface';
-import type { StepState } from '@/domain/entities/workflowRunSnapshot';
+import type { IReconcilerVersionRouter } from '@/application/port/reconciler/versionRouter.interface';
 
 /**
  * Loop 2 === watches K8s Jobs created by the operator (label managed-by=torq)
  *
- * When a job transitions to Complete or Failed, this watcher patches the
- * corresponding step in the WorkflowRun CRD's status subresource.
- * That patch fires a new CRD MODIFIED event → CRDWatcher → Reconciler re-runs,
- * which then schedules the next wave of jobs (or marks the run terminal).
- *
- * JobWatcher intentionally does NOT call the reconciler directly — the CRD
- * status is the single source of truth and the event is the trigger.
+ * When a job transitions to Complete or Failed, this watcher:
+ *  1. reads the torq/version label to route to the correct version handler
+ *  2. calls handler.onJobComplete() which:
+ *       - patches the step status on the CRD
+ *       - calls reconcile(freshRun) directly to schedule the next wave
  */
 @injectable()
 export class JobWatcher extends BaseWatcher {
 	private readonly watch = new k8s.Watch(kubeConfig);
 
 	constructor(
-		@inject(TOKENS.WorkflowRunStatusRepository)
-		private statusRepo: IWorkflowRunStatusRepository,
+		@inject(TOKENS.ReconcilerVersionRouter)
+		private versionRouter: IReconcilerVersionRouter,
 	) {
 		super();
 	}
@@ -35,6 +32,7 @@ export class JobWatcher extends BaseWatcher {
 		const path = `/apis/batch/v1/namespaces/${namespace}/jobs`;
 
 		logger.info({ path }, '[job-watcher] starting watch');
+		this.markWatchStarted();
 
 		this.watch.watch(
 			path,
@@ -48,57 +46,70 @@ export class JobWatcher extends BaseWatcher {
 	}
 
 	private async handler(phase: string, job: k8s.V1Job): Promise<void> {
-		// Track cursor for reconnect resume
 		if (job.metadata?.resourceVersion) {
 			this.lastResourceVersion = job.metadata.resourceVersion;
 		}
 
-		// Only care about state changes — ADDED fires when the Job is first created
-		// (still running at that point), DELETED is after TTL cleanup
+		// Only care about state changes
 		if (phase !== 'MODIFIED') return;
 
-		const conditions = job.status?.conditions ?? [];
-		const isComplete = conditions.some((c) => c.type === 'Complete' && c.status === 'True');
-		const isFailed = conditions.some((c) => c.type === 'Failed' && c.status === 'True');
+		// Terminal detection via status counters
+		// K8s updates these atomically; conditions can lag in some edge cases.
+		const active = job.status?.active ?? 0;
+		const succeeded = job.status?.succeeded ?? 0;
+		const failed = job.status?.failed ?? 0;
 
-		// Job is still in progress — ignore this event
-		if (!isComplete && !isFailed) return;
+		// Job is still running
+		if (active > 0) return;
 
-		const workflowRunName = job.metadata?.labels?.['torq/workflow-run-name'];
-		const stepName = job.metadata?.labels?.['torq/job-id'];
+		// Not started yet or no meaningful change
+		if (succeeded === 0 && failed === 0) return;
+
+		const isSucceeded = succeeded > 0;
+
+		// Extract routing labels
+		const labels = job.metadata?.labels ?? {};
+		const workflowRunName = labels['torq/workflow-run-name'];
+		const stepName = labels['torq/job-id'];
+		const torqVersion = labels['torq/version'];
 		const namespace = job.metadata?.namespace ?? Envconfig.k8s.namespace;
 		const jobName = job.metadata?.name;
 
-		if (!workflowRunName || !stepName) {
+		if (!workflowRunName || !stepName || !torqVersion) {
 			logger.warn(
-				{ jobName },
-				'[job-watcher] Job completed but is missing torq labels — cannot update WorkflowRun status',
+				{ jobName, labels },
+				'[job-watcher] Job terminal but missing torq labels — cannot update WorkflowRun',
 			);
 			return;
 		}
 
-		const stepState: StepState = {
-			status: isComplete ? 'Succeeded' : 'Failed',
-			completedAt: new Date().toISOString(),
-			attempt: 1, // JobWatcher doesn't track retries — handler sets attempt on creation
-		};
+		const handler = this.versionRouter.resolve(torqVersion);
+		if (!handler) {
+			logger.error(
+				{ jobName, torqVersion },
+				'[job-watcher] No handler found for torqVersion — skipping',
+			);
+			return;
+		}
+
+		logger.info(
+			{ jobName, workflowRunName, stepName, isSucceeded },
+			'[job-watcher] Job terminal, invoking handler.onJobComplete',
+		);
 
 		try {
-			await this.statusRepo.patchStepStatus({
+			await handler.onJobComplete({
 				name: workflowRunName,
 				namespace,
 				stepName,
-				stepState,
+				succeeded: isSucceeded,
 			});
-			logger.info(
-				{ workflowRunName, stepName, status: stepState.status },
-				'[job-watcher] Step status patched — reconciler will pick up the next wave',
-			);
 		} catch (err) {
-			// Non-fatal: the next job MODIFIED event (or a re-list) will retry
+			// Non-fatal: the CRD MODIFIED event triggered by the status patch will
+			// drive a reconcile pass as a safety net.
 			logger.error(
 				{ err, workflowRunName, stepName },
-				'[job-watcher] Failed to patch step status',
+				'[job-watcher] handler.onJobComplete threw — will retry via CRD watch event',
 			);
 		}
 	}

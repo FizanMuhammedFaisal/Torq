@@ -29,6 +29,7 @@ export class CRDWatcher extends BaseWatcher {
 			'[crd-watcher] starting watch': { path, resourceVersion: this.lastResourceVersion },
 		});
 		logger.info(`[crd-watcher] watching path: ${path} with resourceVersion: ${this.lastResourceVersion}`);
+		this.markWatchStarted();
 		this.watch.watch(
 			path,
 			this.lastResourceVersion ? { resourceVersion: this.lastResourceVersion } : {},
@@ -43,21 +44,25 @@ export class CRDWatcher extends BaseWatcher {
 	 * accordance with how we need to move currect status to given spec
 	 */
 	private async handler(phase: string, apiObj: unknown, _watchObj?: unknown) {
-		logger.trace("HEY");
 		if (!this.isWorkflowRunK8s(apiObj)) {
-			logger.warn({
-				'[crd - watcher] received unexpected object shape': apiObj,
-			});
+			logger.warn({ '[crd-watcher] received unexpected object shape': apiObj });
 			return;
 		}
 		if (apiObj.metadata?.resourceVersion) {
 			this.lastResourceVersion = apiObj.metadata.resourceVersion;
 		}
+		if (phase === 'DELETED') {
+			// Finalizer was removed by CleanUpService — K8s is now completing deletion.
+			logger.debug(
+				{ runName: apiObj.metadata?.name },
+				'[crd-watcher] DELETED phase — CRD fully removed, finalizer already cleared',
+			);
+			return;
+		}
 		if (phase !== 'ADDED' && phase !== 'MODIFIED') return;
 		try {
-
 			const run = toDomainWorkflowRun(apiObj);
-			console.log(run)
+			logger.trace({ runName: run.metadata.name, phase }, '[crd-watcher] dispatching to reconciler');
 			await this.reconciler.reconcile(run);
 		} catch (err) {
 			logger.error({ '[crd-watcher] reconcile error': err });

@@ -1,7 +1,7 @@
-import { DatabaseInternalError } from '@infrastructure/errors/databaseInternalError';
+import { DatabaseInternalError } from '@/infrastructure/errors/DatabaseError';
 import { ConflictError } from '@domain/errors/conflictError';
 import type { DomainError } from '@domain/errors/domainError.abstract';
-import type { InfraError } from '@infrastructure/errors/infraError.abstract';
+import type { InfraError } from '@infrastructure/errors/infrastructure.error';
 
 export class PostgresErrorMapper {
 	static mapError(error: unknown, context: { entity: string }): DomainError | InfraError {

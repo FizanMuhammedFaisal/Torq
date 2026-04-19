@@ -28,6 +28,12 @@ spec:
   selector:
     app: torq-operator
   ports:
-    - port: 4001
+    - name: http
+      port: 4001
       targetPort: 4001
+    - name: grpc
+      port: 50051
+      targetPort: 50051
   type: ClusterIP
+
+

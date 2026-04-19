@@ -37,4 +37,5 @@ export const TOKENS = {
 	V1AlphaJobBuilder: Symbol('V1AlphaJobBuilder'),
 	// infra
 	LogForwarderManager: Symbol('LogForwarderManager'),
+	RedisPublisher: Symbol('RedisPublisher'),
 } as const;

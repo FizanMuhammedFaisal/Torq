@@ -1,9 +1,11 @@
 import type { IReconciliationHandler } from '@/application/port/reconciler/reconciliationHandler.interface';
 import type { ISpecRepository } from '@/application/port/repository/spec.interface';
+import type { IWorkflowRunRepository } from '@/application/port/repository/workflowRun.interface';
 import type { IJobService } from '@/application/port/services/jobService.interface';
 import type { IWorkflowRunStatusRepository } from '@/application/port/repository/workflowRunStatus.interface';
 import type { WorkflowSpec } from '@/domain/entities/workflowSpec';
 import type { WorkflowRunSnapshot, RunPhase, StepState } from '@/domain/entities/workflowRunSnapshot';
+import type { IPublisher } from '@/infrastructure/messageBroker/redisMessageBroker';
 import { V1AlphaTorqJob } from '@/domain/entities/job/v1alpha.job';
 import { TOKENS } from '@/config/di/tokens';
 import { logger } from '@/infrastructure/logger/logger';
@@ -32,10 +34,52 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 		@inject(TOKENS.SpecRepository) private specRepository: ISpecRepository,
 		@inject(TOKENS.JobService) private jobService: IJobService,
 		@inject(TOKENS.WorkflowRunStatusRepository) private statusRepository: IWorkflowRunStatusRepository,
+		@inject(TOKENS.WorkflowRunRepository) private runRepository: IWorkflowRunRepository,
+		@inject(TOKENS.RedisPublisher) private publisher: IPublisher,
 	) { }
 
+	// Called by JobWatcher when a managed K8s Job reaches a terminal state.
+	async onJobComplete(params: {
+		name: string;
+		namespace: string;
+		stepName: string;
+		succeeded: boolean;
+	}): Promise<void> {
+		const { name, namespace, stepName, succeeded } = params;
+
+		// Patch the step status on the CRD
+		const stepState: StepState = {
+			status: succeeded ? 'Succeeded' : 'Failed',
+			completedAt: new Date().toISOString(),
+			attempt: 1,
+		};
+		try {
+			await this.statusRepository.patchStepStatus({ name, namespace, stepName, stepState });
+		} catch (err) {
+			// Don't short-circuit — still attempt reconcile so the DAG doesn't stall.
+			// The CRD watch event will also fire a reconcile as a safety net.
+			logger.error({ err, name, stepName }, '[v1alpha] Failed to patch step status in onJobComplete');
+		}
+
+		await this.publisher.publish(name, { stepName, status: stepState.status });
+
+		// Re-fetch the fresh WorkflowRun
+		// The CRD now has the updated step status from Step 1.
+		let freshRun: WorkflowRunSnapshot;
+		try {
+			freshRun = await this.runRepository.get(name, namespace);
+		} catch (err) {
+			logger.error({ err, name }, '[v1alpha] Failed to re-fetch WorkflowRun after job completion');
+			return; // The CRD watch event will retry
+		}
+
+		// continue the reconcilation
+		logger.info({ name, stepName, succeeded }, '[v1alpha] Job complete, driving DAG forward');
+		await this.reconcile(freshRun);
+	}
+
 	async reconcile(run: WorkflowRunSnapshot): Promise<void> {
-		// if Run is already in a terminal phase — nothing to do ────────────
+		// if Run is already in a terminal phase then  nothing to do here
 		const phase = run.status?.phase;
 		if (phase === 'Succeeded' || phase === 'Failed' || phase === 'Cancelled') {
 			logger.debug(
@@ -45,9 +89,9 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			return;
 		}
 
-		// ── Guard 2: Fetch workflow spec ────────────────────────────────────────────
+		// Fetch workflow spec
 		// A cache miss / gRPC error is transient — return without marking failed.
-		// The next CRD MODIFIED event (from the jobwatcher or a re-list) will retry.
+		// The next CRD MODIFIED event (from the jobwatcher or a re-list) will retry
 		const spec = await this.specRepository.getSpec(run.spec.workflowId, run.spec.versionId);
 		if (!spec) {
 			logger.warn(
@@ -57,9 +101,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			return;
 		}
 
-		// ── Guard 3: Cast spec to typed shape ───────────────────────────────────────
-		// The API server DSL pipeline validates the spec at write time; this is a
-		// defensive cast in case of schema drift or data corruption.
+		// The API server DSL pipeline validates the spec at write time
 		let workflowSpec: WorkflowV1Alpha;
 		try {
 			workflowSpec = this.castSpec(spec.spec);
@@ -69,9 +111,8 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			return;
 		}
 
-		// ── Guard 4: Topological sort ───────────────────────────────────────────────
-		// Cycles / unknown deps were caught by the API server semantic validator.
-		// We still guard defensively (e.g. data corruption, future version skew).
+		//  Topological sort
+		// Cycles / unknown deps were caught by the API server semantic validator, still retry hrer
 		let waves: string[][];
 		try {
 			waves = this.topoSort(workflowSpec.jobs);
@@ -81,10 +122,10 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			return;
 		}
 
-		// ── Build mutable step state map from what the CRD already knows ───────────
+
 		const stepStates: Record<string, StepState> = { ...(run.status?.steps ?? {}) };
 
-		// ── Main scheduling loop (wave-by-wave, jobs within a wave run in parallel) ─
+		// Main scheduling loop (wave-by-wave, jobs within a wave run in parallel)
 		let anyActive = false; // true if any job is Scheduled or Running
 		let anyFailed = false; // true if any job has Failed this pass
 
@@ -115,7 +156,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 				);
 				if (!needsMet) continue;
 
-				// ── Schedule the K8s Job ──────────────────────────────────────────
+				//  Schedule the K8s Job 
 				const torqJob = this.buildTorqJob(run, jobName, job, spec);
 				try {
 					const { created } = await this.jobService.createJob(torqJob);
@@ -144,7 +185,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			}
 		}
 
-		// ── Compute the new overall run phase ───────────────────────────────────────
+		//  Compute the new overall run phase 
 		const allJobNames = Object.keys(workflowSpec.jobs);
 		const allSucceeded = allJobNames.every((n) => stepStates[n]?.status === 'Succeeded');
 		const allTerminal = allJobNames.every((n) =>
@@ -165,7 +206,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			completedAt = new Date().toISOString();
 		}
 
-		// ── Patch the CRD status subresource ────────────────────────────────────────
+		// Patch the CRD status subresource 
 		// Failures here are non-fatal — the next watcher event will re-run reconcile.
 		try {
 			await this.statusRepository.patchStatus({
@@ -179,7 +220,6 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 				observedGeneration: run.metadata.generation,
 			});
 		} catch (err) {
-			// Log and swallow — the watcher will retry on the next event
 			logger.error(
 				{ err, name: run.metadata.name },
 				'[v1alpha] Failed to patch WorkflowRun status — will retry on next event',
@@ -197,62 +237,6 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 		return raw as unknown as WorkflowV1Alpha;
 	}
 
-	/**
-	 * Kahn's BFS topological sort.
-	 * Returns job names grouped into execution waves:
-	 *   Wave 0 — no dependencies (run immediately)
-	 *   Wave N — all dependencies satisfied by waves 0..N-1
-	 *
-	 * Edge cases:
-	 *   - Unknown dep name  → throws (defensive; API server catches this at write time)
-	 *   - Self-dep          → caught by cycle detection below
-	 *   - Cycle             → throws (defensive; API server catches this at write time)
-	 *   - Empty jobs map    → returns [] (caller treats as immediately Succeeded)
-	 */
-	private topoSort(jobs: Record<string, Job>): string[][] {
-		const names = Object.keys(jobs);
-		if (names.length === 0) return [];
-
-		const inDegree: Record<string, number> = {};
-		const adj: Record<string, string[]> = {};
-		for (const name of names) {
-			inDegree[name] = 0;
-			adj[name] = [];
-		}
-
-		for (const [name, job] of Object.entries(jobs)) {
-			for (const dep of job.needs ?? []) {
-				if (!(dep in adj)) {
-					throw new Error(`Job "${name}" depends on unknown job "${dep}"`);
-				}
-				adj[dep].push(name);
-				inDegree[name]++;
-			}
-		}
-
-		let queue = names.filter((n) => inDegree[n] === 0);
-		const waves: string[][] = [];
-
-		while (queue.length > 0) {
-			waves.push([...queue]);
-			const nextQueue: string[] = [];
-			for (const node of queue) {
-				for (const neighbor of adj[node]) {
-					if (--inDegree[neighbor] === 0) nextQueue.push(neighbor);
-				}
-			}
-			queue = nextQueue;
-		}
-
-		// If not all nodes were processed, a cycle exists
-		const processed = waves.reduce((sum, w) => sum + w.length, 0);
-		if (processed < names.length) {
-			const cycleNodes = names.filter((n) => inDegree[n] > 0);
-			throw new Error(`Cyclic dependency detected involving: ${cycleNodes.join(', ')}`);
-		}
-
-		return waves;
-	}
 
 	/**
 	 * Build a TorqJob domain entity from the DSL job definition.
@@ -297,7 +281,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 		);
 	}
 
-	/** Patches the run to Failed with a human-readable reason. */
+
 	private async failRun(run: WorkflowRunSnapshot, reason: string): Promise<void> {
 		try {
 			await this.statusRepository.patchStatus({
@@ -312,5 +296,61 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 		} catch (err) {
 			logger.error({ err, name: run.metadata.name, reason }, '[v1alpha] Could not patch run to Failed');
 		}
+	}
+	/**
+	 * Kahn's BFS topological sort.
+	 * Returns job names grouped into execution waves:
+	 *   Wave 0 — no dependencies (run immediately)
+	 *   Wave N — all dependencies satisfied by waves 0..N-1
+	 *
+	 * Edge cases:
+	 *   - Unknown dep name  → throws (defensive; API server catches this at write time)
+	 *   - Self-dep          → caught by cycle detection below
+	 *   - Cycle             → throws (defensive; API server catches this at write time)
+	 *   - Empty jobs map    → returns [] (caller treats as immediately Succeeded)
+	 */
+	private topoSort(jobs: Record<string, Job>): string[][] {
+		const names = Object.keys(jobs);
+		if (names.length === 0) return [];
+
+		const inDegree: Record<string, number> = {};
+		const adj: Record<string, string[]> = {};
+		for (const name of names) {
+			inDegree[name] = 0;
+			adj[name] = [];
+		}
+
+		for (const [name, job] of Object.entries(jobs)) {
+			for (const dep of job.needs ?? []) {
+				if (!(dep in adj)) {
+					throw new Error(`Job "${name}" depends on unknown job "${dep}"`);
+				}
+				adj[dep].push(name);
+				inDegree[name]++;
+			}
+		}
+
+		let queue = names.filter((n) => inDegree[n] === 0);
+		const waves: string[][] = [];
+
+		while (queue.length > 0) {
+			waves.push([...queue]);
+			const next: string[] = [];
+			for (const node of queue) {
+				for (const neighbor of adj[node]) {
+					if (--inDegree[neighbor] === 0) next.push(neighbor);
+				}
+			}
+			queue = next;
+		}
+
+		// If not all nodes were processed, a cycle exists
+		const processed = waves.reduce((sum, w) => sum + w.length, 0);
+		if (processed < names.length) {
+			const cycleNodes = names.filter((n) => inDegree[n] > 0);
+			throw new Error(`Cyclic dependency detected involving: ${cycleNodes.join(', ')}`);
+		}
+
+		return waves;
 	}
 }

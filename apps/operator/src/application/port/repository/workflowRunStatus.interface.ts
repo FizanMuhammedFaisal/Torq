@@ -2,9 +2,9 @@ import type { RunPhase, StepState } from '@/domain/entities/workflowRunSnapshot'
 
 export interface IWorkflowRunStatusRepository {
 	/**
-	 * Patch the full status subresource of a WorkflowRun CRD.
-	 * Called by V1AlphaReconciliationHandler after each scheduling pass.
-	 */
+	 * Patch the full status subresource of a WorkflowRun CRD
+	 * 
+	 * 	 */
 	patchStatus(params: {
 		name: string;
 		namespace: string;
@@ -17,9 +17,12 @@ export interface IWorkflowRunStatusRepository {
 	}): Promise<void>;
 
 	/**
-	 * Patch a single step inside status.steps via read-modify-write.
+	 * patch a single step inside status.steps
+	 * 
+	 * 
+	 * Patch a single step inside status.steps via read-modify-write
 	 * Called by JobWatcher when a K8s Job transitions to Complete or Failed.
-	 * Triggers a CRD MODIFIED event → CRDWatcher → Reconciler re-runs.
+	 * Triggers a CRD MODIFIED event
 	 */
 	patchStepStatus(params: {
 		name: string;
