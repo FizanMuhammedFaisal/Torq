@@ -1,6 +1,7 @@
 
 export type WorkflowStatus =
 	| 'IDLE'
+	| 'PENDING'
 	| 'QUEUED'
 	| 'RUNNING'
 	| 'SUCCESS'

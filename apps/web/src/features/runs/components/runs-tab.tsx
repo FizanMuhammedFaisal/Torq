@@ -5,7 +5,7 @@ import { useRuns } from '@/features/runs/hooks/use-runs';
 
 interface Step {
 	name: string;
-	status: 'success' | 'failed' | 'idle' | 'running';
+	status: 'SUCCESS' | 'FAILED' | 'IDLE' | 'RUNNING' | 'PENDING';
 	duration: string;
 }
 
@@ -45,15 +45,15 @@ export function RunsTab({ workflowId }: { workflowId: string }) {
 		);
 	}
 
-	const selectedRunStatus = selectedRun?.status ?? 'idle';
-	const rcStatus = statusMap[selectedRunStatus] || statusMap.idle;
+	const selectedRunStatus = selectedRun?.status ?? 'IDLE';
+	const rcStatus = statusMap[selectedRunStatus] || statusMap.IDLE;
 
 	return (
 		<div className="flex flex-col lg:flex-row gap-6 h-[max(75vh,600px)]">
 			{/* Left Sidebar - Run List */}
 			<div className="w-full lg:w-[320px] flex flex-col gap-3 overflow-y-auto pr-3 pb-8 custom-scrollbar">
 				{workflowRuns.map((run) => {
-					const rc = statusMap[run.status] || statusMap.idle;
+					const rc = statusMap[run.status] || statusMap.IDLE;
 					const isSelected = selectedRun && run.id === selectedRun.id;
 
 					return (
@@ -72,7 +72,7 @@ export function RunsTab({ workflowId }: { workflowId: string }) {
 							<div className="flex items-start justify-between mb-3">
 								<div className="flex items-center gap-2">
 									<span
-										className={`size-[6px] rounded-full ${run.status === 'running' ? 'animate-pulse' : ''}`}
+										className={`size-[6px] rounded-full ${run.status === 'RUNNING' ? 'animate-pulse' : ''}`}
 										style={{ background: rc.color }}
 									/>
 									<span className={`text-[14.5px] font-semibold ${isSelected ? 'text-white' : 'text-white/80 group-hover:text-white'}`}>
@@ -132,18 +132,18 @@ export function RunsTab({ workflowId }: { workflowId: string }) {
 					) : (
 						// Temporary mock steps as backend doesn't provide them yet
 						([
-							{ name: 'initialize', status: 'success', duration: '124ms' },
+							{ name: 'initialize', status: 'SUCCESS', duration: '124ms' },
 							{ 
 								name: 'execute-dsl', 
-								status: selectedRun.status === 'failed' ? 'failed' : (selectedRun.status === 'running' ? 'running' : 'success'), 
-								duration: selectedRun.status === 'running' ? '—' : '2.4s' 
+								status: selectedRun.status === 'FAILED' ? 'FAILED' : (selectedRun.status === 'RUNNING' ? 'RUNNING' : 'SUCCESS'), 
+								duration: selectedRun.status === 'RUNNING' ? '—' : '2.4s' 
 							},
-							{ name: 'finalize', status: 'idle', duration: '—' }
+							{ name: 'finalize', status: 'IDLE', duration: '—' }
 						] as Step[]).map((step) => {
 							const isExpanded = expandedSteps[step.name];
-							const isSuccess = step.status === 'success';
-							const isFailed = step.status === 'failed';
-							const isRunning = step.status === 'running';
+							const isSuccess = step.status === 'SUCCESS';
+							const isFailed = step.status === 'FAILED';
+							const isRunning = step.status === 'RUNNING';
 
 							return (
 								<div key={step.name} className="mb-3 rounded-2xl border border-white/5 bg-neutral-900/50 overflow-hidden">

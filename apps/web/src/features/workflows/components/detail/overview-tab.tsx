@@ -115,8 +115,8 @@ export function OverviewTab({
 				/>
 				<MetricCard
 					label="Status"
-					value={runs[0]?.status || 'idle'}
-					accent={(runs[0]?.status === 'success' ? 'emerald' : runs[0]?.status === 'failed' ? 'red' : 'blue') as any}
+					value={runs[0]?.status || 'IDLE'}
+					accent={(runs[0]?.status === 'SUCCESS' ? 'emerald' : runs[0]?.status === 'FAILED' ? 'red' : 'blue') as any}
 					delay={0.2}
 				/>
 			</div>
@@ -166,8 +166,8 @@ export function OverviewTab({
 
 					<div className="space-y-3">
 						{runs.slice(0, 4).map((run, i) => {
-							const rc = statusMap[run.status];
-							const isSuccess = run.status === 'success';
+							const rc = statusMap[run.status] || statusMap.IDLE;
+							const isSuccess = run.status === 'SUCCESS';
 							return (
 								<motion.div
 									initial={{ opacity: 0, x: -10 }}

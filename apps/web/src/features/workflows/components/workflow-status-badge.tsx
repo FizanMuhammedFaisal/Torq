@@ -8,8 +8,8 @@ interface WorkflowStatusBadgeProps {
 }
 
 export function WorkflowStatusBadge({ status, className }: WorkflowStatusBadgeProps) {
-	const cfg = status ? (statusConfig[status] || statusConfig.idle) : statusConfig.idle;
-    const isRunning = status === 'running';
+	const cfg = status ? (statusConfig[status] || statusConfig.IDLE) : statusConfig.IDLE;
+    const isRunning = status === 'RUNNING';
 
 	return (
 		<div

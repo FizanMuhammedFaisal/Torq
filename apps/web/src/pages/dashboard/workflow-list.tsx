@@ -72,8 +72,8 @@ export function WorkflowListPage() {
 	const metrics = useMemo(() => {
 		return {
 			total: data?.meta.totalItems ?? workflows.length,
-			running: workflows.filter((w) => w.lastRun?.status === 'running').length,
-			failed: workflows.filter((w) => w.lastRun?.status === 'failed').length,
+			running: workflows.filter((w) => w.lastRun?.status === 'RUNNING').length,
+			failed: workflows.filter((w) => w.lastRun?.status === 'FAILED').length,
 		};
 	}, [workflows, data?.meta.totalItems]);
 
@@ -99,7 +99,7 @@ export function WorkflowListPage() {
 				cell: ({ row }) => {
 					const wf = row.original;
 					const status = wf.lastRun?.status ?? 'IDLE';
-					const cfg = statusConfig[status];
+					const cfg = statusConfig[status] || statusConfig.IDLE;
 					return (
 						<div className="flex items-center gap-4 min-w-0 pr-4">
 							<div className="relative flex items-center justify-center size-2.5 shrink-0 mt-0.5">

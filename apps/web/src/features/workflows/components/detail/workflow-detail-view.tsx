@@ -29,7 +29,7 @@ export function WorkflowDetailView() {
 	const { data: workflow, isLoading, error } = useWorkflow(id);
 	const { runs } = useRuns();
 
-	const cfg = workflow ? (statusMap[workflow.status as keyof typeof statusMap] || statusMap.idle) : statusMap.idle;
+	const cfg = workflow ? (statusMap[workflow.status as keyof typeof statusMap] || statusMap.IDLE) : statusMap.IDLE;
 
 	if (!id) {
 		return (
@@ -110,7 +110,7 @@ export function WorkflowDetailView() {
 								<h1 className="text-2xl font-bold tracking-tight text-white">{workflow.name}</h1>
 								<div className="flex items-center gap-1.5 rounded-full border border-white/6 px-2.5 py-1">
 									<span
-										className={`size-[6px] rounded-full ${workflow.status === 'running' ? 'animate-pulse' : ''}`}
+										className={`size-[6px] rounded-full ${workflow.status === 'RUNNING' ? 'animate-pulse' : ''}`}
 										style={{ background: cfg.color }}
 									/>
 									<span className="text-[11px] font-medium" style={{ color: cfg.color }}>

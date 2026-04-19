@@ -8,7 +8,7 @@ import { useRuns } from '@/features/runs/hooks/use-runs';
 
 export function MetricsTab({ workflowId }: { workflowId: string }) {
 	const { runs } = useRuns();
-	const successRate = runs.length > 0 ? Math.round((runs.filter(r => r.status === 'success').length / runs.length) * 100) : 0;
+	const successRate = runs.length > 0 ? Math.round((runs.filter(r => r.status === 'SUCCESS').length / runs.length) * 100) : 0;
 	const totalRuns = runs.length;
 
 	// Generate mock historical run data for the histogram
@@ -22,7 +22,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 					: Math.random() * 45 + 10;
 				return {
 					id: `hist-${i}`,
-					status: isSuccess ? 'success' : 'failed',
+					status: isSuccess ? 'SUCCESS' : 'FAILED',
 					durationSec,
 					label: `Run #${128 - i}`,
 				};
@@ -86,7 +86,7 @@ export function MetricsTab({ workflowId }: { workflowId: string }) {
 					<div className="flex-1 flex items-end justify-between gap-1.5 sm:gap-2 h-[180px] w-full pt-4 border-b border-white/5 pb-2">
 						{history.map((run, i) => {
 							const heightPct = Math.max((run.durationSec / maxDuration) * 100, 4); // min 4% height
-							const isSuccess = run.status === 'success';
+							const isSuccess = run.status === 'SUCCESS';
 							return (
 								<div
 									key={run.id}

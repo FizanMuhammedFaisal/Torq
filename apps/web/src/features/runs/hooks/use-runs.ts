@@ -24,7 +24,7 @@ async function fetchRuns(): Promise<Run[]> {
 		id: r.id,
 		workflowId: r.workflowId,
 		workflowName: r.workflowName || 'Unknown Workflow',
-		status: (r.status as WorkflowStatus) || 'idle',
+		status: (r.status as WorkflowStatus) || 'IDLE',
 		trigger: r.trigger || 'unknown',
 		date: formatRelativeTime(r.startedAt),
 		duration: formatDuration(r.durationMs),
@@ -56,8 +56,8 @@ export function useRuns() {
 	const metrics = useMemo(() => {
 		return {
 			total: runs.length,
-			active: runs.filter((r) => r.status === 'running' || r.status === 'queued').length,
-			failed24h: runs.filter((r) => r.status === 'failed').length,
+			active: runs.filter((r) => r.status === 'RUNNING' || r.status === 'QUEUED').length,
+			failed24h: runs.filter((r) => r.status === 'FAILED').length,
 		};
 	}, [runs]);
 

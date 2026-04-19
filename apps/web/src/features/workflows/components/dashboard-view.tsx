@@ -18,8 +18,8 @@ export function DashboardView() {
 	const metrics = useMemo(() => {
 		return {
 			total: workflows.length,
-			running: workflows.filter((w) => w.lastRun?.status === 'running').length,
-			failed: workflows.filter((w) => w.lastRun?.status === 'failed').length,
+			running: workflows.filter((w) => w.lastRun?.status === 'RUNNING').length,
+			failed: workflows.filter((w) => w.lastRun?.status === 'FAILED').length,
 		};
 	}, [workflows]);
 

@@ -9,6 +9,11 @@ export const statusConfig: Record<
 		color: 'rgba(161,161,170,1)',
 		bg: 'rgba(161,161,170,0.1)',
 	},
+	PENDING: {
+		label: 'Pending',
+		color: 'rgba(234,179,8,1)',
+		bg: 'rgba(234,179,8,0.1)',
+	},
 	QUEUED: {
 		label: 'Queued',
 		color: 'rgba(234,179,8,1)',

@@ -28,7 +28,6 @@ import { statusConfig } from '@/features/workflows/config';
 import { type Run, useRuns } from '@/features/runs/hooks/use-runs';
 import { useAppConfig } from '@/lib/app-config';
 
-/* ── View ─── */
 
 export function RunsView() {
 	const navigate = useNavigate();
@@ -56,11 +55,11 @@ export function RunsView() {
 				header: 'Run',
 				cell: ({ row }) => {
 					const run = row.original;
-					const cfg = statusConfig[run.status];
+					const cfg = statusConfig[run.status] || statusConfig.IDLE;
 					return (
 						<div className="flex items-center gap-4 min-w-0 pr-4">
 							<div className="relative flex items-center justify-center size-2.5 shrink-0 mt-0.5">
-								{run.status === 'running' && (
+								{run.status === 'RUNNING' && (
 									<span
 										className="absolute size-[16px] rounded-full animate-ping opacity-30"
 										style={{ backgroundColor: cfg.color }}
@@ -322,26 +321,26 @@ export function RunsView() {
 										All Statuses
 									</DropdownMenuCheckboxItem>
 									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'running'}
-										onCheckedChange={() => setStatusFilter('running')}
+										checked={statusFilter === 'RUNNING'}
+										onCheckedChange={() => setStatusFilter('RUNNING')}
 									>
 										Running
 									</DropdownMenuCheckboxItem>
 									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'queued'}
-										onCheckedChange={() => setStatusFilter('queued')}
+										checked={statusFilter === 'QUEUED'}
+										onCheckedChange={() => setStatusFilter('QUEUED')}
 									>
 										Queued
 									</DropdownMenuCheckboxItem>
 									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'failed'}
-										onCheckedChange={() => setStatusFilter('failed')}
+										checked={statusFilter === 'FAILED'}
+										onCheckedChange={() => setStatusFilter('FAILED')}
 									>
 										Failed
 									</DropdownMenuCheckboxItem>
 									<DropdownMenuCheckboxItem
-										checked={statusFilter === 'success'}
-										onCheckedChange={() => setStatusFilter('success')}
+										checked={statusFilter === 'SUCCESS'}
+										onCheckedChange={() => setStatusFilter('SUCCESS')}
 									>
 										Passed
 									</DropdownMenuCheckboxItem>
