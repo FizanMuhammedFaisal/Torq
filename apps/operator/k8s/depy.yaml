@@ -17,7 +17,7 @@ spec:
         - name: torq-operator
           image: fizanmuhammedfaisal/torq-operator
           ports:
-            - containerPort: 3000
+            - containerPort: 4001
 
 ---
 apiVersion: v1
@@ -26,8 +26,8 @@ metadata:
   name: torq-operator-service
 spec:
   selector:
-    app: torq-operator-service
+    app: torq-operator
   ports:
-    - port: 3000
-      targetPort: 3000
+    - port: 4001
+      targetPort: 4001
   type: ClusterIP

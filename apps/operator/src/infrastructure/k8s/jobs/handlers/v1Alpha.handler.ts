@@ -57,11 +57,13 @@ export class V1AlphaJobBuilder implements IJobBuilder {
     private labels(job: TorqJob): Record<string, string> {
         return {
             'app.kubernetes.io/managed-by': 'torq',
-            'torq/workflow-run-id': job.workflowRunId,
-            'torq/job-id': job.id,
-            'collect-logs': "true"
+            'torq/workflow-run-id':   job.workflowRunId,
+            'torq/workflow-run-name': job.workflowRunName,
+            'torq/job-id':           job.id,
+            'collect-logs':          'true',
         };
-        // job watcher loop filters on managed-by=torq
+        // job watcher filters on managed-by=torq
+        // torq/workflow-run-name is the CRD name — used by JobWatcher to patch step status
     }
     // private buildLogSidecarContainer(job: TorqJob): V1Container {
     //     return {
@@ -121,6 +123,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
         return {
             name: `step-${step.index}`,
             image: job.image,
+            command: ['sh', '-c', step.run],
             volumeMounts: [
                 { name: 'workspace', mountPath: '/workspace' },
                 { name: 'logs', mountPath: '/var/log/torq' },
@@ -129,12 +132,9 @@ export class V1AlphaJobBuilder implements IJobBuilder {
                 requests: { cpu: '100m', memory: '256Mi' },
                 limits: { cpu: '500m', memory: '512Mi' },
             },
+            // All env vars (including secret values already merged in by the handler)
             env: [
                 ...Object.entries(job.envs).map(([name, value]) => ({ name, value })),
-                ...job.secrets.map((s) => ({
-                    name: s.name,
-                    value: s.envVar
-                })),
             ],
             workingDir: '/workspace',
         }

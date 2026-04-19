@@ -57,25 +57,43 @@ export class Server {
                             continue;
                         }
 
-                        const workflowRunId = log.kubernetes?.labels?.[Envconfig.ingetionConfig.WORKFLOW_RUN_LABEL];
-                        if (!workflowRunId) { dropped++; continue; }   // not a TORQ pod, ignore
+                        // Build a per-pod stream key.
+                        // FluentBit kubernetes filter uses snake_case field names.
+                        const podName = log.kubernetes?.pod_name;
+                        const namespace = log.kubernetes?.namespace_name;
 
-                        const queued = this.enqueue({ workflowRunId, log });
+                        if (!podName || !namespace) {
+                            // Not a pod log or missing metadata — skip
+                            dropped++;
+                            continue;
+                        }
+
+                        // Only ingest logs from pods managed by Torq
+                        const isTorqPod = log.kubernetes?.labels?.[Envconfig.ingetionConfig.WORKFLOW_RUN_LABEL];
+                        if (!isTorqPod) {
+                            dropped++;
+                            continue;
+                        }
+
+                        // Stream key: logs:pod:{namespace}:{podName}
+                        // Consumers (API server) read per-pod and fan-out by workflowRunId label
+                        const streamKey = `logs:pod:${namespace}:${podName}`;
+                        const queued = this.enqueue({ streamKey, log });
                         if (queued) { accepted++; } else { dropped++; }
                     }
 
-                    console.log(`[ingestor] POST /ingest — accepted: ${accepted} dropped: ${dropped} buffer: ${this.buffer.length}`);
+                    logger.info({ accepted, dropped, bufferSize: this.buffer.length }, '[ingestor] POST /ingest');
                     res.writeHead(200);
                     res.end('OK');
                 });
                 req.on('error', (err) => {
-                    console.error('[ingestor] request error:', err.message);
+                    logger.error({ err: err.message }, '[ingestor] request error');
                     res.writeHead(400);
                     res.end('bad request');
                 });
-
                 return;
             }
+
             res.writeHead(404);
             res.end('not found');
         })
@@ -91,34 +109,34 @@ export class Server {
         if (this.buffer.length >= this.batchSize) {
             // Cancel the timer — we're triggering an immediate flush
             if (this.flushTimer) { clearTimeout(this.flushTimer); this.flushTimer = null; }
-            this.flush().catch(err => console.error('[ingestor] flush error:', err));
+            this.flush().catch(err => logger.error({ err }, '[ingestor] flush error'));
         } else {
             this.scheduleFlush();
         }
         return true;
     }
-    // flushes if currenlty not flsuhing and if therr is left after flush schdule flushes
+
+    // Flushes if currently not flushing. If more entries arrive during flush,
+    // scheduleFlush() will trigger another pass.
     private async flush(): Promise<void> {
         if (this.flushRunning || this.buffer.length === 0) return
         if (!this.redisInstance.isReady()) {
-            logger.warn(`[ingestor] redis not ready, skipping flush — buffer size:${this.buffer.length}`);
+            logger.warn({ bufferSize: this.buffer.length }, '[ingestor] redis not ready, skipping flush');
             this.scheduleFlush()
             return
         }
         this.flushRunning = true
-
         const batch = this.buffer.splice(0, this.batchSize)
-
         try {
             await this.flushToRedis(batch)
-            logger.info(`[ingestor] flushed ${batch.length} logs | buffer remaining: ${this.buffer.length}`);
-
+            logger.info({ count: batch.length, remaining: this.buffer.length }, '[ingestor] flushed logs');
         } catch (error) {
+            // Requeue the batch if there's room, otherwise drop
             if (this.buffer.length + batch.length <= this.maxBufferSize) {
                 this.buffer = [...batch, ...this.buffer];
-                logger.warn('[ingestor] requeued batch, buffer size now:' + this.buffer.length);
+                logger.warn({ bufferSize: this.buffer.length }, '[ingestor] requeued batch');
             } else {
-                logger.error(`[ingestor] buffer full (${this.maxBufferSize}), dropping ${batch.length} logs`);
+                logger.error({ dropped: batch.length }, '[ingestor] buffer full, dropping logs');
             }
         } finally {
             this.flushRunning = false;
@@ -126,6 +144,7 @@ export class Server {
             if (this.buffer.length > 0) this.scheduleFlush();
         }
     }
+
     private scheduleFlush() {
         if (this.flushTimer) return
         this.flushTimer = setTimeout(async () => {
@@ -133,31 +152,55 @@ export class Server {
             await this.flush()
         }, Envconfig.ingetionConfig.FLUSH_INTERVAL_MS)
     }
+
     public async stop() {
         this.server?.close()
         if (this.flushTimer) {
             clearTimeout(this.flushTimer)
             this.flushTimer = null
         }
-
+        // Drain buffer before shutting down
         while (this.buffer.length > 0 && this.redisInstance.isReady()) {
             await this.flush()
         }
         if (this.buffer.length > 0) {
-            console.error(`[ingestor] shutdown: lost ${this.buffer.length} logs — redis was down`);
+            logger.error({ lost: this.buffer.length }, '[ingestor] shutdown: lost logs — redis was down');
         }
         await this.redisInstance.closeClient()
-        console.log('[ingestor] clean shutdown complete');
+        logger.info('[ingestor] clean shutdown complete');
         process.exit(0);
     }
+
+    /**
+     * Writes a batch of log entries to Redis Streams using a pipeline.
+     *
+     * Stream key: logs:pod:{namespace}:{podName}  (one stream per pod)
+     * Stream entry fields:
+     *   - log:           the raw log line string
+     *   - container:     container name (for multi-container pods)
+     *   - ts:            original FluentBit timestamp (epoch ms)
+     *
+     * Using a pipeline (multi/exec) batches all xAdd calls into a single
+     * network round-trip — critical for high-throughput ingestion.
+     */
     async flushToRedis(batch: LogEntry[]): Promise<void> {
-        const grouped = new Map<string, FluentBitLog[]>();
+        const client = await this.redisInstance.getClient();
+        const pipeline = client.multi();
+
         for (const entry of batch) {
-            const list = grouped.get(entry.workflowRunId) ?? [];
-            list.push(entry.log);
-            grouped.set(entry.workflowRunId, list);
+            pipeline.xAdd(
+                entry.streamKey,
+                '*',  // auto-generate stream ID
+                {
+                    log: entry.log.log ?? '',
+                    container: entry.log.kubernetes?.container_name ?? '',
+                    ts: String(entry.log.date ?? Date.now()),
+                }
+            );
         }
-        // flush 
+
+        await pipeline.exec();
     }
 }
+
 

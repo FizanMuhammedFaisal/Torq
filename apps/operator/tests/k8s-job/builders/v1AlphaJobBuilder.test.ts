@@ -4,20 +4,21 @@ import { V1AlphaJobBuilder } from '@/infrastructure/k8s/jobs/handlers/v1Alpha.ha
 import { describe, expect, it } from 'bun:test';
 
 const baseJob: TorqJob = {
-    id: 'test',
-    workflowRunId: 'run-abc123',
-    torqVersion: 'v1alpha',
-    workflowId: 'ULID',
-    versionId: "ULID",
-    image: 'node:20-alpine',
-    namespace: 'torq-system',
-    steps: [
-        { index: 0, run: 'npm ci' },
-        { index: 1, run: 'npm test' },
-    ],
-    needs: [],
-    envs: { NODE_ENV: 'test' },
-    secrets: [],
+	id: 'test',
+	workflowRunId: 'run-abc123-uid',
+	workflowRunName: 'run-my-workflow',
+	torqVersion: 'v1alpha',
+	workflowId: 'ULID',
+	versionId: 'ULID',
+	image: 'node:20-alpine',
+	namespace: 'torq-system',
+	steps: [
+		{ index: 0, run: 'npm ci' },
+		{ index: 1, run: 'npm test' },
+	],
+	needs: [],
+	envs: { NODE_ENV: 'test' },
+	secrets: [],
 };
 const builder = new V1AlphaJobBuilder();
 

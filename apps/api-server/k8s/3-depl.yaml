@@ -20,6 +20,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: apiserver-config
+            - secretRef:
+                name: apiserver-secret
 --- 
 apiVersion: v1 
 kind: Service
@@ -29,6 +31,10 @@ spec:
   selector:
     app: torq-apiserver
   ports:
-    - port: 4000 
+    - name: http
+      port: 4000 
       targetPort: 4000
+    - name: grpc
+      port: 50052
+      targetPort: 50052
   type: NodePort

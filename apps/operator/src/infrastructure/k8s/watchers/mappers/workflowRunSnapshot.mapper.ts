@@ -39,7 +39,6 @@ export function toDomainWorkflowRun(raw: WorkflowRunK8s): WorkflowRunSnapshot {
             versionId: raw.spec.versionId,
             torqVersion: raw.spec.torqVersion,
             triggeredBy: raw.spec.triggeredBy,
-            inputs: raw.spec.inputs,
         },
         status: raw.status
             ? {

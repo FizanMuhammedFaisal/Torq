@@ -11,7 +11,9 @@ deploy:
   kubectl: {}
 
 requires:
-  - configs: [ "torq-log-ingestor" ]
+  - configs: ["torq-log-ingestor"]
     path: ./apps/log-ingestor
-  - configs: [ "torq-operator" ]
+  - configs: ["torq-operator"]
     path: ./apps/operator
+  - configs: ["torq-apiserver"]
+    path: ./apps/api-server
