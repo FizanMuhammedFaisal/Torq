@@ -6,6 +6,7 @@ import type { RevealSecretOutputDto } from '@/application/dto/worflows/revealSec
 import type { GetWorkflowsOutputDto } from '@/application/dto/worflows/getWorkflows.dto';
 import type { TriggerWorkflowRunOutputDto } from '@/application/dto/worflows/triggerWorkflowRun.dto';
 import type { GetWorkflowByIdOutputDto } from '@/application/dto/worflows/getWorkflowById.dto';
+import { GetWorkflowSpecOutput } from '@/application/dto/worflows/getWorkflowSpec.dto';
 
 export interface IWorkflowController {
 	getWorkflows: (ctx: AuthenticatedContext) => Promise<GetWorkflowsOutputDto>;
@@ -15,4 +16,5 @@ export interface IWorkflowController {
 	triggerWorkflowRun: (ctx: AuthenticatedContext) => Promise<TriggerWorkflowRunOutputDto>;
 	revealSecret: (ctx: AuthenticatedContext) => Promise<RevealSecretOutputDto>;
 	getWorkflowById: (ctx: AuthenticatedContext) => Promise<GetWorkflowByIdOutputDto>;
+	getWorkflowBySpec: (ctx: AuthenticatedContext) => Promise<GetWorkflowSpecOutput>;
 }

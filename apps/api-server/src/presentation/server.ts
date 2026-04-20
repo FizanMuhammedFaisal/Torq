@@ -52,6 +52,6 @@ export class HTTPServer {
 		this.setupRoutes();
 		this.app.listen(this.envconfig.server.port);
 
-		console.log(`🦊 Server is running at ${this.app.server?.hostname}:${this.app.server?.port}`);
+		console.log(`🦊 Server is running at ${this.envconfig.server.hostname}:${this.envconfig.server.port}`);
 	}
 }

@@ -37,7 +37,7 @@ export class WorkflowController implements IWorkflowController {
 		private triggerWorkflowRunUseCase: ITriggerWorkflowRunUseCase,
 		@inject(TOKENS.GetWorkflowSpecUseCase)
 		private getWorkflowSpecUseCase: IGetWorkflowSpecUseCase,
-	) {}
+	) { }
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
 		const query = validate(GetWorkflowsInputSchema, ctx.query);
@@ -90,11 +90,12 @@ export class WorkflowController implements IWorkflowController {
 			req: ctx.user,
 		});
 	};
-	getWorkflowSpec = async (ctx: AuthenticatedContext): Promise<GetWorkflowSpecOutput> => {
+	getWorkflowBySpec = async (ctx: AuthenticatedContext): Promise<GetWorkflowSpecOutput> => {
 		const workflowId = ctx.params.id;
 		return this.getWorkflowSpecUseCase.execute({
 			workflowId: workflowId,
 			secrets: false,
+			raw: true
 		});
 	};
 }

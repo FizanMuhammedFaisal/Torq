@@ -12,11 +12,11 @@ import { TriggerWorkflowRunSchema } from '@/application/dto/worflows/triggerWork
 import { GetSecretsSchema } from '@/application/dto/worflows/getSecrets.dto';
 import { RevealSecretSchema } from '@/application/dto/worflows/revealSecret.dto';
 import type { AuthMacro } from '@/presentation/http/macros/auth.macro';
-import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows.dto';
 import {
 	GetWorkflowByIdInputParamsSchema,
 	GetWorkflowByIdInputQuerySchema,
 } from '@/application/dto/worflows/getWorkflowById.dto';
+import { GetWorkflowSpecInputSchema, GetWorkflowSpecInputSchemaParams, GetWorkflowSpecInputSchemaQuery } from '@/application/dto/worflows/getWorkflowSpec.dto';
 
 @injectable()
 export class WorkflowRouter implements Router {
@@ -27,7 +27,7 @@ export class WorkflowRouter implements Router {
 		private workflowController: IWorkflowController,
 		@inject(TOKENS.AuthMacro)
 		private authMacro: AuthMacro,
-	) {}
+	) { }
 
 	register() {
 		return new Elysia({ prefix: this.prefix })
@@ -37,7 +37,8 @@ export class WorkflowRouter implements Router {
 			.use(this.getSecrets())
 			.use(this.trigger())
 			.use(this.revealSecret())
-			.use(this.getById());
+			.use(this.getById())
+			.use(this.getWrokflowSpec());
 	}
 
 	getById() {
@@ -127,6 +128,19 @@ export class WorkflowRouter implements Router {
 			},
 			{
 				params: RevealSecretSchema,
+				auth: true,
+			},
+		);
+	}
+	getWrokflowSpec() {
+		return new Elysia().use(this.authMacro.plugin()).get(
+			'/:id/spec',
+			(ctx) => {
+				return this.workflowController.getWorkflowBySpec(ctx);
+			},
+			{
+				query: GetWorkflowSpecInputSchemaQuery,
+				params: GetWorkflowSpecInputSchemaParams,
 				auth: true,
 			},
 		);
