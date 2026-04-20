@@ -1,11 +1,11 @@
 export class Workflow {
 	private constructor(
-		public id: string,
-		public identityId: string,
+		public readonly id: string,
+		public readonly identityId: string,
 		public name: string,
-		public createdAt: Date,
+		public readonly createdAt: Date,
 		public description?: string,
-	) {}
+	) { }
 
 	static create({
 		id,
@@ -21,5 +21,13 @@ export class Workflow {
 		description?: string;
 	}) {
 		return new Workflow(id, identityId, name, createdAt, description);
+	}
+	update(name?: string, description?: string) {
+		if (name) {
+			this.name = name
+		}
+		if (description) {
+			this.description = description
+		}
 	}
 }

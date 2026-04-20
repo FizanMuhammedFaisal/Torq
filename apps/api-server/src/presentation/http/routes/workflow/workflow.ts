@@ -17,6 +17,7 @@ import {
 	GetWorkflowByIdInputQuerySchema,
 } from '@/application/dto/worflows/getWorkflowById.dto';
 import { GetWorkflowSpecInputSchema, GetWorkflowSpecInputSchemaParams, GetWorkflowSpecInputSchemaQuery } from '@/application/dto/worflows/getWorkflowSpec.dto';
+import { UpdateWorkflowBodySchema, UpdateWorkflowParamsSchema } from '@/application/dto/worflows/updateWorkflow.dto';
 
 @injectable()
 export class WorkflowRouter implements Router {
@@ -38,7 +39,8 @@ export class WorkflowRouter implements Router {
 			.use(this.trigger())
 			.use(this.revealSecret())
 			.use(this.getById())
-			.use(this.getWrokflowSpec());
+			.use(this.getWrokflowSpec())
+			.use(this.updateWorkflow());
 	}
 
 	getById() {
@@ -141,6 +143,19 @@ export class WorkflowRouter implements Router {
 			{
 				query: GetWorkflowSpecInputSchemaQuery,
 				params: GetWorkflowSpecInputSchemaParams,
+				auth: true,
+			},
+		);
+	}
+	updateWorkflow() {
+		return new Elysia().use(this.authMacro.plugin()).patch(
+			'/:id',
+			(ctx) => {
+				return this.workflowController.updateWorkflow(ctx);
+			},
+			{
+				body: UpdateWorkflowBodySchema,
+				params: UpdateWorkflowParamsSchema,
 				auth: true,
 			},
 		);

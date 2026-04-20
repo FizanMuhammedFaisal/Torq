@@ -19,6 +19,7 @@ export const TOKENS = {
 	SecretMapper: Symbol.for('SecretMapper'),
 	WorkflowVersionMapper: Symbol.for('WorkflowVersionMapper'),
 	SpecValidationService: Symbol.for('SpecValidationService'),
+
 	UpsertSecretsUseCase: Symbol.for('UpsertSecretsUseCase'),
 	GetSecretsUseCase: Symbol.for('GetSecretsUseCase'),
 	GetWorkflowsUseCase: Symbol.for('GetWorkflowsUseCase'),
@@ -39,6 +40,7 @@ export const TOKENS = {
 
 	// usecases
 	GetWorkflowSpecUseCase: Symbol.for('GetWorkflowSpecUseCase'),
+	UpdateWorkflowUseCase: Symbol.for('UpdateWorkflowUseCase'),
 
 	//
 	WorkflowRPCMapper: Symbol.for('WorkflowRPCMapper'),

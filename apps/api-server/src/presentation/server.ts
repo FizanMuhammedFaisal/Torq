@@ -40,7 +40,7 @@ export class HTTPServer {
 		this.app.use(
 			cors({
 				origin: this.envconfig.app.cors.origins,
-				methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+				methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', "PATCH"],
 				credentials: true,
 				allowedHeaders: ['Content-Type', 'Authorization'],
 			}),

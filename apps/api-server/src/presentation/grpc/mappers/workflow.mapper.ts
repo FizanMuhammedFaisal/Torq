@@ -16,14 +16,16 @@ export class WorkflowRPCMapper implements IWorkflowRPCMapper {
 		return {
 			workflowId: request.workflowRunId,
 			versionId: request.versionId,
-			secrects: true, // Operator ned th secrects
+			secrets: true, // Operator ned th secrects,
+			raw: false
 		};
 	}
 	toProtoGetSpecResponse(dto: GetWorkflowSpecOutput): GetSpecResponse {
-		function toProtoSecrets(secrets: { name: string; value: string }[]): Secrets[] {
+		function toProtoSecrets(secrets: { name: string; value: string }[] | undefined): Secrets[] {
+			if (!secrets) return []
 			return secrets.map((secret) => create(SecretsSchema, secret));
 		}
-		function mapSpecType(spec: Record<string, unknown>): JsonObject {
+		function mapSpecType(spec: Record<string, unknown> | string): JsonObject {
 			return JSON.parse(JSON.stringify(spec)) as JsonObject;
 		}
 		return create(GetSpecResponseSchema, {

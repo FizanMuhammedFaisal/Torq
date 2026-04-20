@@ -17,6 +17,8 @@ import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows
 import { validate } from '../../validator';
 import type { GetWorkflowSpecOutput } from '@/application/dto/worflows/getWorkflowSpec.dto';
 import type { IGetWorkflowSpecUseCase } from '@/application/port/usecases/workflows/getWorkflowSpec.interface';
+import { UpdateWorkflowInputDto, UpdateWorkflowOutputDto } from '@/application/dto/worflows/updateWorkflow.dto';
+import { type IUpdateWorkflowUseCase } from '@/application/port/usecases/workflows/updateWorkflow.interface';
 
 @injectable()
 export class WorkflowController implements IWorkflowController {
@@ -37,6 +39,8 @@ export class WorkflowController implements IWorkflowController {
 		private triggerWorkflowRunUseCase: ITriggerWorkflowRunUseCase,
 		@inject(TOKENS.GetWorkflowSpecUseCase)
 		private getWorkflowSpecUseCase: IGetWorkflowSpecUseCase,
+		@inject(TOKENS.UpdateWorkflowUseCase)
+		private updateWorkflowUseCase: IUpdateWorkflowUseCase,
 	) { }
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
@@ -96,6 +100,14 @@ export class WorkflowController implements IWorkflowController {
 			workflowId: workflowId,
 			secrets: false,
 			raw: true
+		});
+	};
+	updateWorkflow = async (ctx: AuthenticatedContext): Promise<UpdateWorkflowOutputDto> => {
+		const workflowId = ctx.params.id;
+		const body = ctx.body as Omit<UpdateWorkflowInputDto, 'req'>;
+		return this.updateWorkflowUseCase.execute({
+			...body,
+			id: workflowId
 		});
 	};
 }
