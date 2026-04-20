@@ -37,7 +37,10 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 	): Promise<WorkflowVersion | null> {
 		try {
 			const result = await getExecutor().query.workflowVersion.findFirst({
-				where: and(eq(workflowVersion.workflowId, workflowId), eq(workflowVersion.version, version)),
+				where: and(
+					eq(workflowVersion.workflowId, workflowId),
+					eq(workflowVersion.version, version),
+				),
 			});
 
 			if (!result) return null;
@@ -73,6 +76,9 @@ export class WorkflowVersionRepository implements IWorkflowVersionRepository {
 					set: {
 						workflowId: entity.workflowId,
 						version: entity.version,
+						troqVersion: entity.torqVersion,
+						id: entity.id,
+						createdAt: entity.createdAt,
 						spec: entity.spec,
 						raw: entity.raw,
 					},

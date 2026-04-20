@@ -16,14 +16,14 @@ export class RevealSecretUseCase implements IRevealSecretUseCase {
 		private readonly secretRepository: ISecrectRepository,
 		@inject(TOKENS.SecretManagementService)
 		private readonly secretService: ISecretManagementService,
-	) { }
+	) {}
 
 	async execute(data: RevealSecretInputDto): Promise<RevealSecretOutputDto> {
-		const secrets = await this.secretRepository.findByWorkflowId(data.workflowId);
+		const secrets = await this.secretRepository.findByWorkflowId(data.id);
 		const secret = secrets.find((s) => s.key === data.key);
 
 		if (!secret) {
-			throw new NotFoundError('Secrect', data.key);
+			throw new NotFoundError('Secrect');
 		}
 
 		const value = await this.secretService.decryptSecret({

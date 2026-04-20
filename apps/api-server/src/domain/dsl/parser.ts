@@ -12,14 +12,14 @@ export class SpecParser {
 			if (!res.valid) {
 				throw new SpecValidationError(res.error ?? 'Invalid Json spec');
 			}
-			return res.data;
+			return res.data as Record<string, unknown>;
 		}
 		if (specType === 'yaml') {
 			const res = validator.validateYaml(workflowSpec);
 			if (!res.valid) {
 				throw new SpecValidationError(res.error ?? 'Invalid Yaml spec');
 			}
-			return res.data;
+			return res.data as Record<string, unknown>;
 		}
 		throw new SpecValidationError('Unsupported spec type');
 	}

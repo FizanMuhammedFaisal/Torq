@@ -12,8 +12,11 @@ export const Envconfig = {
 		cors: {
 			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:4000'],
 		},
+		nodeEnv: process.env.NODE_ENV || 'development',
 	},
-
+	images: {
+		fluentBit: "fluent/fluent-bit:4.2.4"
+	},
 	services: {
 		grpc: {
 			apiServer: {
@@ -30,6 +33,10 @@ export const Envconfig = {
 		version: process.env.K8S_VERSION || 'v1alpha1',
 		plural: process.env.K8S_PLURAL || 'workflowruns',
 		namespace: process.env.K8S_NAMESPACE || 'default',
-	}
+		kind: process.env.K8S_KIND || 'WorkflowRun',
+	},
+	redis: {
+		url: `redis://${process.env.REDIS_HOST ?? 'localhost'}:${process.env.REDIS_PORT ?? 6379}`,
+	},
 };
 export type Envconfig = typeof Envconfig;

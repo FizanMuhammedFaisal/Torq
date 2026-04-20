@@ -19,6 +19,7 @@ export class WorkflowRunMapper implements IWorkflowRunMapper<WorkflowRunTable, W
 			startedAt: row.startedAt,
 			completedAt: row.completedAt,
 			duration: row.duration,
+			steps: (row.steps as Record<string, { status: string }>) ?? {},
 		});
 	}
 
@@ -33,6 +34,7 @@ export class WorkflowRunMapper implements IWorkflowRunMapper<WorkflowRunTable, W
 			startedAt: entity.startedAt,
 			completedAt: entity.completedAt,
 			duration: entity.duration,
+			steps: entity.steps,
 		};
 	}
 }

@@ -2,7 +2,7 @@ import type {
     WorkflowRunSnapshot,
     RunPhase,
     StepState,
-} from '@/domain/entities/WorkflowRunSnapshot';
+} from '@/domain/entities/workflowRunSnapshot';
 import type { KubernetesObject } from '@kubernetes/client-node';
 
 export interface WorkflowRunK8s extends KubernetesObject {
@@ -25,9 +25,6 @@ export interface WorkflowRunK8s extends KubernetesObject {
 
 export function toDomainWorkflowRun(raw: WorkflowRunK8s): WorkflowRunSnapshot {
     return {
-        name: raw.metadata?.name ?? '',
-        namespace: raw.metadata?.namespace ?? '',
-        uid: raw.metadata?.uid ?? '',
         metadata: {
             name: raw.metadata?.name ?? '',
             namespace: raw.metadata?.namespace ?? '',
@@ -42,7 +39,6 @@ export function toDomainWorkflowRun(raw: WorkflowRunK8s): WorkflowRunSnapshot {
             versionId: raw.spec.versionId,
             torqVersion: raw.spec.torqVersion,
             triggeredBy: raw.spec.triggeredBy,
-            inputs: raw.spec.inputs,
         },
         status: raw.status
             ? {

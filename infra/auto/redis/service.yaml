@@ -1,0 +1,42 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: torq
+  labels:
+    app: redis
+    component: message-broker
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+      protocol: TCP
+
+---
+
+##
+## Headless Service  ──  required by StatefulSet for stable pod DNS
+##
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-headless
+  namespace: torq
+  labels:
+    app: redis
+    component: message-broker
+spec:
+  type: ClusterIP
+  clusterIP: None          
+  selector:
+    app: redis
+  ports:
+    - name: redis
+      port: 6379
+      targetPort: redis
+      protocol: TCP

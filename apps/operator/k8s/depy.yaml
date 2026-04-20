@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torq-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: torq-operator
+  template:
+    metadata:
+      labels:
+        app: torq-operator
+    spec:
+      serviceAccountName: torq-operator
+      containers:
+        - name: torq-operator
+          image: fizanmuhammedfaisal/torq-operator
+          ports:
+            - containerPort: 4001
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: torq-operator-service
+spec:
+  selector:
+    app: torq-operator
+  ports:
+    - name: http
+      port: 4001
+      targetPort: 4001
+    - name: grpc
+      port: 50051
+      targetPort: 50051
+  type: ClusterIP
+
+

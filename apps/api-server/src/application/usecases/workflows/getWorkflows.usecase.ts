@@ -16,7 +16,14 @@ export class GetWorkflowsUseCase implements IGetWorkflowsUseCase {
 	) {}
 
 	async execute(data: GetWorkflowsInputDto): Promise<GetWorkflowsOutputDto> {
-		const aggregates = await this.aggregateRepository.findAllWithLatestRun(data.req.id);
+		const skip = (data.query.pageSize ?? 20) * ((data.query.page ?? 1) - 1);
+		const limit = data.query.pageSize ?? 20;
+		const aggregates = await this.aggregateRepository.findAllWithLatestRun(
+			data.req.id,
+			limit,
+			skip,
+		);
+		const count = await this.aggregateRepository.findCount(data.req.id);
 
 		const workflows = aggregates.map((agg) => {
 			const lastRun = agg.latestRun;
@@ -26,7 +33,7 @@ export class GetWorkflowsUseCase implements IGetWorkflowsUseCase {
 				name: agg.workflow.name,
 				description: agg.workflow.description,
 				createdAt: agg.workflow.createdAt,
-				health: [], 
+				health: [],
 				lastRun: lastRun
 					? {
 							status: lastRun.status as WorkflowRunStatus,
@@ -35,10 +42,17 @@ export class GetWorkflowsUseCase implements IGetWorkflowsUseCase {
 							duration: lastRun.duration,
 						}
 					: null,
-				status: agg.status as WorkflowRunStatus,
 			};
 		});
 
-		return { workflows };
+		return {
+			workflows,
+			meta: {
+				page: data.query.page ?? 1,
+				pageSize: data.query.pageSize ?? 20,
+				totalItems: count,
+				totalPages: Math.ceil(count / (data.query.pageSize ?? 20)),
+			},
+		};
 	}
 }

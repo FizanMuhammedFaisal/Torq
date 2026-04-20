@@ -1,24 +1,25 @@
 import { injectable, inject } from 'tsyringe';
 import { ulid } from 'ulid';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, ilike, count } from 'drizzle-orm';
 import { getExecutor } from './database/transaction/transactionContext';
-import { workflowRun } from './database/schema';
+import { workflowRun, workflow } from './database/schema';
 import { PostgresErrorMapper } from './database/errors/postgresErrorMapper';
 import { DatabaseInternalError } from '@infrastructure/errors/databaseInternalError';
 import type {
 	IWorkflowRunRepository,
 	PersistRunDto,
 } from '@/application/port/repositories/workflowRunRepository.interface';
-import type { WorkflowRun, WorkflowRunStatus } from '@/domain/entities/workflowRun';
+import type { WorkflowRun, RunStatus } from '@/domain/entities/workflowRun';
 import type { WorkflowRunMapper } from './mappers/workflowRun.mapper';
 import { TOKENS } from '@/config/di/tokens';
+import { logger } from '../logger/logger';
 
 @injectable()
 export class WorkflowRunRepository implements IWorkflowRunRepository {
 	constructor(
 		@inject(TOKENS.WorkflowRunMapper)
 		private readonly mapper: WorkflowRunMapper,
-	) { }
+	) {}
 
 	async create(data: PersistRunDto): Promise<WorkflowRun> {
 		try {
@@ -50,15 +51,71 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 		}
 	}
 
-	async updateStatus(id: string, status: WorkflowRunStatus): Promise<void> {
+	async updateStatus(id: string, status: RunStatus): Promise<void> {
 		try {
 			await getExecutor()
 				.update(workflowRun)
 				.set({
 					status,
-					completedAt: status === 'failed' || status === 'success' ? new Date() : null,
+					completedAt: status === 'FAILED' || status === 'SUCCESS' ? new Date() : null,
 				})
 				.where(eq(workflowRun.id, id));
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
+		}
+	}
+
+	async updateRunState(
+		runId: string,
+		status?: string,
+		stepName?: string,
+		ts?: Date,
+	): Promise<void> {
+		try {
+			const executor = getExecutor();
+			const targetRun = await executor.query.workflowRun.findFirst({
+				where: eq(workflowRun.id, runId),
+			});
+
+			if (!targetRun) {
+				logger.warn(
+					{ runId },
+					'[WorkflowRunRepository] updateRunState: Target run not found in database',
+				);
+				return;
+			}
+
+			const updateData: any = {};
+			const eventTs = ts ? ts.getTime() : Date.now();
+
+			// Pre-check for twargetRun status to avoid reverting from terminal states
+			const isWorkflowTerminal = ['SUCCESS', 'FAILED'].includes(targetRun.status);
+
+			if (!stepName && status) {
+				// Don't modify overall workflow status if it's already terminal
+				if (!isWorkflowTerminal) {
+					updateData.status = status;
+					if (['SUCCESS', 'FAILED'].includes(status)) {
+						updateData.completedAt = ts || new Date();
+					}
+				}
+			} else if (stepName && status) {
+				const existingSteps =
+					(targetRun.steps as Record<string, { status: string; ts?: number }>) || {};
+				const existingStep = existingSteps[stepName];
+
+				// Only update the step if we have newer information
+				if (!existingStep || !existingStep.ts || eventTs > existingStep.ts) {
+					updateData.steps = {
+						...existingSteps,
+						[stepName]: { status, ts: eventTs },
+					};
+				}
+			}
+
+			if (Object.keys(updateData).length > 0) {
+				await executor.update(workflowRun).set(updateData).where(eq(workflowRun.id, targetRun.id));
+			}
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
 		}
@@ -114,6 +171,54 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 				where: eq(workflowRun.id, id),
 			});
 			return !!result;
+		} catch (error) {
+			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
+		}
+	}
+
+	async findAllPaged(options: {
+		userId: string;
+		page: number;
+		pageSize: number;
+		search?: string;
+		workflowId?: string;
+	}): Promise<{ runs: (WorkflowRun & { workflowName: string })[]; total: number }> {
+		try {
+			const offset = (options.page - 1) * options.pageSize;
+			const executor = getExecutor();
+
+			const whereClause = and(
+				eq(workflow.identityId, options.userId),
+				options.search ? ilike(workflow.name, `%${options.search}%`) : undefined,
+				options.workflowId ? eq(workflowRun.workflowId, options.workflowId) : undefined,
+			);
+
+			const results = await executor
+				.select({
+					run: workflowRun,
+					workflowName: workflow.name,
+				})
+				.from(workflowRun)
+				.innerJoin(workflow, eq(workflowRun.workflowId, workflow.id))
+				.where(whereClause)
+				.orderBy(desc(workflowRun.startedAt))
+				.limit(options.pageSize)
+				.offset(offset);
+
+			const totalResult = await executor
+				.select({ count: count() })
+				.from(workflowRun)
+				.innerJoin(workflow, eq(workflowRun.workflowId, workflow.id))
+				.where(whereClause);
+
+			const total = totalResult[0]?.count ?? 0;
+
+			const mappedRuns = results.map((row) => {
+				const domainRun = this.mapper.toDomain(row.run);
+				return Object.assign(domainRun, { workflowName: row.workflowName });
+			});
+
+			return { runs: mappedRuns, total };
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowRun' });
 		}

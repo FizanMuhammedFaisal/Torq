@@ -15,7 +15,7 @@ export class WorkflowRepository implements IWorkflowRepository {
 	constructor(
 		@inject(TOKENS.WorkflowMapper)
 		private readonly mapper: WorkflowMapper,
-	) { }
+	) {}
 
 	async findById(id: string): Promise<Workflow | null> {
 		try {

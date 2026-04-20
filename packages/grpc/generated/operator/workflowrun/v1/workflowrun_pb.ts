@@ -10,31 +10,40 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file operator/workflowrun/v1/workflowrun.proto.
  */
 export const file_operator_workflowrun_v1_workflowrun: GenFile = /*@__PURE__*/
-  fileDesc("CilvcGVyYXRvci93b3JrZmxvd3J1bi92MS93b3JrZmxvd3J1bi5wcm90bxIXb3BlcmF0b3Iud29ya2Zsb3dydW4udjEipgEKGVRyaWdnZXJXb3JrZmxvd1J1blJlcXVlc3QSEwoLd29ya2Zsb3dfaWQYASABKAkSDAoEc3BlYxgCIAEoCRI6Cgx0cmlnZ2VyX3R5cGUYAyABKA4yJC5vcGVyYXRvci53b3JrZmxvd3J1bi52MS5UcmlnZ2VyVHlwZRIZCgx0cmlnZ2VyZWRfYnkYBCABKAlIAIgBAUIPCg1fdHJpZ2dlcmVkX2J5IiwKGlRyaWdnZXJXb3JrZmxvd1J1blJlc3BvbnNlEg4KBnJ1bl9pZBgBIAEoCSp5CgtUcmlnZ2VyVHlwZRIcChhUUklHR0VSX1RZUEVfVU5TUEVDSUZJRUQQABIXChNUUklHR0VSX1RZUEVfTUFOVUFMEAESGAoUVFJJR0dFUl9UWVBFX1dFQkhPT0sQAhIZChVUUklHR0VSX1RZUEVfU0NIRURVTEUQAzKQAQoPT3BlcmF0b3JTZXJ2aWNlEn0KElRyaWdnZXJXb3JrZmxvd1J1bhIyLm9wZXJhdG9yLndvcmtmbG93cnVuLnYxLlRyaWdnZXJXb3JrZmxvd1J1blJlcXVlc3QaMy5vcGVyYXRvci53b3JrZmxvd3J1bi52MS5UcmlnZ2VyV29ya2Zsb3dSdW5SZXNwb25zZWIGcHJvdG8z");
+  fileDesc("CilvcGVyYXRvci93b3JrZmxvd3J1bi92MS93b3JrZmxvd3J1bi5wcm90bxIXb3BlcmF0b3Iud29ya2Zsb3dydW4udjEirwEKGVRyaWdnZXJXb3JrZmxvd1J1blJlcXVlc3QSFwoPd29ya2Zsb3dfcnVuX2lkGAEgASgJEhMKC3dvcmtmbG93X2lkGAIgASgJEhIKCnZlcnNpb25faWQYAyABKAkSFAoMdG9ycV92ZXJzaW9uGAQgASgJEjoKDHRyaWdnZXJfdHlwZRgFIAEoDjIkLm9wZXJhdG9yLndvcmtmbG93cnVuLnYxLlRyaWdnZXJUeXBlIi0KGlRyaWdnZXJXb3JrZmxvd1J1blJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAgqeQoLVHJpZ2dlclR5cGUSHAoYVFJJR0dFUl9UWVBFX1VOU1BFQ0lGSUVEEAASFwoTVFJJR0dFUl9UWVBFX01BTlVBTBABEhgKFFRSSUdHRVJfVFlQRV9XRUJIT09LEAISGQoVVFJJR0dFUl9UWVBFX1NDSEVEVUxFEAMykAEKD09wZXJhdG9yU2VydmljZRJ9ChJUcmlnZ2VyV29ya2Zsb3dSdW4SMi5vcGVyYXRvci53b3JrZmxvd3J1bi52MS5UcmlnZ2VyV29ya2Zsb3dSdW5SZXF1ZXN0GjMub3BlcmF0b3Iud29ya2Zsb3dydW4udjEuVHJpZ2dlcldvcmtmbG93UnVuUmVzcG9uc2ViBnByb3RvMw");
 
 /**
  * @generated from message operator.workflowrun.v1.TriggerWorkflowRunRequest
  */
 export type TriggerWorkflowRunRequest = Message<"operator.workflowrun.v1.TriggerWorkflowRunRequest"> & {
   /**
-   * @generated from field: string workflow_id = 1;
+   * @generated from field: string workflow_run_id = 1;
+   */
+  workflowRunId: string;
+
+  /**
+   * @generated from field: string workflow_id = 2;
    */
   workflowId: string;
 
   /**
-   * @generated from field: string spec = 2;
+   * workflowVersion that was triggered
+   *
+   * @generated from field: string version_id = 3;
    */
-  spec: string;
+  versionId: string;
 
   /**
-   * @generated from field: operator.workflowrun.v1.TriggerType trigger_type = 3;
+   * whihc is the torq version of this workflow
+   *
+   * @generated from field: string torq_version = 4;
+   */
+  torqVersion: string;
+
+  /**
+   * @generated from field: operator.workflowrun.v1.TriggerType trigger_type = 5;
    */
   triggerType: TriggerType;
-
-  /**
-   * @generated from field: optional string triggered_by = 4;
-   */
-  triggeredBy?: string;
 };
 
 /**
@@ -49,9 +58,9 @@ export const TriggerWorkflowRunRequestSchema: GenMessage<TriggerWorkflowRunReque
  */
 export type TriggerWorkflowRunResponse = Message<"operator.workflowrun.v1.TriggerWorkflowRunResponse"> & {
   /**
-   * @generated from field: string run_id = 1;
+   * @generated from field: bool success = 1;
    */
-  runId: string;
+  success: boolean;
 };
 
 /**

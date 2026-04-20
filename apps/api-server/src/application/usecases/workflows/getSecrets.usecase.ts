@@ -15,7 +15,7 @@ export class GetSecretsUseCase implements IGetSecretsUseCase {
 	) {}
 
 	async execute(data: GetSecretsInputDto): Promise<GetSecretsOutputDto> {
-		const secrets = await this.secretRepository.findByWorkflowId(data.workflowId);
+		const secrets = await this.secretRepository.findByWorkflowId(data.id);
 
 		return secrets.map((secret) => ({
 			id: secret.id as string,

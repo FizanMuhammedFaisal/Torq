@@ -1,0 +1,19 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: torq-dev-infra
+
+manifests:
+  rawYaml:
+    - infra/auto/redis/*.yaml
+
+deploy:
+  kubectl: {}
+
+requires:
+  - configs: ["torq-log-ingestor"]
+    path: ./apps/log-ingestor
+  - configs: ["torq-operator"]
+    path: ./apps/operator
+  - configs: ["torq-apiserver"]
+    path: ./apps/api-server

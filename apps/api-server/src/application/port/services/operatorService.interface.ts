@@ -1,13 +1,13 @@
-/**
- * Application port for the Operator service.
- * plain TypeScript 
- */
+import type { TriggerType } from '@domain/entities/workflowRun';
 
 export interface TriggerWorkflowRunParams {
-    workflowId: string;
-    spec: string;
+	workflowId: string;
+	versionId: string;
+	torqVersion: string;
+	triggerType: TriggerType;
+	workflowRunId: string;
 }
 
 export interface IOperatorService {
-    triggerWorkflowRun(params: TriggerWorkflowRunParams): Promise<void>;
+	triggerWorkflowRun(params: TriggerWorkflowRunParams): Promise<void>;
 }

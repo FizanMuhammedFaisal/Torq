@@ -1,70 +1,75 @@
 import { apiClient } from '@/api/client';
 import { API_ROUTES } from '@/api/routes';
-
-export type CreateWorkflowPayload = {
-	name: string;
-	description?: string;
-	workflowSpec: string;
-	specFormat: 'yaml' | 'json';
-	secrets?: { key: string; value: string }[];
-};
-
-export type WorkflowResponse = {
-	id: string;
-	name: string;
-	description?: string;
-	createdAt: string;
-	updatedAt: string;
-	status: 'running' | 'success' | 'failed' | 'idle';
-};
+import type {
+	CreateWorkflowPayload,
+	CreateWorkflowResponse,
+	GetWorkflowsResponse,
+	GetWorkflowByIdQuery,
+	GetWorkflowByIdResponse,
+	UpsertSecretsPayload,
+	UpsertSecretsResponse,
+	GetSecretsResponse,
+	RevealSecretResponse,
+	TriggerWorkflowPayload,
+	TriggerWorkflowResponse,
+} from '../schema/api.dto';
 
 export const workflowService = {
-	create: async (payload: CreateWorkflowPayload): Promise<WorkflowResponse> => {
-		const { data } = await apiClient.post<WorkflowResponse>(
+	create: async (payload: CreateWorkflowPayload): Promise<CreateWorkflowResponse> => {
+		const { data } = await apiClient.post<CreateWorkflowResponse>(
 			API_ROUTES.WORKFLOWS.BASE,
 			payload,
 		);
 		return data;
 	},
 
-	list: async (): Promise<WorkflowResponse[]> => {
-		const { data } = await apiClient.get<WorkflowResponse[]>(
+	getWorkflows: async (): Promise<GetWorkflowsResponse> => {
+		const { data } = await apiClient.get<GetWorkflowsResponse>(
 			API_ROUTES.WORKFLOWS.BASE,
 		);
 		return data;
 	},
 
-	getById: async (id: string): Promise<WorkflowResponse> => {
-		const { data } = await apiClient.get<WorkflowResponse>(
+	getById: async (id: string, params?: GetWorkflowByIdQuery): Promise<GetWorkflowByIdResponse> => {
+		const { data } = await apiClient.get<GetWorkflowByIdResponse>(
 			API_ROUTES.WORKFLOWS.BY_ID(id),
+			{ params },
 		);
 		return data;
 	},
 
 	upsertSecrets: async (
 		workflowId: string,
-		secrets: { key: string; value: string }[],
-	): Promise<{ count: number }> => {
-		const { data } = await apiClient.post<{ count: number }>(
+		payload: UpsertSecretsPayload,
+	): Promise<UpsertSecretsResponse> => {
+		const { data } = await apiClient.post<UpsertSecretsResponse>(
 			API_ROUTES.WORKFLOWS.SECRETS(workflowId),
-			{ secrets },
+			payload,
 		);
 		return data;
 	},
 
 	getSecrets: async (
 		workflowId: string,
-	): Promise<{ id: string; key: string; createdAt: string; updatedAt: string }[]> => {
-		const { data } = await apiClient.get<
-			{ id: string; key: string; createdAt: string; updatedAt: string }[]
-		>(API_ROUTES.WORKFLOWS.SECRETS(workflowId));
+	): Promise<GetSecretsResponse> => {
+		const { data } = await apiClient.get<GetSecretsResponse>(API_ROUTES.WORKFLOWS.SECRETS(workflowId));
 		return data;
 	},
 
-	trigger: async (workflowId: string, version?: number): Promise<{ runId: string }> => {
-		const { data } = await apiClient.post<{ runId: string }>(
+	revealSecret: async (
+		workflowId: string,
+		key: string,
+	): Promise<RevealSecretResponse> => {
+		const { data } = await apiClient.get<RevealSecretResponse>(
+			API_ROUTES.WORKFLOWS.REVEAL_SECRET(workflowId, key),
+		);
+		return data;
+	},
+
+	trigger: async (workflowId: string, payload?: TriggerWorkflowPayload): Promise<TriggerWorkflowResponse> => {
+		const { data } = await apiClient.post<TriggerWorkflowResponse>(
 			API_ROUTES.WORKFLOWS.TRIGGER(workflowId),
-			{ version },
+			payload,
 		);
 		return data;
 	},

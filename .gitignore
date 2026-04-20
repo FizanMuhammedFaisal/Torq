@@ -38,3 +38,5 @@ coverage/
 .cache/
 
 master.key
+1-secret.yaml
+secret.yaml

@@ -1,0 +1,29 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: torq-log-ingestor
+
+manifests:
+  rawYaml:
+    - k8s/*.yaml
+
+build:
+  local:
+    concurrency: 1
+    tryImportMissing: false
+    useDockerCLI: false
+    push: false # not push images to registry
+  tagPolicy:
+    gitCommit: {}
+  artifacts:
+    - image: fizanmuhammedfaisal/torq-log-ingestor
+      context: .
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - dest: .
+            src: "src/**/*.ts"
+
+deploy:
+  kubectl: {}

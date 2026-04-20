@@ -47,3 +47,8 @@ inside that hanlder
 ## Loop2 (Job Watcher)
 
 K8s streams job modified events (label:managedby-torq)
+
+tracks resource version
+
+1. is job on terminal stage
+    

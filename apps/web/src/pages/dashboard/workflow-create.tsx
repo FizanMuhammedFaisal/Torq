@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 import { WORKFLOW_TEMPLATES } from '@/features/workflows/config/templates';
 import { useCreateWorkflow } from '@/features/workflows/hooks/use-create-workflow';
 import { useVersionStore } from '@/store/version-store';
-import { ConfigurationSection } from './workflow-create/configuration-section';
-import { SecretsSection } from './workflow-create/secrets-section';
-import { TemplateSelector } from './workflow-create/template-selector';
-import { WorkflowEditor } from './workflow-create/workflow-editor';
+import { ConfigurationSection } from '@/features/workflows/components/create/configuration-section';
+import { SecretsSection } from '@/features/workflows/components/create/secrets-section';
+import { TemplateSelector } from '@/features/workflows/components/create/template-selector';
+import { WorkflowEditor } from '@/features/workflows/components/create/workflow-editor';
 
 export function WorkflowCreatePage() {
 	const navigate = useNavigate();
@@ -81,7 +81,7 @@ export function WorkflowCreatePage() {
 		} catch (err: unknown) {
 			const axiosErr = err as AxiosError<ApiErrorBody>;
 			const errorData = axiosErr?.response?.data;
-			
+
 			if (errorData) {
 				setApiError(errorData);
 				if (errorData.issues && errorData.issues.length > 0) {
@@ -155,10 +155,8 @@ export function WorkflowCreatePage() {
 						exit={{ opacity: 0, x: -20, width: 0 }}
 						className="lg:col-span-6 space-y-10 relative"
 					>
-						{/* Stepper Line extending down the left side */}
 						<div className="absolute left-[13px] top-[24px] bottom-0 w-px bg-white/5 hidden sm:block pointer-events-none" />
 
-						{/* Section 1: Templates */}
 						<TemplateSelector
 							activeVersion={activeVersion}
 							setActiveVersion={setActiveVersion}
@@ -167,7 +165,6 @@ export function WorkflowCreatePage() {
 							onSelect={handleTemplateSelect}
 						/>
 
-						{/* Section 2: Metadata */}
 						<ConfigurationSection
 							name={name}
 							setName={setName}
@@ -178,7 +175,6 @@ export function WorkflowCreatePage() {
 							sectionDelay={sectionDelay}
 						/>
 
-						{/* Section 3: Secrets List */}
 						<SecretsSection
 							secrets={secrets}
 							setSecrets={setSecrets}
@@ -187,7 +183,7 @@ export function WorkflowCreatePage() {
 					</motion.div>
 				)}
 
-				{/* Editor Column - Expands to full width when isExpanded is true */}
+
 				<WorkflowEditor
 					isExpanded={isExpanded}
 					setIsExpanded={setIsExpanded}
@@ -199,7 +195,6 @@ export function WorkflowCreatePage() {
 				/>
 			</div>
 
-			{/* Floating Action Bar removed */}
 		</div>
 	);
 }

@@ -35,7 +35,7 @@ export class UpsertSecretsUseCase implements IUpsertSecretsUseCase {
 
 				const secretEntity = Secret.create({
 					id: ulid(),
-					workflowId: data.workflowId,
+					workflowId: data.id,
 					key: secretParam.key,
 					ciphertext,
 					iv,

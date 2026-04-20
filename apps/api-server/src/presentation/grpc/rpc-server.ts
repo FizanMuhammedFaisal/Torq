@@ -7,32 +7,47 @@ import type { IRPCRouter } from './interfaces/router.interface';
 import { logger } from '@/infrastructure/logger/logger';
 import { TOKENS } from '@/config/di/tokens';
 import { rpcConfig } from '@/config/rpc.config';
-
+import { readFileSync } from 'node:fs';
 
 @injectable()
 export class GRpcServer {
 	private server: http2.Http2Server | null = null;
 
-	constructor(@inject(TOKENS.RPCRouter) private readonly rpcRouter: IRPCRouter) { }
+	constructor(@inject(TOKENS.RPCRouter) private readonly rpcRouter: IRPCRouter) {}
 
 	async start(): Promise<void> {
 		const { port, host } = rpcConfig;
 
-		this.server = http2.createServer(
-			connectNodeAdapter({
-				routes: (router) => this.rpcRouter.register(router),
-				grpc: true,
-				connect: false,
-				interceptors: [errorInterceptor, loggingInterceptor],
-			}),
-		);
+		const handler = connectNodeAdapter({
+			routes: (router) => this.rpcRouter.register(router),
+			grpc: true,
+			connect: false,
+			interceptors: [errorInterceptor, loggingInterceptor],
+		});
+
+		const tlsKeyPath = process.env.TLS_KEY_PATH;
+		const tlsCertPath = process.env.TLS_CERT_PATH;
+
+		if (tlsKeyPath && tlsCertPath) {
+			// K8s / TLS mode
+			this.server = http2.createSecureServer(
+				{
+					key: readFileSync(tlsKeyPath),
+					cert: readFileSync(tlsCertPath),
+				},
+				handler,
+			);
+			logger.info('Starting with tls mode');
+		} else {
+			// Local dev - plain h2c
+			this.server = http2.createServer(handler);
+		}
 
 		await new Promise<void>((resolve, reject) => {
 			this.server?.listen(port, host, () => {
-				logger.info({ port, host, protocol: 'HTTP/2' }, 'gRPC server started successfully');
+				logger.info({ port, host }, 'gRPC server started successfully');
 				resolve();
 			});
-
 			this.server?.on('error', (error) => {
 				logger.error({ error }, 'Failed to start gRPC server');
 				reject(error);

@@ -32,9 +32,7 @@ const transactionStorage = new AsyncLocalStorage<TransactionClient>();
  *
  * @returns The active transaction client or default database connection.
  */
-export function getExecutor():
-	| TransactionClient
-	| DB {
+export function getExecutor(): TransactionClient | DB {
 	return transactionStorage.getStore() ?? db;
 }
 

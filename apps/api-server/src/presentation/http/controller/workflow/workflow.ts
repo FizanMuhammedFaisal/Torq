@@ -1,3 +1,4 @@
+import { TOKENS } from '@/config/di/tokens';
 import { inject, injectable } from 'tsyringe';
 import type { IWorkflowController } from '@/presentation/http/interfaces/controller/workflow.interface';
 import type { ICreateWorkflowUseCase } from '@/application/port/usecases/workflows/createWorkflow.interface';
@@ -8,11 +9,14 @@ import type { IGetWorkflowByIdUseCase } from '@/application/port/usecases/workfl
 import type { IRevealSecretUseCase } from '@/application/port/usecases/workflows/revealSecret.interface';
 import type { ITriggerWorkflowRunUseCase } from '@/application/port/usecases/workflows/triggerWorkflowRun.interface';
 import type { AuthenticatedContext } from '@/presentation/http/macros/auth.macro';
-import { TOKENS } from '@/config/di/tokens';
 import type { CreateWorkflowOutputDto } from '@/application/dto/worflows/createWorkflow.dto';
 import type { CreateWorkflowInputDto } from '@/application/dto/worflows/createWorkflow.dto';
 import type { GetSecretsOutputDto } from '@/application/dto/worflows/getSecrets.dto';
 import type { UpsertSecretsInputDto } from '@/application/dto/worflows/upsertSecrets.dto';
+import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows.dto';
+import { validate } from '../../validator';
+import type { GetWorkflowSpecOutput } from '@/application/dto/worflows/getWorkflowSpec.dto';
+import type { IGetWorkflowSpecUseCase } from '@/application/port/usecases/workflows/getWorkflowSpec.interface';
 
 @injectable()
 export class WorkflowController implements IWorkflowController {
@@ -31,10 +35,16 @@ export class WorkflowController implements IWorkflowController {
 		private revealSecretUseCase: IRevealSecretUseCase,
 		@inject(TOKENS.TriggerWorkflowRunUseCase)
 		private triggerWorkflowRunUseCase: ITriggerWorkflowRunUseCase,
+		@inject(TOKENS.GetWorkflowSpecUseCase)
+		private getWorkflowSpecUseCase: IGetWorkflowSpecUseCase,
 	) {}
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
-		return this.getWorkflowsUseCase.execute({ req: ctx.user });
+		const query = validate(GetWorkflowsInputSchema, ctx.query);
+		return this.getWorkflowsUseCase.execute({
+			req: ctx.user,
+			query: query,
+		});
 	};
 	getWorkflowById = async (ctx: AuthenticatedContext) => {
 		const id = ctx.params.id;
@@ -43,14 +53,16 @@ export class WorkflowController implements IWorkflowController {
 
 	triggerWorkflowRun = async (ctx: AuthenticatedContext) => {
 		const workflowId = ctx.params.id;
-		const version = ctx.query.version ? Number.parseInt(ctx.query.version as string) : undefined;
+		const version = ctx.query.version
+			? Number.parseInt(ctx.query.version as string, 10)
+			: undefined;
 		return this.triggerWorkflowRunUseCase.execute({ workflowId, version, req: ctx.user });
 	};
 
 	revealSecret = async (ctx: AuthenticatedContext) => {
 		const workflowId = ctx.params.id;
 		const key = ctx.params.key as string;
-		return this.revealSecretUseCase.execute({ workflowId, key, req: ctx.user });
+		return this.revealSecretUseCase.execute({ id: workflowId, key, req: ctx.user });
 	};
 
 	createWorkflow = async (ctx: AuthenticatedContext): Promise<CreateWorkflowOutputDto> => {
@@ -66,7 +78,7 @@ export class WorkflowController implements IWorkflowController {
 		const body = ctx.body as UpsertSecretsInputDto;
 		return this.upsertSecretsUseCase.execute({
 			...body,
-			workflowId,
+			id: workflowId,
 			req: ctx.user,
 		});
 	};
@@ -74,8 +86,15 @@ export class WorkflowController implements IWorkflowController {
 	getSecrets = async (ctx: AuthenticatedContext): Promise<GetSecretsOutputDto> => {
 		const workflowId = ctx.params.id;
 		return this.getSecretsUseCase.execute({
-			workflowId,
+			id: workflowId,
 			req: ctx.user,
+		});
+	};
+	getWorkflowSpec = async (ctx: AuthenticatedContext): Promise<GetWorkflowSpecOutput> => {
+		const workflowId = ctx.params.id;
+		return this.getWorkflowSpecUseCase.execute({
+			workflowId: workflowId,
+			secrets: false,
 		});
 	};
 }

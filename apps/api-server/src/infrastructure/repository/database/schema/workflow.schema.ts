@@ -13,18 +13,19 @@ export const workflow = pgTable('workflow', {
 });
 
 export const workflowVersion = pgTable('workflow_version', {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().notNull(),
 	workflowId: text('workflow_id')
 		.notNull()
 		.references(() => workflow.id),
 	version: integer('version').notNull(),
 	raw: text('raw').notNull(),
 	spec: json('spec').$type<Record<string, unknown>>().notNull(),
+	troqVersion: text('torq_version').notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const secrets = pgTable('secret', {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().notNull(),
 	workflowId: text('workflow_id')
 		.notNull()
 		.references(() => workflow.id),
@@ -49,7 +50,6 @@ export const workflowRelations = relations(workflow, ({ one, many }) => ({
 	runs: many(workflowRun),
 }));
 
-
 export const workflowVersionRelations = relations(workflowVersion, ({ one }) => ({
 	workflow: one(workflow, {
 		fields: [workflowVersion.workflowId],
@@ -73,12 +73,16 @@ export const workflowRun = pgTable('workflow_run', {
 	workflowVersionId: text('workflow_version_id')
 		.notNull()
 		.references(() => workflowVersion.id),
-	status: text('status', { enum: ['pending', 'running', 'success', 'failed', 'idle'] }).notNull(),
-	triggerType: text('trigger_type', { enum: ['manual', 'webhook', 'schedule'] }).notNull(),
+	status: text('status', {
+		enum: ['PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'IDLE', 'NOT_SUPPORTED_RUN'],
+	}).notNull(),
+	triggerType: text('trigger_type', { enum: ['MANUAL', 'WEBHOOK', 'SCHEDULE'] }).notNull(),
 	triggeredBy: text('triggered_by').notNull(),
 	startedAt: timestamp('started_at').defaultNow().notNull(),
 	completedAt: timestamp('completed_at'),
 	duration: integer('duration'),
+	// Maps stepName -> { status: string, ts?: number }
+	steps: json('steps').$type<Record<string, { status: string; ts?: number }>>().default({}),
 });
 
 export const workflowRunRelations = relations(workflowRun, ({ one }) => ({

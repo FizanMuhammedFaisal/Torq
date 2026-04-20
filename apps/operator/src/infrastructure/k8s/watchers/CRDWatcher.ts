@@ -11,8 +11,6 @@ import type { IReconciler } from '@/application/port/reconciler/reconciler.inter
 // https://kubernetes.io/docs/reference/using-api/api-concepts/#efficient-detection-of-changes
 // workflow watcher should watch modified/created events
 
-
-
 /**
  * the watcher loop, even when on crash will restart to watch for events from kuber-api-server
  * doing reconciliation
@@ -30,33 +28,41 @@ export class CRDWatcher extends BaseWatcher {
 		logger.info({
 			'[crd-watcher] starting watch': { path, resourceVersion: this.lastResourceVersion },
 		});
-
+		logger.info(`[crd-watcher] watching path: ${path} with resourceVersion: ${this.lastResourceVersion}`);
+		this.markWatchStarted();
 		this.watch.watch(
 			path,
 			this.lastResourceVersion ? { resourceVersion: this.lastResourceVersion } : {},
-			this.handler,
+			this.handler.bind(this),
 			this.hanldeDisconnect.bind(this),
 		);
 	}
 
 	/**
-	 * 
-	 * Start of the reconciliation loop, each event and workflowrunCRD will be modified 
+	 *
+	 * Start of the reconciliation loop, each event and workflowrunCRD will be modified
 	 * accordance with how we need to move currect status to given spec
 	 */
 	private async handler(phase: string, apiObj: unknown, _watchObj?: unknown) {
 		if (!this.isWorkflowRunK8s(apiObj)) {
-			logger.warn({
-				'[crd - watcher] received unexpected object shape': apiObj,
-			});
+			logger.warn({ '[crd-watcher] received unexpected object shape': apiObj });
 			return;
 		}
 		if (apiObj.metadata?.resourceVersion) {
 			this.lastResourceVersion = apiObj.metadata.resourceVersion;
 		}
+		if (phase === 'DELETED') {
+			// Finalizer was removed by CleanUpService — K8s is now completing deletion.
+			logger.debug(
+				{ runName: apiObj.metadata?.name },
+				'[crd-watcher] DELETED phase — CRD fully removed, finalizer already cleared',
+			);
+			return;
+		}
 		if (phase !== 'ADDED' && phase !== 'MODIFIED') return;
 		try {
 			const run = toDomainWorkflowRun(apiObj);
+			logger.trace({ runName: run.metadata.name, phase }, '[crd-watcher] dispatching to reconciler');
 			await this.reconciler.reconcile(run);
 		} catch (err) {
 			logger.error({ '[crd-watcher] reconcile error': err });

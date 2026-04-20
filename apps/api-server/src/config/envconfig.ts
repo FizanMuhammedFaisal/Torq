@@ -1,3 +1,5 @@
+import 'dotenv/config';
+
 export const Envconfig = {
 	server: {
 		port: process.env.PORT || 4000,
@@ -6,11 +8,17 @@ export const Envconfig = {
 	database: {
 		url: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/postgres',
 	},
+	redis: {
+		url: `redis://${process.env.REDIS_HOST ?? 'localhost'}:${process.env.REDIS_PORT ?? 6379}`,
+	},
 	app: {
 		name: 'TORQ API Server',
 		version: process.env.APP_VERSION || '0.0.1',
 		cors: {
-			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173'],
+			origins: process.env.CORS_ORIGINS?.split(',') || [
+				'http://localhost:5173',
+				'http://localhost:5174',
+			],
 		},
 		masterKeyFile: './src/config/torq/master.key',
 	},
@@ -27,12 +35,12 @@ export const Envconfig = {
 		grpc: {
 			operator: {
 				baseUrl: process.env.OPERATOR_GRPC_URL || 'http://localhost:50051',
-			}
-		}
+			},
+		},
 	},
 	grpc: {
 		PORT: process.env.GRPC_PORT || 50052,
-		HOST: process.env.GRPC_HOST || 'localhost',
-	}
+		HOST: process.env.GRPC_HOST || '0.0.0.0',
+	},
 };
 export type Envconfig = typeof Envconfig;
