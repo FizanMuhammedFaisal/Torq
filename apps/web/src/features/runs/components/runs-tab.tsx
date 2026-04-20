@@ -129,28 +129,23 @@ export function RunsTab({ workflowId }: { workflowId: string }) {
 						<div className="flex flex-col items-center justify-center h-full opacity-30 italic">
 							Waiting for execution data...
 						</div>
+					) : Object.keys(selectedRun.stepsMap || {}).length === 0 ? (
+						<div className="flex flex-col items-center justify-center h-full opacity-30 italic">
+							No execution steps reported yet for this run.
+						</div>
 					) : (
-						// Temporary mock steps as backend doesn't provide them yet
-						([
-							{ name: 'initialize', status: 'SUCCESS', duration: '124ms' },
-							{ 
-								name: 'execute-dsl', 
-								status: selectedRun.status === 'FAILED' ? 'FAILED' : (selectedRun.status === 'RUNNING' ? 'RUNNING' : 'SUCCESS'), 
-								duration: selectedRun.status === 'RUNNING' ? '—' : '2.4s' 
-							},
-							{ name: 'finalize', status: 'IDLE', duration: '—' }
-						] as Step[]).map((step) => {
-							const isExpanded = expandedSteps[step.name];
-							const isSuccess = step.status === 'SUCCESS';
-							const isFailed = step.status === 'FAILED';
-							const isRunning = step.status === 'RUNNING';
+						Object.entries(selectedRun.stepsMap).map(([name, data]) => {
+							const isExpanded = expandedSteps[name];
+							const isSuccess = data.status === 'SUCCESS';
+							const isFailed = data.status === 'FAILED';
+							const isRunning = data.status === 'RUNNING';
 
 							return (
-								<div key={step.name} className="mb-3 rounded-2xl border border-white/5 bg-neutral-900/50 overflow-hidden">
+								<div key={name} className="mb-3 rounded-2xl border border-white/5 bg-neutral-900/50 overflow-hidden">
 									{/* Accordion Trigger */}
 									<button
 										type="button"
-										onClick={() => toggleStep(step.name)}
+										onClick={() => toggleStep(name)}
 										className="w-full flex items-center gap-3.5 px-5 py-3.5 hover:bg-white/3 transition-colors text-left"
 									>
 										{/* Expand icon */}
@@ -167,8 +162,10 @@ export function RunsTab({ workflowId }: { workflowId: string }) {
 										{isRunning && <span className="size-2 rounded-full bg-blue-400 animate-ping" />}
 										{!isSuccess && !isFailed && !isRunning && <div className="size-4 rounded-full border-2 border-white/15" />}
 
-										<span className={`font-bold tracking-tight ${isFailed ? 'text-red-400' : (isRunning ? 'text-blue-400' : 'text-white/80')}`}>{step.name}</span>
-										<span className="text-white/20 text-[11px] ml-auto font-mono">{step.duration}</span>
+										<span className={`font-bold tracking-tight ${isFailed ? 'text-red-400' : (isRunning ? 'text-blue-400' : 'text-white/80')}`}>{name}</span>
+										<span className="text-white/20 text-[11px] ml-auto font-mono">
+											{data.ts ? new Date(data.ts).toLocaleTimeString([], { hour12: false }) : '—'}
+										</span>
 									</button>
 
 									{/* Accordion Content */}
@@ -181,48 +178,20 @@ export function RunsTab({ workflowId }: { workflowId: string }) {
 												transition={{ duration: 0.3, ease: 'circOut' }}
 												className="border-t border-white/5 bg-black/60"
 											>
-												<div className="p-5 space-y-1.5 overflow-x-auto text-[12.5px] text-white/50 font-mono">
-													<div className="flex gap-4">
-														<span className="w-10 text-right opacity-30 select-none">1</span>
-														<span>[09:42:11] torq: initializing runner environment...</span>
+												<div className="p-8 flex flex-col items-center justify-center gap-4 text-center">
+													<div className="size-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+														<svg className="size-5 text-white/20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+															<title>Logs Unavailable</title>
+															<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+														</svg>
 													</div>
-													<div className="flex gap-4">
-														<span className="w-10 text-right opacity-30 select-none">2</span>
-														<span>[09:42:11] torq: fetching spec for {selectedRun.workflowName}...</span>
+													<div className="space-y-1">
+														<p className="text-[13px] font-bold text-white/60">Execution Logs Unavailable</p>
+														<p className="text-[12px] text-white/30 max-w-[240px]">
+															Live log streaming for individual steps is currently being integrated. 
+															Please check the operator logs for detailed output.
+														</p>
 													</div>
-													{isRunning ? (
-														<div className="flex gap-4">
-															<span className="w-10 text-right opacity-30 select-none">3</span>
-															<span className="text-blue-400/80 italic">Worker executing logic...</span>
-														</div>
-													) : isSuccess ? (
-														<>
-															<div className="flex gap-4">
-																<span className="w-10 text-right opacity-30 select-none">3</span>
-																<span>[09:42:12] torq: successfully applied DSL transform</span>
-															</div>
-															<div className="flex gap-4">
-																<span className="w-10 text-right opacity-30 select-none">4</span>
-																<span className="text-emerald-400/80">Done. Process exited with code 0.</span>
-															</div>
-														</>
-													) : isFailed ? (
-														<>
-															<div className="flex gap-4 text-red-400/60">
-																<span className="w-10 text-right opacity-30 select-none">3</span>
-																<span>[critical] FATAL_ERROR: Connection timeout to downstream service</span>
-															</div>
-															<div className="flex gap-4">
-																<span className="w-10 text-right opacity-30 select-none">4</span>
-																<span className="text-red-400/80">Failed. Cleanup started.</span>
-															</div>
-														</>
-													) : (
-														<div className="flex gap-4 opacity-20 italic">
-															<span className="w-10 text-right select-none">3</span>
-															<span>Pending...</span>
-														</div>
-													)}
 												</div>
 											</motion.div>
 										)}

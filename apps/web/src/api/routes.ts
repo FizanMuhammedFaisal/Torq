@@ -6,6 +6,7 @@ export const API_ROUTES = {
 		REVEAL_SECRET: (id: string, key: string) => `/workflows/${id}/secrets/${key}/reveal`,
 		TRIGGER: (id: string) => `/workflows/${id}/trigger`,
 		RUNS: (id: string) => `/workflows/${id}/runs`,
+		GET_SPEC: (id: string) => `/workflows/${id}/spec`,
 	},
 	RUNS: {
 		BASE: '/runs',

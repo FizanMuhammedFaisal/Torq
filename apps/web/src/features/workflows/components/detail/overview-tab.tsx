@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { File02Icon, GearsIcon, GridIcon, Alert02Icon } from '@hugeicons/core-free-icons';
-import { Button } from '@/components/ui/button';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { statusConfig as statusMap } from '@/features/workflows/config';
-import type { Workflow } from '@/features/workflows/types';
-import type { Run } from './types';
+import type { Workflow, WorkflowStatus } from '@/features/workflows/types';
+import type { GetWorkflowByIdResponse } from '@/features/workflows/schema/api.dto';
+import type { Run } from '@/features/runs/hooks/use-runs';
 
 function MetricCard({
 	label,
@@ -84,9 +84,25 @@ export function OverviewTab({
 	workflow,
 	runs,
 }: {
-	workflow: Workflow;
+	workflow: GetWorkflowByIdResponse;
 	runs: Run[];
 }) {
+	// Calculate Metrics
+	const totalRuns = runs.length;
+	const successfulRuns = runs.filter((r) => r.status === 'SUCCESS').length;
+	const successRate = totalRuns > 0 ? Math.round((successfulRuns / totalRuns) * 100) : 0;
+
+	const durations = runs
+		.filter((r) => r.status === 'SUCCESS' && r.durationMs)
+		.map((r) => r.durationMs as number);
+	const avgDurationMs = durations.length > 0 ? durations.reduce((a, b) => a + b, 0) / durations.length : 0;
+
+	const formatMs = (ms: number) => {
+		if (ms === 0) return '—';
+		if (ms < 1000) return `${Math.round(ms)}ms`;
+		if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
+		return `${(ms / 60000).toFixed(1)}m`;
+	};
 
 	return (
 		<div className="space-y-8 pb-12">
@@ -94,32 +110,34 @@ export function OverviewTab({
 			<div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 				<MetricCard
 					label="Total Runs"
-					value={runs.length}
+					value={totalRuns}
 					accent="white"
 					icon={File02Icon}
 					delay={0.05}
 				/>
 				<MetricCard
 					label="Avg Duration"
-					value="—"
+					value={formatMs(avgDurationMs)}
 					accent="blue"
 					icon={GearsIcon}
 					delay={0.1}
 				/>
 				<MetricCard
-					label="Last Run"
-					value={runs[0]?.date || '—'}
-					accent="blue"
+					label="Success Rate"
+					value={`${successRate}%`}
+					accent={successRate > 80 ? 'emerald' : successRate > 50 ? 'blue' : 'red'}
 					icon={GridIcon}
 					delay={0.15}
 				/>
 				<MetricCard
-					label="Status"
+					label="Last Status"
 					value={runs[0]?.status || 'IDLE'}
 					accent={(runs[0]?.status === 'SUCCESS' ? 'emerald' : runs[0]?.status === 'FAILED' ? 'red' : 'blue') as any}
 					delay={0.2}
 				/>
 			</div>
+
+
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
 				{/* About Section */}
@@ -140,6 +158,12 @@ export function OverviewTab({
 					<p className="text-[14px] text-white/50 leading-relaxed font-light mb-6 flex-1 relative z-10">
 						{workflow.description || 'No description provided.'}
 					</p>
+					<div className="pt-6 border-t border-white/5 relative z-10">
+						<div className="flex items-center justify-between text-[13px]">
+							<span className="text-white/30">Created</span>
+							<span className="text-white/60">{new Date(workflow.createdAt).toLocaleDateString()}</span>
+						</div>
+					</div>
 				</motion.div>
 
 				{/* Recent Runs Section */}
@@ -153,19 +177,20 @@ export function OverviewTab({
 					<div className="flex items-center justify-between mb-6">
 						<div>
 							<h3 className="text-[16px] font-semibold text-white/90">Latest Executions</h3>
-							<p className="text-[13px] text-white/40 mt-1">Most recent activity for this YAML</p>
+							<p className="text-[13px] text-white/40 mt-1">Timeline of history for this workflow</p>
 						</div>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="h-8 text-[12px] text-white/40 hover:text-white/80 rounded-full"
-						>
-							View all
-						</Button>
+						<div className="flex items-center gap-2">
+							<div className="size-2 rounded-full bg-emerald-500/20 animate-pulse" />
+							<span className="text-[11px] font-bold text-white/20 uppercase tracking-widest">Auto-Updating</span>
+						</div>
 					</div>
 
 					<div className="space-y-3">
-						{runs.slice(0, 4).map((run, i) => {
+						{runs.length === 0 ? (
+							<div className="py-12 border border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-center opacity-30 italic text-sm">
+								No execution history found.
+							</div>
+						) : runs.slice(0, 5).map((run, i) => {
 							const rc = statusMap[run.status] || statusMap.IDLE;
 							const isSuccess = run.status === 'SUCCESS';
 							return (
@@ -176,30 +201,25 @@ export function OverviewTab({
 									key={run.id}
 									className="group flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-white/3 bg-white/1 hover:bg-white/3 transition-colors p-4 gap-4 relative overflow-hidden"
 								>
-									{isSuccess ? null : (
-										<div className="absolute inset-y-0 left-0 w-1 bg-red-500/50" />
-									)}
 									<div className="flex items-center gap-4">
 										<div
-											className={`size-10 rounded-full flex items-center justify-center border ${isSuccess ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-red-500/10 border-red-500/20 text-red-400'}`}
+											className={`size-10 rounded-xl flex items-center justify-center border transition-colors ${isSuccess ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20' : 'bg-red-500/10 border-red-500/20 text-red-400 group-hover:bg-red-500/20'}`}
 										>
 											<HugeiconsIcon icon={isSuccess ? GridIcon : Alert02Icon} className="size-5" />
 										</div>
 										<div>
 											<div className="flex items-center gap-2 mb-1">
-												<span className="text-[14px] font-semibold text-white/80">
-													{run.trigger}
+												<span className="text-[14px] font-semibold text-white/80 capitalize">
+													{run.trigger.toLowerCase()}
 												</span>
 												<span
-													className={`text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full font-bold ${isSuccess ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}
+													className={`text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-md font-bold ${isSuccess ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-500'}`}
 												>
 													{rc.label}
 												</span>
 											</div>
-											<div className="text-[12px] text-white/30 flex items-center gap-3">
-												<span>
-													ID: <span className="font-mono text-white/40">{run.id}</span>
-												</span>
+											<div className="text-[11px] text-white/20 flex items-center gap-3">
+												<span className="font-mono">#{run.id.slice(-8).toUpperCase()}</span>
 												<span className="size-1 rounded-full bg-white/10" />
 												<span>{run.date}</span>
 											</div>
@@ -208,18 +228,12 @@ export function OverviewTab({
 									<div className="flex items-center gap-3 sm:pr-2">
 										<div className="flex flex-col items-end">
 											<span className="text-[14px] font-mono text-white/70">{run.duration}</span>
-											<span className="text-[11px] text-white/30">Duration</span>
+											<span className="text-[10px] text-white/20 uppercase tracking-tighter">Time</span>
 										</div>
-										<div className="size-8 rounded-full ml-2 opacity-0 group-hover:opacity-100 transition-opacity text-white/40 flex items-center justify-center bg-white/5">
+										<div className="size-8 rounded-full ml-2 opacity-0 group-hover:opacity-100 transition-all text-white/40 flex items-center justify-center bg-white/5 hover:bg-white/10 hover:text-white cursor-pointer">
 											<svg className="size-4 -rotate-90" viewBox="0 0 16 16" fill="none">
 												<title>View run</title>
-												<path
-													d="M10 12L6 8l4-4"
-													stroke="currentColor"
-													strokeWidth="1.5"
-													strokeLinecap="round"
-													strokeLinejoin="round"
-												/>
+												<path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 											</svg>
 										</div>
 									</div>

@@ -11,6 +11,7 @@ export interface RunDto {
 	durationMs?: number;
 	namespace?: string;
 	stepCount?: number;
+	steps: Record<string, { status: string; ts?: number }>;
 }
 
 export interface GetRunsResponse {

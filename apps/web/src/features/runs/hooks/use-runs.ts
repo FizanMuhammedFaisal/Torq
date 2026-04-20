@@ -12,12 +12,14 @@ export interface Run {
 	trigger: string;
 	date: string;
 	duration: string;
+	durationMs?: number;
 	namespace: string;
-	steps: number;
+	stepCount: number;
+	stepsMap: Record<string, { status: string; ts?: number }>;
 }
 
-async function fetchRuns(): Promise<Run[]> {
-	const response = await runService.list();
+async function fetchRuns(workflowId?: string): Promise<Run[]> {
+	const response = await runService.list({ workflowId });
 	const runsData = response.data || [];
 
 	return runsData.map((r) => ({
@@ -28,20 +30,21 @@ async function fetchRuns(): Promise<Run[]> {
 		trigger: r.trigger || 'unknown',
 		date: formatRelativeTime(r.startedAt),
 		duration: formatDuration(r.durationMs),
+		durationMs: r.durationMs,
 		namespace: r.namespace || 'default',
-		steps: r.stepCount ?? 0,
+		stepCount: r.stepCount ?? 0,
+		stepsMap: r.steps || {},
 	}));
 }
 
-export function useRuns() {
+export function useRuns(options: { workflowId?: string; refetchInterval?: number } = {}) {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [statusFilter, setStatusFilter] = useState<WorkflowStatus | 'all'>('all');
 
 	const query = useQuery({
-		queryKey: ['runs', 'list'],
-		queryFn: fetchRuns,
-		// Refetch every 15s to simulate live updates until we have WebSockets
-		refetchInterval: 15_000,
+		queryKey: ['runs', 'list', options.workflowId],
+		queryFn: () => fetchRuns(options.workflowId),
+		refetchInterval: options.refetchInterval ?? 15_000,
 	});
 
 	const runs = query.data ?? [];

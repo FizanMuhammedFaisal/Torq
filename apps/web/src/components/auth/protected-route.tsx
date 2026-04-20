@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppConfig } from '@/lib/app-config';
-import { useAuthStore } from '@/store/use-auth-store';
+import { useAuthStore } from '@/store/auth';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 	const { user, isLoading } = useAuthStore();

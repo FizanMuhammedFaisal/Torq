@@ -14,7 +14,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { authClient } from '@/lib/auth';
-import { useAuthStore } from '@/store/use-auth-store';
+import { useAuthStore } from '@/store/auth';
 
 const navItems = [
 	{
