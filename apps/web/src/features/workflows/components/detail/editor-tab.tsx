@@ -6,15 +6,22 @@ import { Button } from '@/components/ui/button';
 import { type ValidationError, YamlEditor } from '@/components/yaml-editor';
 import { useGetWorkflowSpec } from '../../hooks/use-get-workflow-spec';
 import { useWorkFlowActions, useWorkFlowStore } from '@/store/workflow';
+import { useUpdateWorkflow } from '../../hooks/use-update-workflow';
+import toast from 'react-hot-toast';
 export function EditorTab({ workflowId }: { workflowId: string }) {
 
-	useGetWorkflowSpec(workflowId)
+	const { isPending, isLoading } = useGetWorkflowSpec(workflowId)
+	const updateWorkflowMutation = useUpdateWorkflow(workflowId)
+
 	const { workflows } = useWorkFlowStore()
 	const { setEditingSpecContent, setSaved } = useWorkFlowActions()
-	const { editingSpec: yamlContent, saved, spec } = workflows[workflowId]
-
-
 	const [errors, setErrors] = useState<ValidationError[]>([]);
+
+
+	if (isPending || isLoading || !workflows[workflowId]) {
+		return <div> loding</div>
+	}
+	const { editingSpec: yamlContent, saved, spec } = workflows[workflowId]
 
 
 	const handleChange = (val: string) => {
@@ -22,14 +29,28 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 		setSaved(workflowId, false);
 	};
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		if (errors.length > 0) return;
-		setSaved(workflowId, true);
+		if (saved) return
+		updateWorkflowMutation.mutate({ raw: yamlContent }, {
+			onSuccess: (data) => {
+				if (data.raw) {
+					setEditingSpecContent(workflowId, data.raw)
+				}
+				toast.success("Workflow Updated")
+				setSaved(workflowId, true);
+			},
+			onError: (error) => {
+				toast.error("Update Failed, Try again")
+				setSaved(workflowId, false);
+			}
+		})
 	};
 	const hanldeDiscard = () => {
 		setEditingSpecContent(workflowId, spec);
 		setSaved(workflowId, true);
 	}
+
 	return (
 		<div className="flex flex-col items-center justify-center w-full pb-12">
 			<div className="w-full max-w-4xl space-y-6">

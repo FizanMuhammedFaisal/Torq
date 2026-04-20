@@ -14,6 +14,8 @@ import type {
 	TriggerWorkflowResponse,
 	GetWorkflowBySpecPayload,
 	GetWorkflowBySpecResponse,
+	UpdateWorkflowPayload,
+	UpdateWorkflowResponse,
 } from '../schema/api.dto';
 
 export const workflowService = {
@@ -76,9 +78,16 @@ export const workflowService = {
 		return data;
 	},
 	getWorkflowSpec: async (workflowId: string, payload?: GetWorkflowBySpecPayload): Promise<GetWorkflowBySpecResponse> => {
-		const { data } = await apiClient.post<GetWorkflowBySpecResponse>(
+		const { data } = await apiClient.get<GetWorkflowBySpecResponse>(
 			API_ROUTES.WORKFLOWS.GET_SPEC(workflowId),
-			payload,
+
+		);
+		return data;
+	},
+	updateWorkflow: async (workflowId: string, payload?: UpdateWorkflowPayload): Promise<UpdateWorkflowResponse> => {
+		const { data } = await apiClient.patch<UpdateWorkflowResponse>(
+			API_ROUTES.WORKFLOWS.BY_ID(workflowId),
+			payload
 		);
 		return data;
 	},

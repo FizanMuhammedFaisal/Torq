@@ -128,3 +128,16 @@ export interface GetWorkflowBySpecResponse {
 	spec: string;
 	createdAt: Date;
 }
+export interface UpdateWorkflowPayload {
+	raw?: string,
+	name?: string,
+	description?: string
+}
+
+
+export interface UpdateWorkflowResponse {
+	id: string,
+	name: string,
+	description?: string
+	raw?: string
+}

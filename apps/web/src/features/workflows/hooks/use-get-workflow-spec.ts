@@ -13,12 +13,13 @@ export const useGetWorkflowSpec = (workflowId: string, versionId?: string) => {
             const data = await workflowService.getWorkflowSpec(workflowId)
             addWorkflow(data.workflowId, {
                 workflowId: data.workflowId,
-                isDirty: false,
+                saved: false,
                 spec: data.spec,
-                versionId: data.versionId
+                versionId: data.versionId,
+                editingSpec: data.spec
             })
         },
-        enabled: !!existing.spec,
+        enabled: !existing?.spec,
         staleTime: Infinity
     },
     );
