@@ -139,8 +139,8 @@ export const Alert = ({
 			className={cn(
 				'my-8 rounded-xl border p-4 sm:p-5',
 				isWarning
-					? 'bg-amber-500/[0.03] border-amber-500/20 text-amber-500/90'
-					: 'bg-emerald-500/[0.03] border-emerald-500/20 text-emerald-500/90',
+					? 'bg-amber-500/3 border-amber-500/20 text-amber-500/90'
+					: 'bg-emerald-500/3 border-emerald-500/20 text-emerald-500/90',
 				className,
 			)}
 		>

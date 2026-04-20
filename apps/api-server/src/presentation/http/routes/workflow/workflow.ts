@@ -1,11 +1,22 @@
 import Elysia from 'elysia';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
-import type { IWorkflowController } from '@/presentation/interfaces/controller/workflow.interface';
-import type { Router } from '@/presentation/interfaces/routes';
+import type { IWorkflowController } from '@/presentation/http/interfaces/controller/workflow.interface';
+import type { Router } from '@/presentation/http/interfaces/routes';
 import { CreateWorkflowSchema } from '@/application/dto/worflows/createWorkflow.dto';
-import { UpsertSecretsSchema } from '@/application/dto/worflows/upsertSecrets.dto';
-import type { AuthMacro } from '@/presentation/macros/auth.macro';
+import {
+	UpsertSecretsQuerySchema,
+	UpsertSecretsSchema,
+} from '@/application/dto/worflows/upsertSecrets.dto';
+import { TriggerWorkflowRunSchema } from '@/application/dto/worflows/triggerWorkflowRun.dto';
+import { GetSecretsSchema } from '@/application/dto/worflows/getSecrets.dto';
+import { RevealSecretSchema } from '@/application/dto/worflows/revealSecret.dto';
+import type { AuthMacro } from '@/presentation/http/macros/auth.macro';
+import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows.dto';
+import {
+	GetWorkflowByIdInputParamsSchema,
+	GetWorkflowByIdInputQuerySchema,
+} from '@/application/dto/worflows/getWorkflowById.dto';
 
 @injectable()
 export class WorkflowRouter implements Router {
@@ -24,8 +35,23 @@ export class WorkflowRouter implements Router {
 			.use(this.list())
 			.use(this.upsertSecrets())
 			.use(this.getSecrets())
-			.use(this.createRun())
-			.use(this.revealSecret());
+			.use(this.trigger())
+			.use(this.revealSecret())
+			.use(this.getById());
+	}
+
+	getById() {
+		return new Elysia().use(this.authMacro.plugin()).get(
+			'/:id',
+			(ctx) => {
+				return this.workflowController.getWorkflowById(ctx);
+			},
+			{
+				auth: true,
+				query: GetWorkflowByIdInputQuerySchema,
+				params: GetWorkflowByIdInputParamsSchema,
+			},
+		);
 	}
 
 	create() {
@@ -60,6 +86,7 @@ export class WorkflowRouter implements Router {
 				return this.workflowController.upsertSecrets(ctx);
 			},
 			{
+				params: UpsertSecretsQuerySchema,
 				body: UpsertSecretsSchema,
 				auth: true,
 			},
@@ -73,18 +100,20 @@ export class WorkflowRouter implements Router {
 				return this.workflowController.getSecrets(ctx);
 			},
 			{
+				params: GetSecretsSchema,
 				auth: true,
 			},
 		);
 	}
 
-	createRun() {
+	trigger() {
 		return new Elysia().use(this.authMacro.plugin()).post(
-			'/:id/runs',
+			'/:id/trigger',
 			(ctx) => {
-				return this.workflowController.createRun(ctx);
+				return this.workflowController.triggerWorkflowRun(ctx);
 			},
 			{
+				body: TriggerWorkflowRunSchema,
 				auth: true,
 			},
 		);
@@ -97,6 +126,7 @@ export class WorkflowRouter implements Router {
 				return this.workflowController.revealSecret(ctx);
 			},
 			{
+				params: RevealSecretSchema,
 				auth: true,
 			},
 		);

@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import type { AuthUser } from '@/presentation/macros/auth.macro';
+import type { AuthUser } from '@/presentation/http/macros/auth.macro';
 
 export const GetSecretsSchema = z.object({
-	workflowId: z.string().min(1, 'Invalid workflow ID format'),
+	id: z.ulid('Invalid workflow ID format'),
 });
 
 export type GetSecretsInputDto = z.infer<typeof GetSecretsSchema> & { req: AuthUser };

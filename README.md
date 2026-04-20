@@ -1,4 +1,4 @@
-# Workflow Execution System
+# Torq - Workflow Execution System
 
 A Kubernetes-native workflow execution engine for running containerized jobs with DAG-based orchestration.
 
@@ -7,7 +7,7 @@ A Kubernetes-native workflow execution engine for running containerized jobs wit
 [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
 [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[Getting Started](docs/getting-started.md) • [Concepts](docs/concepts.md) • [Architecture](docs/architecture.md) • [Contributing](CONTRIBUTING.md)
+[Getting Started](docs/getting-started.md) • [Architecture](docs/architecture.md) • [Structure](docs/structure.md) • [Contributing](CONTRIBUTING.md)
 
 </div>
 
@@ -15,17 +15,19 @@ A Kubernetes-native workflow execution engine for running containerized jobs wit
 
 ## Accelerate Your Operations
 
-**Workflow Execution System** is a security-first, event-driven orchestration engine designed to automate complex processes at scale. Built natively for Kubernetes, it empowers engineering teams to build, run, and monitor automation workflows with unparalleled reliability and speed.
+**Torq** is a workflow orchestration engine designed to automate complex processes at scale. Built natively for Kubernetes, it empowers engineering teams to build, run, and monitor automation workflows with unparalleled reliability and speed.
 
 Stop writing glue code. Start orchestrating value.
 
 ## Key Capabilities
 
+*Note: Some features are in development and may not be fully implemented yet.*
+
 ### ⚡️ Event-Driven Automation
 
-Trigger workflows instantly from any source. Whether it's a webhook, a system event, or a scheduled task, our engine reacts in real-time to drive your business logic forward.
+Trigger workflows instantly from Dashboard. Whether it's a webhook, a system event, or a scheduled task, our engine reacts in real-time to drive your business logic forward.
 
-### 🛡️ Assessing Security Posture
+### 🛡️ Security-First Execution
 
 Built with safety in mind. Execute arbitrary containerized steps with strict isolation. Define granular permissions and resource limits to ensure your automation never compromises your infrastructure.
 
@@ -58,7 +60,7 @@ Explore our comprehensive guides to master the platform:
 | **[Core Concepts](docs/concepts.md)**          | Learn about Workflows, Steps, Triggers, and Context.                    |
 | **[Architecture](docs/architecture.md)**       | Deep dive into the system internals and design decisions.               |
 
-## 🛠️ Quick Start
+##  Quick Start
 
 Ready to dive in?
 
@@ -79,6 +81,6 @@ For full deployment instructions, see the [Getting Started Guide](docs/getting-s
 
 We welcome contributions from the community! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

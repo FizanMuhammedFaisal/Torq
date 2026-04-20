@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: torq-operator
+  namespace: default
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: torq-operator-role
+rules:
+  # CRD management
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources:
+      - "customresourcedefinitions"
+      - "customresourcedefinitions/status"
+    verbs: ["get", "create", "update", "patch", "delete", "list", "watch"]
+  # custom resources
+  - apiGroups: ["torq.dev"]
+    resources: ["workflowruns"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # DaemonSet management (for fluent-bit in logging namespace)
+  - apiGroups: ["apps"]
+    resources: ["daemonsets"]
+    verbs: ["get", "create", "update", "patch", "delete", "list", "watch"]
+  # For managing fluent-bit's RBAC (operator creates these dynamically)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings"]
+    verbs:
+      [
+        "get",
+        "create",
+        "update",
+        "patch",
+        "delete",
+        "list",
+        "watch",
+        "bind",
+        "escalate",
+      ]
+    #  for operator to grand permission to fluentbit it needs then first
+  - apiGroups: [""]
+    resources:
+      ["namespaces", "events", "serviceaccounts", "configmaps", "pods", "nodes"]
+    verbs: ["get", "create", "update", "patch", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: torq-operator-rolebinding
+subjects:
+  - kind: ServiceAccount
+    name: torq-operator
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: torq-operator-role
+  apiGroup: rbac.authorization.k8s.io
+
+# By default, every pod gets zero permissions
+# here we grand permisson for our operator pod deploybed in kuber as a pod to access api server

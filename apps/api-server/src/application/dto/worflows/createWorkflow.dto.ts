@@ -1,4 +1,4 @@
-import type { AuthUser } from '@/presentation/macros/auth.macro';
+import type { AuthUser } from '@/presentation/http/macros/auth.macro';
 import z from 'zod';
 
 export const CreateWorkflowSchema = z.object({

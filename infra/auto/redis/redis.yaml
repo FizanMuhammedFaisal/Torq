@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: torq
+  labels:
+    app: redis
+    component: message-broker
+spec:
+  serviceName: redis-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        component: message-broker
+    spec:
+      terminationGracePeriodSeconds: 30
+      # ── Init: fix /data permissions ────────────────────────────────────────
+      initContainers:
+        - name: fix-permissions
+          image: busybox:1.36
+          command: [ "sh", "-c", "chown -R 999:999 /data" ]
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+
+      containers:
+        - name: redis
+          image: redis:7.2-alpine
+          command:
+            - redis-server
+            - /etc/redis/redis.conf
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 384Mi
+
+          # ── Health checks ────────────────────────────────────────────────────
+          livenessProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            exec:
+              command: [ "redis-cli", "ping" ]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+
+          # ── Volume mounts ────────────────────────────────────────────────────
+          volumeMounts:
+            - name: redis-config
+              mountPath: /etc/redis/redis.conf
+              subPath: redis.conf # mount only the file, not the whole dir
+              readOnly: true
+            - name: redis-data
+              mountPath: /data
+      # telling the source of the data for redis-config
+      volumes:
+        - name: redis-config
+          configMap:
+            name: redis-config # matches ConfigMap metadata.name
+
+  # ── Persistent storage ──────────────────────────────────────────────────────
+  volumeClaimTemplates:
+    - metadata:
+        name: redis-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

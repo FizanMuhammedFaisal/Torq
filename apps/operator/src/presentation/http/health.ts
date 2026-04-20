@@ -1,10 +1,20 @@
 import { createServer } from 'node:http';
 
-export class HealthServer {
+//
+export interface IHealthServer {
+	markReady(): void;
+	markNotReady(): void;
+	start(): void;
+}
+
+export class HealthServer implements IHealthServer {
 	private ready = false;
 
 	markReady() {
 		this.ready = true;
+	}
+	markNotReady(): void {
+		this.ready = false;
 	}
 
 	start() {

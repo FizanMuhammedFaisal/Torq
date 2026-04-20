@@ -1,0 +1,85 @@
+# https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+# {plural}.{group}
+  name: workflowruns.torq.dev
+spec:
+  group: torq.dev
+  scope: Namespaced
+  names:
+    plural: workflowruns
+    singular: workflowrun
+    kind: WorkflowRun
+    shortNames:
+      - wr
+    categories:
+      - torq
+versions:
+# version string. Becomes part of apiVersion: torq.dev/v1alpha1. Convention: v1alpha1, v1beta1, v1. Alpha = unstable, beta = mostly stable, v1 = stable forever.
+  - name: v1alpha1
+# whether the K8s API currently accepts requests for this version, normaly set to true for old versns
+    served: true
+# which version K8s actually stores in etcd,other versin get converted to onw with storage:true
+    storage: true
+  
+    subresources:
+    # seperated sepc from status
+      status: {}
+
+    additionalPrinterColumns:
+      - name: Phase
+        type: string
+        jsonPath: .status.phase
+      - name: Workflow
+        type: string
+        jsonPath: .spec.workflowId
+      - name: Version
+        type: string
+        jsonPath: .spec.torqVersion
+      - name: Triggered by
+        type: string
+        jsonPath: .spec.triggeredBy
+      - name: Age
+        type: date
+        jsonPath: .metadata.creationTimestamp
+
+    schema:
+      openAPIV3Schema:
+        type: object
+        properties:
+
+          spec:
+            type: object
+            required:
+              - workflowId
+              - versionId
+              - torqVersion
+            properties:
+              workflowId:
+                type: string
+                description: >
+                  ID of the workflow definition stored
+                  in the API server database.
+              versionId:
+                type: string
+                description: >
+                  Specific version of the workflow DSL
+                  to execute.
+              torqVersion:
+                type: string
+                enum:
+                  - v1alpha
+                description: >
+                  DSL feature set version. Determines
+                  which operator handler runs this run.
+              triggeredBy:
+                type: string
+                description: User or system that triggered this run.
+# status is controller by the opearator
+          status:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+            description: >
+              Populated by the operator only. Never
+              written by the API server or users.

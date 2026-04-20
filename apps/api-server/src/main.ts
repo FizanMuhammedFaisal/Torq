@@ -5,12 +5,19 @@
 
 import 'reflect-metadata';
 import { Envconfig } from './config/envconfig';
-import { HTTPServer } from './presentation/server';
+import type { HTTPServer } from './presentation/server';
+import { container } from './config/di/container';
+import { TOKENS } from './config/di/tokens';
+import type { GRpcServer } from './presentation/grpc/rpc-server';
+import { WorkflowRunStateConsumer } from './infrastructure/redis/WorkflowRunStateConsumer';
+import { logger } from './infrastructure/logger/logger';
 
-console.log(' Torq API Server starting...');
-console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
-console.log(` Bun version: ${Bun.version}`);
-console.log(` Torq version: ${Envconfig.app.version}`);
+logger.info(' Torq API Server starting...');
+logger.info(` Environment: ${process.env.NODE_ENV || 'development'}`);
+logger.info(` Torq version: ${Envconfig.app.version}`);
 
-const server = new HTTPServer();
-await server.start();
+const server = container.resolve<HTTPServer>(TOKENS.HTTPServer);
+const grpcServer = container.resolve<GRpcServer>(TOKENS.GRPCServer);
+const runStateConsumer = container.resolve(WorkflowRunStateConsumer);
+
+await Promise.all([server.start(), grpcServer.start(), runStateConsumer.start()]);

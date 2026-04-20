@@ -1,15 +1,18 @@
-import { injectable } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import type { IRPCRouter } from '../interfaces/router.interface';
+import type { ConnectRouter } from '@connectrpc/connect';
+import { OperatorService } from '@torq-system/grpc';
+import { TOKENS } from '@/config/di/tokens';
+import type { IWorkflowRunController } from '../interfaces/controllers/workflow.interface';
 
 @injectable()
 export class RPCRouter implements IRPCRouter {
-	constructor() {}
-
+	constructor(
+		@inject(TOKENS.IWorkflowRunController) private workflowRunController: IWorkflowRunController,
+	) { }
 	public register(router: ConnectRouter): void {
-		// Tag routes
-		router.service(TagService, {
-			getTags: (req, context) => this._tagController.getTags(req, context),
-			getTagById: (req, context) => this._tagController.getTagById(req, context),
+		router.service(OperatorService, {
+			triggerWorkflowRun: (req, context) => this.workflowRunController.triggerRun(req, context),
 		});
 	}
 }

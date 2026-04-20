@@ -45,7 +45,7 @@ function ToastCard({ t }: { t: Toast }) {
 				filter: t.visible ? 'blur(0px)' : 'blur(5px)',
 			}}
 			transition={{ type: 'spring', stiffness: 450, damping: 25 }}
-			className="pointer-events-auto relative flex min-w-[280px] max-w-[400px] items-center gap-3 overflow-hidden rounded-full bg-[#100D08] px-4 py-3 shadow-2xl will-change-transform"
+			className="pointer-events-auto relative flex min-w-[280px] max-w-[400px] items-center gap-3 overflow-hidden rounded-full bg-zinc-950 px-4 py-3 shadow-2xl will-change-transform"
 			style={{
 				border: `1px solid ${borderColor}`,
 				boxShadow: `0 24px 48px -12px rgba(0,0,0,0.5), 0 0 24px -4px ${glowColor}, inset 0 1px 0 0 rgba(255,255,255,0.06)`,

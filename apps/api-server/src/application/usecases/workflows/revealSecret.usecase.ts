@@ -19,11 +19,11 @@ export class RevealSecretUseCase implements IRevealSecretUseCase {
 	) {}
 
 	async execute(data: RevealSecretInputDto): Promise<RevealSecretOutputDto> {
-		const secrets = await this.secretRepository.findByWorkflowId(data.workflowId);
+		const secrets = await this.secretRepository.findByWorkflowId(data.id);
 		const secret = secrets.find((s) => s.key === data.key);
 
 		if (!secret) {
-			throw new NotFoundError(`Secret with key "${data.key}" not found`);
+			throw new NotFoundError('Secrect');
 		}
 
 		const value = await this.secretService.decryptSecret({

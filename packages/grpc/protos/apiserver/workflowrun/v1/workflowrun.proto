@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package apiserver.workflowrun.v1;
+
+service ApiServerService {
+  rpc GetSpec(GetSpecRequest) returns (GetSpecResponse);
+}
+
+message GetSpecRequest {
+  string workflow_run_id = 1;
+  string version_id = 2;
+}
+
+import "google/protobuf/struct.proto";
+
+message GetSpecResponse {
+  string workflow_id = 1;
+  string version_id = 2;
+  repeated Secrets secrets = 5;
+  google.protobuf.Struct spec = 6;
+  string created_at = 7;
+}
+
+message Secrets {
+  string name = 1;
+  string value = 2;
+}

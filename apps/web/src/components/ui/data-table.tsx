@@ -90,7 +90,7 @@ export function DataTable<TData, TValue>({
 						initial={{ opacity: 0, scale: 0.98 }}
 						animate={{ opacity: 1, scale: 1 }}
 						transition={{ duration: 0.2 }}
-						className="flex-1 flex flex-col items-center justify-center py-20 text-center border border-white/[0.06] rounded-2xl bg-white/[0.01] border-dashed"
+						className="flex-1 flex flex-col items-center justify-center py-20 text-center border border-white/6 rounded-2xl bg-white/1 border-dashed"
 					>
 						<p className="text-[13px] text-white/30">{noResultsSubtext}</p>
 					</motion.div>
@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
 
 							<div className="flex-1 overflow-y-auto overflow-x-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
 								<Table className="relative min-w-full">
-									<TableHeader className="bg-[#0a0a0a] sticky top-0 z-20">
+									<TableHeader className="bg-zinc-950 sticky top-0 z-20">
 										{table.getHeaderGroups().map((headerGroup) => (
 											<TableRow
 												key={headerGroup.id}
@@ -139,7 +139,7 @@ export function DataTable<TData, TValue>({
 												key={row.id}
 												data-state={row.getIsSelected() && 'selected'}
 												onClick={() => onRowClick?.(row.original)}
-												className="border-none hover:bg-white/[0.03] transition-colors cursor-pointer rounded-xl group"
+												className="border-none hover:bg-white/3 transition-colors cursor-pointer rounded-xl group"
 											>
 												{row.getVisibleCells().map((cell) => (
 													<TableCell
@@ -161,8 +161,8 @@ export function DataTable<TData, TValue>({
 
 						{/* Bottom Pagination Bar */}
 						{table.getPageCount() > 1 && (
-							<div className="flex-none py-2 border-t border-white/[0.05]  flex justify-center z-20">
-								<div className="flex items-center gap-1 p-1 bg-[#101010] shadow-sm border border-white/[0.05] rounded-full">
+							<div className="flex-none py-2 border-t border-white/5  flex justify-center z-20">
+								<div className="flex items-center gap-1 p-1 bg-zinc-950 shadow-sm border border-white/5 rounded-full">
 									<Button
 										variant="ghost"
 										size="icon"

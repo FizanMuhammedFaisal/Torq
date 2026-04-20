@@ -40,7 +40,7 @@ export function HomePage() {
 			>
 				<Link to="/" className="select-none">
 					<span className="text-xl font-black tracking-tighter text-white">
-						torq
+						Torq
 					</span>
 				</Link>
 
@@ -108,7 +108,7 @@ export function HomePage() {
 								<Button
 									variant="outline"
 									size="lg"
-									className="font-medium text-sm px-7 h-11 rounded-xl border-white/10 text-white/50 bg-transparent hover:text-white hover:bg-white/[0.04] hover:border-white/20"
+									className="font-medium text-sm px-7 h-11 rounded-xl border-white/10 text-white/50 bg-transparent hover:text-white hover:bg-white/4 hover:border-white/20"
 								>
 									Documentation
 								</Button>
@@ -119,13 +119,13 @@ export function HomePage() {
 			</section>
 
 			<div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12">
-				<div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+				<div className="h-px bg-linear-to-r from-transparent via-white/6 to-transparent" />
 			</div>
 
 			<FeatureBentoGrid />
 
 			<div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12">
-				<div className="h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+				<div className="h-px bg-linear-to-r from-transparent via-white/6 to-transparent" />
 			</div>
 
 			<section className="relative z-10 w-full py-24 flex flex-col items-center overflow-hidden">

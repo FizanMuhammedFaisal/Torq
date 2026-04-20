@@ -1,12 +1,13 @@
 import { cors } from '@elysiajs/cors';
 import { openapi } from '@elysiajs/openapi';
 import { Elysia } from 'elysia';
+import { node } from '@elysiajs/node';
 import { container } from '@/config/di/container';
 import { TOKENS } from '@/config/di/tokens';
-import type { AppRouter } from '@/presentation/routes';
-import type { ErrorMacro } from '@/presentation/macros/error.macro';
+import type { AppRouter } from '@/presentation/http/routes';
+import type { ErrorMacro } from '@/presentation/http/macros/error.macro';
 import { Envconfig } from '../config/envconfig';
-import { OpenAPI } from './routes/auth/openapi';
+import { OpenAPI } from '@presentation/http/routes/auth/openapi';
 
 export class HTTPServer {
 	private app: Elysia;
@@ -14,7 +15,7 @@ export class HTTPServer {
 
 	constructor() {
 		this.envconfig = Envconfig;
-		this.app = new Elysia();
+		this.app = new Elysia({ adapter: node() });
 	}
 
 	private async configureOpenAPI() {

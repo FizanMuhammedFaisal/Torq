@@ -1,8 +1,12 @@
-export interface RevealSecretInputDto {
-	workflowId: string;
-	key: string;
-	req: { id: string };
-}
+import { z } from 'zod';
+import type { AuthUser } from '@/presentation/http/macros/auth.macro';
+
+export const RevealSecretSchema = z.object({
+	id: z.ulid('Invalid workflow ID format'),
+	key: z.string().min(1, 'Secret key cannot be empty'),
+});
+
+export type RevealSecretInputDto = z.infer<typeof RevealSecretSchema> & { req: AuthUser };
 
 export interface RevealSecretOutputDto {
 	key: string;

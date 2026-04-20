@@ -8,23 +8,24 @@ export const workflow = pgTable('workflow', {
 		.notNull()
 		.references(() => user.id),
 	name: text('name').notNull(),
-	description: text('description').notNull(),
+	description: text('description'),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const workflowVersion = pgTable('workflow_version', {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().notNull(),
 	workflowId: text('workflow_id')
 		.notNull()
 		.references(() => workflow.id),
 	version: integer('version').notNull(),
 	raw: text('raw').notNull(),
-	spec: json('spec').notNull(),
+	spec: json('spec').$type<Record<string, unknown>>().notNull(),
+	troqVersion: text('torq_version').notNull(),
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const secrets = pgTable('secret', {
-	id: text('id').primaryKey(),
+	id: text('id').primaryKey().notNull(),
 	workflowId: text('workflow_id')
 		.notNull()
 		.references(() => workflow.id),
@@ -63,16 +64,25 @@ export const secretRelations = relations(secrets, ({ one }) => ({
 	}),
 }));
 
+// Workflow runs
 export const workflowRun = pgTable('workflow_run', {
 	id: text('id').primaryKey(),
 	workflowId: text('workflow_id')
 		.notNull()
 		.references(() => workflow.id),
-	status: text('status', { enum: ['running', 'success', 'failed', 'idle'] }).notNull(),
+	workflowVersionId: text('workflow_version_id')
+		.notNull()
+		.references(() => workflowVersion.id),
+	status: text('status', {
+		enum: ['PENDING', 'RUNNING', 'SUCCESS', 'FAILED', 'IDLE', 'NOT_SUPPORTED_RUN'],
+	}).notNull(),
+	triggerType: text('trigger_type', { enum: ['MANUAL', 'WEBHOOK', 'SCHEDULE'] }).notNull(),
+	triggeredBy: text('triggered_by').notNull(),
 	startedAt: timestamp('started_at').defaultNow().notNull(),
 	completedAt: timestamp('completed_at'),
 	duration: integer('duration'),
-	steps: integer('steps').notNull(),
+	// Maps stepName -> { status: string, ts?: number }
+	steps: json('steps').$type<Record<string, { status: string; ts?: number }>>().default({}),
 });
 
 export const workflowRunRelations = relations(workflowRun, ({ one }) => ({

@@ -26,12 +26,12 @@ export function CodeBlock({
 	return (
 		<div
 			className={cn(
-				'relative my-8 rounded-xl border border-white/10 bg-[#0a0a0a] overflow-hidden group',
+				'relative my-8 rounded-xl border border-white/10 bg-zinc-950 overflow-hidden group',
 				className,
 			)}
 		>
 			{/* Header */}
-			<div className="flex items-center justify-between px-4 h-10 border-b border-white/5 bg-[#050505]/50">
+			<div className="flex items-center justify-between px-4 h-10 border-b border-white/5 bg-black/50">
 				<div className="flex items-center gap-2">
 					{filename && (
 						<span className="text-[13px] font-mono text-emerald-400/80">
@@ -60,7 +60,7 @@ export function CodeBlock({
 			</div>
 
 			{/* Code Content */}
-			<div className="relative w-full max-h-[500px] overflow-auto custom-scrollbar bg-[#0c0c0c]/80 text-[13px]">
+			<div className="relative w-full max-h-[500px] overflow-auto custom-scrollbar bg-neutral-950/80 text-[13px]">
 				<YamlEditor
 					value={code.trim()}
 					readOnly={true}

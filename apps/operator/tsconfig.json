@@ -14,9 +14,14 @@
 		"emitDecoratorMetadata": true,
 		"baseUrl": ".",
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["src/*"],
+			"@application/*": ["src/application/*"],
+			"@domain/*": ["src/domain/*"],
+			"@presentation/*": ["src/presentation/*"],
+			"@infrastructure/*": ["src/infrastructure/*"],
+			"@config/*": ["src/config/*"]
 		}
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "drizzle.config.ts", "tests/**/*"],
 	"exclude": ["node_modules", "dist"]
 }

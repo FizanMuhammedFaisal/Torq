@@ -18,6 +18,7 @@ export class WorkflowVersionMapper
 			spec: row.spec,
 			raw: row.raw,
 			createdAt: row.createdAt,
+			torqVersion: row.troqVersion,
 		});
 	}
 
@@ -29,6 +30,7 @@ export class WorkflowVersionMapper
 			spec: entity.spec,
 			raw: entity.raw,
 			createdAt: entity.createdAt,
+			troqVersion: entity.torqVersion,
 		};
 	}
 }

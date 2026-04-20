@@ -98,11 +98,11 @@ export function YamlEditor({
 
 	return (
 		<div
-			className={`rounded-xl border border-white/7 overflow-hidden ${className ?? ''} bg-[#0a0a0a]`}
+			className={`rounded-xl border border-white/7 overflow-hidden ${className ?? ''} bg-zinc-950`}
 		>
 			{/* Title bar */}
 			{!hideHeader && (
-				<div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/[0.04] bg-[#0c0c0c]">
+				<div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/4 bg-neutral-950">
 					<div className="flex items-center justify-center size-5 rounded-[4px] bg-primary/10 border border-primary/20 text-primary">
 						<svg
 							className="size-3"

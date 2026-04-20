@@ -1,0 +1,60 @@
+{
+  "name": "@torq-system/grpc",
+  "version": "0.0.14",
+  "description": "Generated TypeScript gRPC definitions for Torq protos",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "generate": "buf generate",
+    "build": "rm -rf dist generated && buf generate && tsc && tsx scripts/generate-barrels.ts",
+    "release": "./scripts/publish.sh",
+    "lint": "buf lint && biome lint .",
+    "format": "biome format --write .",
+    "version:patch": " npm version patch"
+  },
+  "type": "module",
+  "main": "./dist/generated/index.js",
+  "module": "./dist/generated/index.js",
+  "types": "./dist/generated/index.d.ts",
+  "exports": {
+    ".": "./dist/generated/index.js",
+    "./*": "./dist/*",
+    "./apiserver/workflowrun/v1": {
+      "types": "./dist/generated/apiserver/workflowrun/v1/index.d.ts",
+      "import": "./dist/generated/apiserver/workflowrun/v1/index.js",
+      "default": "./dist/generated/apiserver/workflowrun/v1/index.js"
+    },
+    "./common/error/v1": {
+      "types": "./dist/generated/common/error/v1/index.d.ts",
+      "import": "./dist/generated/common/error/v1/index.js",
+      "default": "./dist/generated/common/error/v1/index.js"
+    },
+    "./operator/workflowrun/v1": {
+      "types": "./dist/generated/operator/workflowrun/v1/index.d.ts",
+      "import": "./dist/generated/operator/workflowrun/v1/index.js",
+      "default": "./dist/generated/operator/workflowrun/v1/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "protos",
+    "buf.yaml",
+    "buf.gen.yaml"
+  ],
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.11.0",
+    "@connectrpc/connect": "^1.7.0",
+    "@connectrpc/connect-node": "^1.7.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.11",
+    "@bufbuild/buf": "^1.67.0",
+    "@bufbuild/protoc-gen-es": "^2.11.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.7.0",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

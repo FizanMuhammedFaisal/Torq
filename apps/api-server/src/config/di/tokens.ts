@@ -1,4 +1,6 @@
 export const TOKENS = {
+	HTTPServer: Symbol.for('HTTPServer'),
+	GRPCServer: Symbol.for('GRPCServer'),
 	WorkflowController: Symbol.for('WorkflowController'),
 	WorkflowRouter: Symbol.for('WorkflowRouter'),
 	HealthRouter: Symbol.for('HealthRouter'),
@@ -20,11 +22,28 @@ export const TOKENS = {
 	UpsertSecretsUseCase: Symbol.for('UpsertSecretsUseCase'),
 	GetSecretsUseCase: Symbol.for('GetSecretsUseCase'),
 	GetWorkflowsUseCase: Symbol.for('GetWorkflowsUseCase'),
-	CreateRunUseCase: Symbol.for('CreateRunUseCase'),
 	RevealSecretUseCase: Symbol.for('RevealSecretUseCase'),
+	TriggerWorkflowRunUseCase: Symbol.for('TriggerWorkflowRunUseCase'),
 	CreateWorkflowUseCase: Symbol.for('CreateWorkflowUseCase'),
+	GetWorkflowByIdUseCase: Symbol.for('GetWorkflowByIdUseCase'),
 	WorkflowRunRepository: Symbol.for('WorkflowRunRepository'),
+	OperatorService: Symbol.for('OperatorService'),
 	UnitOfWork: Symbol.for('UnitOfWork'),
 	AuthMacro: Symbol.for('AuthMacro'),
 	ErrorMacro: Symbol.for('ErrorMacro'),
+	RPCRouter: Symbol.for('RPCRouter'),
+	GrpcClient: Symbol.for('GrpcClient'),
+	WorkflowAggregateRepository: Symbol.for('WorkflowAggregateRepository'),
+	WorkflowRunMapper: Symbol.for('WorkflowRunMapper'),
+	RedisClient: Symbol.for('RedisClient'),
+
+	// usecases
+	GetWorkflowSpecUseCase: Symbol.for('GetWorkflowSpecUseCase'),
+
+	//
+	WorkflowRPCMapper: Symbol.for('WorkflowRPCMapper'),
+	WorkflowRPCController: Symbol.for('WorkflowRPCController'),
+	RunController: Symbol.for('RunController'),
+	RunRouter: Symbol.for('RunRouter'),
+	GetRunsUseCase: Symbol.for('GetRunsUseCase'),
 } as const;

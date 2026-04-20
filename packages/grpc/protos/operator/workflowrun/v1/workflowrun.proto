@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package operator.workflowrun.v1;
+
+service OperatorService {
+  rpc TriggerWorkflowRun(TriggerWorkflowRunRequest)
+      returns (TriggerWorkflowRunResponse);
+}
+
+message TriggerWorkflowRunRequest {
+  string workflow_run_id = 1;
+  string workflow_id = 2;
+  // workflowVersion that was triggered
+  string version_id = 3;
+  // whihc is the torq version of this workflow
+  string torq_version = 4;
+  TriggerType trigger_type = 5;
+}
+
+enum TriggerType {
+  TRIGGER_TYPE_UNSPECIFIED = 0;
+  TRIGGER_TYPE_MANUAL = 1;
+  TRIGGER_TYPE_WEBHOOK = 2;
+  TRIGGER_TYPE_SCHEDULE = 3;
+}
+
+message TriggerWorkflowRunResponse { bool success = 1; }

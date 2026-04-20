@@ -1,9 +1,9 @@
 import { container, Lifecycle } from 'tsyringe';
-import { WorkflowController } from '@/presentation/controller/workflow/workflow';
-import { AppRouter } from '@/presentation/routes';
-import { AuthRouter } from '@/presentation/routes/auth/auth';
-import { HealthRouter } from '@/presentation/routes/health/health';
-import { WorkflowRouter } from '@/presentation/routes/workflow/workflow';
+import { WorkflowController } from '@/presentation/http/controller/workflow/workflow';
+import { AppRouter } from '@/presentation/http/routes';
+import { AuthRouter } from '@/presentation/http/routes/auth/auth';
+import { HealthRouter } from '@/presentation/http/routes/health/health';
+import { WorkflowRouter } from '@/presentation/http/routes/workflow/workflow';
 import { TOKENS } from './tokens';
 import { ResendEmailService } from '@/infrastructure/services/emailService';
 import { SignInOTPStrategy } from '@/application/usecases/email/strategies/signInOTPStrategy';
@@ -14,9 +14,16 @@ import { UpsertSecretsUseCase } from '@/application/usecases/workflows/upsertSec
 import { GetSecretsUseCase } from '@/application/usecases/workflows/getSecrets.usecase';
 import { CreateWorkflowUseCase } from '@/application/usecases/workflows/createWorkflow.usecase';
 import { GetWorkflowsUseCase } from '@/application/usecases/workflows/getWorkflows.usecase';
-import { CreateRunUseCase } from '@/application/usecases/workflows/createRun.usecase';
+import { GetWorkflowByIdUseCase } from '@/application/usecases/workflows/getWorkflowById.usecase';
 import { RevealSecretUseCase } from '@/application/usecases/workflows/revealSecret.usecase';
+import { TriggerWorkflowRunUseCase } from '@/application/usecases/workflows/triggerWorkflowRun.usecase';
+import { OperatorService } from '@/infrastructure/services/operatorService';
 import { WorkflowRunRepository } from '@/infrastructure/repository/workflowRun.repository';
+import { WorkflowAggregateRepository } from '@/infrastructure/repository/workflowAggregate.repository';
+import { WorkflowRunMapper } from '@/infrastructure/repository/mappers/workflowRun.mapper';
+import { GetRunsUseCase } from '@/application/usecases/runs/getRuns.usecase';
+import { RunController } from '@/presentation/http/controller/run.controller';
+import { RunRouter } from '@/presentation/http/routes/run/run';
 
 import { WorkflowRepository } from '@/infrastructure/repository/workflow.repository';
 import { SecrectRepository } from '@/infrastructure/repository/secret.repository';
@@ -26,10 +33,18 @@ import { SecretMapper } from '@/infrastructure/repository/mappers/secret.mapper'
 import { WorkflowVersionMapper } from '@/infrastructure/repository/mappers/workflowVersion.mapper';
 import { SpecValidationService } from '@/infrastructure/services/specValidationService';
 import { DrizzleUnitOfWork } from '@/infrastructure/repository/database/transaction/unitOfWork';
-import { AuthMacro } from '@/presentation/macros/auth.macro';
-import { ErrorMacro } from '@/presentation/macros/error.macro';
+import { AuthMacro } from '@/presentation/http/macros/auth.macro';
+import { ErrorMacro } from '@/presentation/http/macros/error.macro';
 import { SecretManagementService } from '@/infrastructure/services/secretManagementService';
-
+import { GrpcClient } from '@/infrastructure/grpc/client';
+import { HTTPServer } from '@/presentation/server';
+import { GRpcServer } from '@/presentation/grpc/rpc-server';
+import { RPCRouter } from '@/presentation/grpc/routers/router';
+import { WorkflowRunController } from '@/presentation/grpc/controllers/workflow.controller';
+import { GetWorkflowSpecUseCase } from '@/application/usecases/workflows/getWorkflowSpec.usecase';
+import { WorkflowRPCMapper } from '@/presentation/grpc/mappers/workflow.mapper';
+import { RedisClient } from '@/infrastructure/redis/redisClient';
+import { WorkflowRunStateConsumer } from '@/infrastructure/redis/WorkflowRunStateConsumer';
 // Register as singletons using Symbols
 container.register(TOKENS.WorkflowController, { useClass: WorkflowController }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.WorkflowRouter, { useClass: WorkflowRouter }, { lifecycle: Lifecycle.Singleton });
@@ -46,8 +61,12 @@ container.register(TOKENS.SendOTPEmail, { useClass: SendOTPUseCase }, { lifecycl
 // Repository & Mapper Registration
 container.register(TOKENS.WorkflowRepository, { useClass: WorkflowRepository }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.SecretRepository, { useClass: SecrectRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.OperatorService, { useClass: OperatorService }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.WorkflowVersionRepository, { useClass: WorkflowVersionRepository }, { lifecycle: Lifecycle.Singleton });
-container.register(TOKENS.WorkflowMapper, { useClass: WorkflowMapper });
+container.register(TOKENS.WorkflowMapper, { useClass: WorkflowMapper }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRunMapper, { useClass: WorkflowRunMapper }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRPCMapper, { useClass: WorkflowRPCMapper }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.SecretMapper, { useClass: SecretMapper });
 container.register(TOKENS.WorkflowVersionMapper, { useClass: WorkflowVersionMapper });
 container.register(TOKENS.SpecValidationService, { useClass: SpecValidationService }, { lifecycle: Lifecycle.Singleton });
@@ -58,9 +77,21 @@ container.register(TOKENS.ErrorMacro, { useClass: ErrorMacro }, { lifecycle: Lif
 container.register(TOKENS.UpsertSecretsUseCase, { useClass: UpsertSecretsUseCase }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.GetSecretsUseCase, { useClass: GetSecretsUseCase }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.GetWorkflowsUseCase, { useClass: GetWorkflowsUseCase }, { lifecycle: Lifecycle.Singleton });
-container.register(TOKENS.CreateRunUseCase, { useClass: CreateRunUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GetWorkflowByIdUseCase, { useClass: GetWorkflowByIdUseCase }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.RevealSecretUseCase, { useClass: RevealSecretUseCase }, { lifecycle: Lifecycle.Singleton });
-container.register(TOKENS.WorkflowRunRepository, { useClass: WorkflowRunRepository }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.TriggerWorkflowRunUseCase, { useClass: TriggerWorkflowRunUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowAggregateRepository, { useClass: WorkflowAggregateRepository }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.SecretManagementService, { useClass: SecretManagementService }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GrpcClient, { useClass: GrpcClient }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.HTTPServer, { useClass: HTTPServer }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GRPCServer, { useClass: GRpcServer }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.RPCRouter, { useClass: RPCRouter }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.WorkflowRPCController, { useClass: WorkflowRunController }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GetWorkflowSpecUseCase, { useClass: GetWorkflowSpecUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.RedisClient, { useClass: RedisClient }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.GetRunsUseCase, { useClass: GetRunsUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.RunController, { useClass: RunController }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.RunRouter, { useClass: RunRouter }, { lifecycle: Lifecycle.Singleton });
+container.register(WorkflowRunStateConsumer, { useClass: WorkflowRunStateConsumer }, { lifecycle: Lifecycle.Singleton });
 
 export { container };

@@ -34,12 +34,12 @@ function SettingSection({
 			initial={{ opacity: 0, y: 8 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.2, delay, ease: [0.25, 1, 0.5, 1] }}
-			className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
+			className="rounded-2xl border border-white/6 bg-white/2 overflow-hidden"
 			style={{ boxShadow: 'inset 0 1px 0 0 rgba(255,255,255,0.03)' }}
 		>
 			<div className="p-5 pb-4">
 				<div className="flex items-center gap-3">
-					<div className="size-9 rounded-xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+					<div className="size-9 rounded-xl bg-white/4 border border-white/6 flex items-center justify-center shrink-0">
 						{icon}
 					</div>
 					<div>
@@ -48,7 +48,7 @@ function SettingSection({
 					</div>
 				</div>
 			</div>
-			<div className="border-t border-white/[0.04] p-5">{children}</div>
+			<div className="border-t border-white/4 p-5">{children}</div>
 		</motion.div>
 	);
 }
@@ -64,7 +64,7 @@ export function SettingsPage() {
 	return (
 		<div className="flex flex-col h-full">
 			{/* Header */}
-			<div className="px-6 lg:px-8 py-6 border-b border-white/[0.05] flex items-center justify-between">
+			<div className="px-6 lg:px-8 py-6 border-b border-white/5 flex items-center justify-between">
 				<div>
 					<h1 className="text-2xl font-bold tracking-tight text-white">
 						Settings
@@ -149,7 +149,7 @@ export function SettingsPage() {
 							<Button
 								size="sm"
 								variant="outline"
-								className="text-xs h-8 px-3 rounded-full border-white/[0.08]"
+								className="text-xs h-8 px-3 rounded-full border-white/8"
 								onClick={() => {
 									import('react-hot-toast').then(({ toast }) =>
 										toast.success('Workspace settings updated successfully.'),
@@ -161,7 +161,7 @@ export function SettingsPage() {
 							<Button
 								size="sm"
 								variant="outline"
-								className="text-xs h-8 px-3 rounded-full border-white/[0.08]"
+								className="text-xs h-8 px-3 rounded-full border-white/8"
 								onClick={() => {
 									import('react-hot-toast').then(({ toast }) =>
 										toast.error('Failed to connect to the database.'),
@@ -173,7 +173,7 @@ export function SettingsPage() {
 							<Button
 								size="sm"
 								variant="outline"
-								className="text-xs h-8 px-3 rounded-full border-white/[0.08]"
+								className="text-xs h-8 px-3 rounded-full border-white/8"
 								onClick={() => {
 									import('react-hot-toast').then(({ toast }) =>
 										toast('Your subscription will expire in 3 days.'),
@@ -185,7 +185,7 @@ export function SettingsPage() {
 							<Button
 								size="sm"
 								variant="outline"
-								className="text-xs h-8 px-3 rounded-full border-white/[0.08]"
+								className="text-xs h-8 px-3 rounded-full border-white/8"
 								onClick={() => {
 									import('react-hot-toast').then(({ toast }) => {
 										toast.loading('Deploying to production...', {
@@ -208,7 +208,7 @@ export function SettingsPage() {
 							delay: config.authEnabled ? 0.08 : 0.04,
 							ease: [0.25, 1, 0.5, 1],
 						}}
-						className="rounded-2xl border border-red-500/10 bg-red-500/[0.02] overflow-hidden"
+						className="rounded-2xl border border-red-500/10 bg-red-500/2 overflow-hidden"
 					>
 						<div className="p-5 pb-4">
 							<h3 className="text-[15px] font-semibold text-red-400">
@@ -221,7 +221,7 @@ export function SettingsPage() {
 
 						{/* Sign Out Section */}
 						{config.authEnabled && (
-							<div className="border-t border-red-500/[0.06] p-5 flex items-center justify-between">
+							<div className="border-t border-red-500/6 p-5 flex items-center justify-between">
 								<div>
 									<p className="text-[14px] text-white/70">Sign out of Torq</p>
 									<p className="text-[12px] text-white/25 mt-0.5">
@@ -231,7 +231,7 @@ export function SettingsPage() {
 								<Button
 									size="sm"
 									variant="outline"
-									className="rounded-full px-5 border-white/[0.08] hover:bg-white/[0.04] text-white"
+									className="rounded-full px-5 border-white/8 hover:bg-white/4 text-white"
 									onClick={async () => {
 										await authClient.signOut();
 										clearAuth();
@@ -250,7 +250,7 @@ export function SettingsPage() {
 						)}
 
 						{/* Delete Account Section */}
-						<div className="border-t border-red-500/[0.06] p-5 flex items-center justify-between">
+						<div className="border-t border-red-500/6 p-5 flex items-center justify-between">
 							<div>
 								<p className="text-[14px] text-white/70">Delete account</p>
 								<p className="text-[12px] text-white/25 mt-0.5">

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log-ingestor
+  namespace: torq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log-ingestor
+  template:
+    metadata:
+      labels:
+        app: log-ingestor
+    spec:
+      containers:
+        - name: log-ingestor
+          image: fizanmuhammedfaisal/torq-log-ingestor
+          ports:
+            - containerPort: 4001
+          envFrom:
+            - configMapRef:
+                name: log-ingestor-config
+          # - secretRef:
+          #     name: log-ingestor-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: log-ingestor-service
+spec:
+  selector:
+    app: log-ingestor
+  ports:
+    - port: 4001
+      targetPort: 4001
+  type: ClusterIP
+
