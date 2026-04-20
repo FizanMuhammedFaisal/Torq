@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: log-ingestor
-  namespace: torq
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -28,6 +28,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: log-ingestor-service
+  namespace: default
 spec:
   selector:
     app: log-ingestor

@@ -1,8 +1,8 @@
 export const Envconfig = {
     server: {
-        port: process.env.PORT || 4003,
+        port: process.env.PORT || 4001,
         hostname: process.env.HOSTNAME || 'localhost',
-        url: `http://${process.env.HOSTNAME ?? 'localhost'}:${process.env.PORT ?? '4003'}`,
+        url: `http://${process.env.HOSTNAME ?? 'localhost'}:${process.env.PORT ?? '4001'}`,
 
     },
     database: {

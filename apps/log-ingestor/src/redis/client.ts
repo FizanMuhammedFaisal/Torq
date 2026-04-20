@@ -25,23 +25,33 @@ export class RedisClient implements RedisClientInterface {
         }
 
         if (this.isConnecting) {
-            logger.info('RedisConnectionManager: Connection already in progress. Waiting...');
-            await new Promise((resolve) => setTimeout(resolve, 50));
+            logger.warn('RedisConnectionManager: Connection already in progress. Waiting...');
+            let attempts = 0;
+            while (this.isConnecting && attempts < 100) {
+                await new Promise((resolve) => setTimeout(resolve, 50));
+                attempts++;
+            }
             if (this.client?.isReady) {
                 return this.client;
-            } else {
-                throw new Error('Redis connection attempt timed out or failed to establish concurrently.');
             }
+            throw new Error('Redis connection attempt timed out or failed to establish concurrently.');
         }
         this.isConnecting = true;
         try {
             if (!this.client) {
-                this.client = createClient({ url: Envconfig.redis.url });
+                this.client = createClient({
+                    url: Envconfig.redis.url,
+                    pingInterval: 5000,
+                    socket: {
+                        family: 4,
+                        reconnectStrategy: (retries) => Math.min(retries * 50, 500)
+                    }
+                });
                 this.client.on('error', (err) => {
                     this.isReadisReady = false
                     logger.error('Redis Client Error:', err)
                 });
-                this.client.on('ready', (err) => this.isReadisReady = true);
+                this.client.on('ready', (err) => { this.isReadisReady = true });
                 this.client.on('connect', () => logger.info('Redis Client Connected.'));
                 this.client.on('reconnecting', () => {
                     this.isReadisReady = false
@@ -52,7 +62,7 @@ export class RedisClient implements RedisClientInterface {
                     logger.info('Redis Client Disconnected.')
                 });
             }
-            if (!this.client.isReady) {
+            if (!this.client.isOpen) {
                 await this.client.connect();
                 logger.info('Redis client connected successfully.');
             }

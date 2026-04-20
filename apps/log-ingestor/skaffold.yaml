@@ -24,6 +24,10 @@ build:
         manual:
           - dest: .
             src: "src/**/*.ts"
+          - dest: .
+            src: "src/**/*.json"
+          - dest: .
+            src: "k8s/*.yaml"
 
 deploy:
   kubectl: {}
