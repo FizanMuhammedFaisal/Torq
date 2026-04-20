@@ -1,5 +1,5 @@
-import { RunStatus, TriggerType } from '@/domain/entities/workflowRun';
-import { AuthUser } from '@/presentation/http/macros/auth.macro';
+import type { RunStatus, TriggerType } from '@/domain/entities/workflowRun';
+import type { AuthUser } from '@/presentation/http/macros/auth.macro';
 import z from 'zod';
 
 export const GetWorkflowRunInputQuerySchema = z.object({

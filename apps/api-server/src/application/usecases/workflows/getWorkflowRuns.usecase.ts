@@ -1,8 +1,8 @@
-import {
+import type {
 	GetWorkflowRunInputDto,
 	GetWorkflowRunOutputDto,
 } from '@/application/dto/worflows/getWorkflowRun.dto';
-import { IGetWorkflowRunsUseCase } from '@/application/port/usecases/workflows/getWorkflowRuns.interface';
+import type { IGetWorkflowRunsUseCase } from '@/application/port/usecases/workflows/getWorkflowRuns.interface';
 
 export class GetWorkflowRunsUseCase implements IGetWorkflowRunsUseCase {
 	execute(data: GetWorkflowRunInputDto): Promise<GetWorkflowRunOutputDto> {

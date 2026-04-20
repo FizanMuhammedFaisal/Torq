@@ -28,7 +28,7 @@ export class WorkflowRun {
 		public readonly completedAt: Date | null,
 		public readonly duration: number | null,
 		public readonly steps: Record<string, { status: string; ts?: number }> = {},
-	) { }
+	) {}
 
 	static create(props: {
 		id: string;

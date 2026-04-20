@@ -6,11 +6,14 @@ import { injectable } from 'tsyringe';
 export class ErrorMacro {
 	plugin() {
 		return new Elysia({ name: 'ErrorMacro' }).onError({ as: 'global' }, ({ code, error, set }) => {
-			logger.error({ 
-				err: error, 
-				code,
-				isDomainError: typeof (error as any)?.serialize === 'function' 
-			}, 'API Request Failed');
+			logger.error(
+				{
+					err: error,
+					code,
+					isDomainError: typeof (error as any)?.serialize === 'function',
+				},
+				'API Request Failed',
+			);
 
 			// Handle explicitly thrown DomainErrors (or objects acting like them)
 			if (error && typeof (error as any).serialize === 'function') {

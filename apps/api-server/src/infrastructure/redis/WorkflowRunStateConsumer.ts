@@ -25,14 +25,17 @@ export class WorkflowRunStateConsumer implements IConsumer {
 
 	constructor(
 		@inject(TOKENS.RedisClient) private redisClientWrapper: IRedisClient,
-		@inject(TOKENS.WorkflowRunRepository) private workflowRunRepository: IWorkflowRunRepository
-	) { }
+		@inject(TOKENS.WorkflowRunRepository) private workflowRunRepository: IWorkflowRunRepository,
+	) {}
 
 	public async start(): Promise<void> {
 		if (this.isRunning) return;
 		this.isRunning = true;
 
-		logger.info({ group: GROUP_NAME, consumer: CONSUMER_NAME }, '[DB Updater] Starting consumer group');
+		logger.info(
+			{ group: GROUP_NAME, consumer: CONSUMER_NAME },
+			'[DB Updater] Starting consumer group',
+		);
 
 		try {
 			await this.ensureGroupExists();
@@ -83,10 +86,15 @@ export class WorkflowRunStateConsumer implements IConsumer {
 					GROUP_NAME,
 					CONSUMER_NAME,
 					[{ key: STREAM_KEY, id: '0' }],
-					{ COUNT: 10 }
+					{ COUNT: 10 },
 				);
 
-				if (!result || result.length === 0 || !result[0].messages || result[0].messages.length === 0) {
+				if (
+					!result ||
+					result.length === 0 ||
+					!result[0].messages ||
+					result[0].messages.length === 0
+				) {
 					logger.info('[DB Updater] PEL is empty, recovery complete');
 					break;
 				}
@@ -112,7 +120,7 @@ export class WorkflowRunStateConsumer implements IConsumer {
 					GROUP_NAME,
 					CONSUMER_NAME,
 					[{ key: STREAM_KEY, id: '>' }],
-					{ BLOCK: 5000, COUNT: 10 }
+					{ BLOCK: 5000, COUNT: 10 },
 				);
 
 				if (!result || result.length === 0) {
@@ -138,7 +146,9 @@ export class WorkflowRunStateConsumer implements IConsumer {
 		const redis = await this.redisClientWrapper.getClient();
 		try {
 			// Autoclaim messages idle for > 60s
-			const result = await redis.xAutoClaim(STREAM_KEY, GROUP_NAME, CONSUMER_NAME, 60000, '0-0', { COUNT: 100 });
+			const result = await redis.xAutoClaim(STREAM_KEY, GROUP_NAME, CONSUMER_NAME, 60000, '0-0', {
+				COUNT: 100,
+			});
 			const claimedEntries = result.messages;
 
 			if (!claimedEntries || claimedEntries.length === 0) return;
@@ -153,7 +163,10 @@ export class WorkflowRunStateConsumer implements IConsumer {
 		}
 	}
 
-	private async processMessage(messageId: string, messageRecord: Record<string, string>): Promise<void> {
+	private async processMessage(
+		messageId: string,
+		messageRecord: Record<string, string>,
+	): Promise<void> {
 		const redis = await this.redisClientWrapper.getClient();
 		try {
 			const payload = messageRecord as unknown as Partial<WorkflowRunStateEvent>;
@@ -168,15 +181,20 @@ export class WorkflowRunStateConsumer implements IConsumer {
 			const event = payload as WorkflowRunStateEvent;
 			await this.updateDatabase({
 				...event,
-				status: event.status.toUpperCase()
+				status: event.status.toUpperCase(),
 			});
 
 			// Acknowledge ONLY after DB write succeeds
 			await redis.xAck(STREAM_KEY, GROUP_NAME, messageId);
-			logger.debug({ messageId, runName: payload.runName }, '[DB Updater] Processed and ACKed message');
-
+			logger.debug(
+				{ messageId, runName: payload.runName },
+				'[DB Updater] Processed and ACKed message',
+			);
 		} catch (error) {
-			logger.error({ error, messageId }, '[DB Updater] Failed to process message, will persist in PEL attached to this consumer');
+			logger.error(
+				{ error, messageId },
+				'[DB Updater] Failed to process message, will persist in PEL attached to this consumer',
+			);
 		}
 	}
 
@@ -187,14 +205,19 @@ export class WorkflowRunStateConsumer implements IConsumer {
 				runId,
 				event.status,
 				event.stepName,
-				event.ts ? new Date(event.ts) : undefined
+				event.ts ? new Date(event.ts) : undefined,
 			);
-			logger.info(
-				{ status: event.status, stepName: event.stepName, Message: '[DB Updater] Updated Postgres workflow_run successfully via repository' },
-
-			);
+			logger.info({
+				status: event.status,
+				stepName: event.stepName,
+				Message: '[DB Updater] Updated Postgres workflow_run successfully via repository',
+			});
 		} catch (error) {
-			logger.error({ error, runName: event.runName, Message: "[DB Updater] DB Update transaction failed" });
+			logger.error({
+				error,
+				runName: event.runName,
+				Message: '[DB Updater] DB Update transaction failed',
+			});
 			throw error;
 		}
 	}

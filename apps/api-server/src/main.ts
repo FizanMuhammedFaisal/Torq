@@ -20,8 +20,4 @@ const server = container.resolve<HTTPServer>(TOKENS.HTTPServer);
 const grpcServer = container.resolve<GRpcServer>(TOKENS.GRPCServer);
 const runStateConsumer = container.resolve(WorkflowRunStateConsumer);
 
-await Promise.all([
-	server.start(),
-	grpcServer.start(),
-	runStateConsumer.start()
-]);
+await Promise.all([server.start(), grpcServer.start(), runStateConsumer.start()]);

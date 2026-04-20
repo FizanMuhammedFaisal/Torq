@@ -9,7 +9,7 @@ import type { IWorkflowRPCController } from '../interfaces/controllers/workflow.
 export class RPCRouter implements IRPCRouter {
 	constructor(
 		@inject(TOKENS.WorkflowRPCController) private workflowController: IWorkflowRPCController,
-	) { }
+	) {}
 	public register(router: ConnectRouter): void {
 		router.service(ApiServerService, {
 			getSpec: (req, context) => this.workflowController.getSpec(req, context),

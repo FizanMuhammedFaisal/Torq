@@ -23,11 +23,13 @@ export class RedisClient implements IRedisClient {
 				await new Promise((resolve) => setTimeout(resolve, 50));
 				attempts++;
 			}
-			
+
 			if (this.client?.isReady) {
 				return this.client;
 			}
-			throw new Error('[RedisClient] Connection attempt timed out or failed to establish concurrently.');
+			throw new Error(
+				'[RedisClient] Connection attempt timed out or failed to establish concurrently.',
+			);
 		}
 
 		this.isConnecting = true;
@@ -39,8 +41,8 @@ export class RedisClient implements IRedisClient {
 					pingInterval: 5000,
 					socket: {
 						family: 4,
-						reconnectStrategy: (retries) => Math.min(retries * 50, 500)
-					}
+						reconnectStrategy: (retries) => Math.min(retries * 50, 500),
+					},
 				});
 
 				this.client.on('error', (err) => {
@@ -67,7 +69,7 @@ export class RedisClient implements IRedisClient {
 			if (!this.client.isOpen) {
 				await this.client.connect();
 			}
-			
+
 			return this.client;
 		} catch (err) {
 			logger.error({ err }, '[RedisClient] Failed to connect to Redis');

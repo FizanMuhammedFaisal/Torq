@@ -9,7 +9,7 @@ import { getTorqValidationHanlder } from './versions/registry';
 export class DSLPipeline {
 	private specParser = new SpecParser();
 	private versionDetector = new VersionDetector();
-	constructor(private parser: ISpecParser) { }
+	constructor(private parser: ISpecParser) {}
 	async process(
 		raw: string,
 		format: SpecType,

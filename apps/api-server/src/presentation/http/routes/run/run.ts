@@ -18,17 +18,15 @@ export class RunRouter implements Router {
 	) {}
 
 	register() {
-		return new Elysia({ prefix: this.prefix })
-			.use(this.authMacro.plugin())
-			.get(
-				'/',
-				(ctx) => {
-					return this.runController.getRuns(ctx);
-				},
-				{
-					auth: true,
-					query: GetRunsQueryInputSchema,
-				},
-			);
+		return new Elysia({ prefix: this.prefix }).use(this.authMacro.plugin()).get(
+			'/',
+			(ctx) => {
+				return this.runController.getRuns(ctx);
+			},
+			{
+				auth: true,
+				query: GetRunsQueryInputSchema,
+			},
+		);
 	}
 }

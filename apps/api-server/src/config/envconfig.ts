@@ -15,7 +15,10 @@ export const Envconfig = {
 		name: 'TORQ API Server',
 		version: process.env.APP_VERSION || '0.0.1',
 		cors: {
-			origins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173', 'http://localhost:5174'],
+			origins: process.env.CORS_ORIGINS?.split(',') || [
+				'http://localhost:5173',
+				'http://localhost:5174',
+			],
 		},
 		masterKeyFile: './src/config/torq/master.key',
 	},

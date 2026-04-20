@@ -16,7 +16,7 @@ export class WorkflowRPCMapper implements IWorkflowRPCMapper {
 		return {
 			workflowId: request.workflowRunId,
 			versionId: request.versionId,
-			secrects: true // Operator ned th secrects
+			secrects: true, // Operator ned th secrects
 		};
 	}
 	toProtoGetSpecResponse(dto: GetWorkflowSpecOutput): GetSpecResponse {

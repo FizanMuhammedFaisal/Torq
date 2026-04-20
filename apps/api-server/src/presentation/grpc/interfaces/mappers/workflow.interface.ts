@@ -1,4 +1,4 @@
-import {
+import type {
 	GetWorkflowSpecInput,
 	GetWorkflowSpecOutput,
 } from '@/application/dto/worflows/getWorkflowSpec.dto';

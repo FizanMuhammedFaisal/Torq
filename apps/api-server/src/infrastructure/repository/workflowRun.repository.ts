@@ -19,7 +19,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 	constructor(
 		@inject(TOKENS.WorkflowRunMapper)
 		private readonly mapper: WorkflowRunMapper,
-	) { }
+	) {}
 
 	async create(data: PersistRunDto): Promise<WorkflowRun> {
 		try {
@@ -65,7 +65,12 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 		}
 	}
 
-	async updateRunState(runId: string, status?: string, stepName?: string, ts?: Date): Promise<void> {
+	async updateRunState(
+		runId: string,
+		status?: string,
+		stepName?: string,
+		ts?: Date,
+	): Promise<void> {
 		try {
 			const executor = getExecutor();
 			const targetRun = await executor.query.workflowRun.findFirst({
@@ -73,7 +78,10 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 			});
 
 			if (!targetRun) {
-				logger.warn({ runId }, '[WorkflowRunRepository] updateRunState: Target run not found in database');
+				logger.warn(
+					{ runId },
+					'[WorkflowRunRepository] updateRunState: Target run not found in database',
+				);
 				return;
 			}
 
@@ -92,14 +100,15 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 					}
 				}
 			} else if (stepName && status) {
-				const existingSteps = (targetRun.steps as Record<string, { status: string; ts?: number }>) || {};
+				const existingSteps =
+					(targetRun.steps as Record<string, { status: string; ts?: number }>) || {};
 				const existingStep = existingSteps[stepName];
 
 				// Only update the step if we have newer information
 				if (!existingStep || !existingStep.ts || eventTs > existingStep.ts) {
 					updateData.steps = {
 						...existingSteps,
-						[stepName]: { status, ts: eventTs }
+						[stepName]: { status, ts: eventTs },
 					};
 				}
 			}
@@ -181,7 +190,7 @@ export class WorkflowRunRepository implements IWorkflowRunRepository {
 			const whereClause = and(
 				eq(workflow.identityId, options.userId),
 				options.search ? ilike(workflow.name, `%${options.search}%`) : undefined,
-				options.workflowId ? eq(workflowRun.workflowId, options.workflowId) : undefined
+				options.workflowId ? eq(workflowRun.workflowId, options.workflowId) : undefined,
 			);
 
 			const results = await executor

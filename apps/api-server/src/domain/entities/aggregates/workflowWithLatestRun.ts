@@ -11,10 +11,14 @@ export class WorkflowWithLatestRun {
 		public readonly latestSpec: Record<string, unknown> | null = null,
 	) {}
 
-	static create({ workflow, latestRun, latestSpec }: { 
-		workflow: Workflow; 
-		latestRun: WorkflowRun | null; 
-		latestSpec?: Record<string, unknown> | null 
+	static create({
+		workflow,
+		latestRun,
+		latestSpec,
+	}: {
+		workflow: Workflow;
+		latestRun: WorkflowRun | null;
+		latestSpec?: Record<string, unknown> | null;
 	}) {
 		return new WorkflowWithLatestRun(workflow, latestRun, latestSpec ?? null);
 	}

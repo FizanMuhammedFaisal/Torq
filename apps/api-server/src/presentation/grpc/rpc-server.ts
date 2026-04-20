@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 export class GRpcServer {
 	private server: http2.Http2Server | null = null;
 
-	constructor(@inject(TOKENS.RPCRouter) private readonly rpcRouter: IRPCRouter) { }
+	constructor(@inject(TOKENS.RPCRouter) private readonly rpcRouter: IRPCRouter) {}
 
 	async start(): Promise<void> {
 		const { port, host } = rpcConfig;
@@ -37,7 +37,7 @@ export class GRpcServer {
 				},
 				handler,
 			);
-			logger.info("Starting with tls mode")
+			logger.info('Starting with tls mode');
 		} else {
 			// Local dev - plain h2c
 			this.server = http2.createServer(handler);

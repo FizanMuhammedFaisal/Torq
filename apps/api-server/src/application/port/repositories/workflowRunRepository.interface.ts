@@ -1,8 +1,4 @@
-import type {
-	WorkflowRun,
-	RunStatus,
-	TriggerType,
-} from '@/domain/entities/workflowRun';
+import type { WorkflowRun, RunStatus, TriggerType } from '@/domain/entities/workflowRun';
 import type { IBaseRepository } from './baseRepository.interface';
 
 export type PersistRunDto = {

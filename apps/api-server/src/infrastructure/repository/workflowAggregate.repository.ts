@@ -16,7 +16,7 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 		private readonly workflowMapper: WorkflowMapper,
 		@inject(TOKENS.WorkflowRunMapper)
 		private readonly runMapper: WorkflowRunMapper,
-	) { }
+	) {}
 	async findCount(identityId: string): Promise<number> {
 		try {
 			const result = await getExecutor()

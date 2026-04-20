@@ -27,7 +27,7 @@ export class WorkflowRouter implements Router {
 		private workflowController: IWorkflowController,
 		@inject(TOKENS.AuthMacro)
 		private authMacro: AuthMacro,
-	) { }
+	) {}
 
 	register() {
 		return new Elysia({ prefix: this.prefix })
