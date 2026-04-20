@@ -10,8 +10,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from '@/components/ui/select';
-import type { TorqVersion } from '@/store/version-store';
-import { useVersionStore } from '@/store/version-store';
+import type { TorqVersion } from '@/store/version';
+import { useVersionStore } from '@/store/version';
 import { TORQ_DOCS_REGISTRY } from '@/torqdocs';
 
 export function DocsPage() {
@@ -60,11 +60,10 @@ export function DocsPage() {
 					<button
 						type="button"
 						onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-						className={`size-9 rounded-md flex items-center justify-center border transition-colors hidden md:flex ${
-							isSidebarOpen
+						className={`size-9 rounded-md flex items-center justify-center border transition-colors hidden md:flex ${isSidebarOpen
 								? 'bg-white/10 border-white/20 text-white'
 								: 'border-white/8 text-white/40 hover:text-white hover:bg-white/4'
-						}`}
+							}`}
 						title="Toggle Sidebar"
 					>
 						<HugeiconsIcon icon={SidebarLeftIcon} className="size-4" />
@@ -95,11 +94,10 @@ export function DocsPage() {
 												type="button"
 												key={page.id}
 												onClick={() => setActivePageId(page.id)}
-												className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[14px] font-medium transition-colors ${
-													isActive
+												className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-[14px] font-medium transition-colors ${isActive
 														? 'bg-emerald-500/10 text-emerald-400'
 														: 'text-white/60 hover:text-white hover:bg-white/5'
-												}`}
+													}`}
 											>
 												<HugeiconsIcon
 													icon={page.icon}

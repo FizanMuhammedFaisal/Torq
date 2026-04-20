@@ -3,7 +3,7 @@ import {
 	CodeIcon,
 	Settings01Icon,
 } from '@hugeicons/core-free-icons';
-import type { TorqVersion } from '@/store/version-store';
+import type { TorqVersion } from '@/store/version';
 import { IntroductionDocs } from './introduction';
 import { QuickStart } from './quickStart';
 

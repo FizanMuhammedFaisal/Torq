@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { WORKFLOW_TEMPLATES } from '@/features/workflows/config/templates';
 import { useCreateWorkflow } from '@/features/workflows/hooks/use-create-workflow';
-import { useVersionStore } from '@/store/version-store';
+import { useVersionStore } from '@/store/version';
 import { ConfigurationSection } from '@/features/workflows/components/create/configuration-section';
 import { SecretsSection } from '@/features/workflows/components/create/secrets-section';
 import { TemplateSelector } from '@/features/workflows/components/create/template-selector';

@@ -1,4 +1,4 @@
-import type { WorkflowWithLatestRun, WorkflowStatus, WorkflowRunSummary } from '../types';
+import type { WorkflowWithLatestRun, WorkflowStatus } from '../types';
 
 
 export interface PaginationMeta {
@@ -46,13 +46,38 @@ export interface GetWorkflowByIdQuery {
 	expand?: ('latestRun' | 'totalRuns' | 'averageDuration')[];
 }
 
+export interface WorkflowJobDto {
+	name?: string;
+	description?: string;
+	steps?: any[];
+}
+
+export interface WorkflowSpecDto {
+	jobs: Record<string, WorkflowJobDto>;
+	triggers?: any[];
+	version?: string;
+}
+
+export interface StepStatusDto {
+	status: string;
+	ts?: number;
+}
+
 export interface GetWorkflowByIdResponse {
 	id: string;
 	name: string;
 	description?: string;
 	createdAt: string;
 	status?: WorkflowStatus;
-	latestRun?: WorkflowRunSummary;
+	spec?: WorkflowSpecDto;
+	latestRun?: {
+		id: string;
+		status: WorkflowStatus;
+		startedAt: string;
+		completedAt?: string;
+		duration?: number;
+		steps: Record<string, StepStatusDto>;
+	};
 	totalRuns?: number;
 	averageDuration?: number;
 }
@@ -89,4 +114,17 @@ export interface TriggerWorkflowResponse {
 	runId: string;
 	workflowId: string;
 	status: WorkflowStatus;
+}
+
+
+export interface GetWorkflowBySpecPayload {
+	versionId?: string
+}
+
+
+export interface GetWorkflowBySpecResponse {
+	workflowId: string;
+	versionId: string;
+	spec: string;
+	createdAt: Date;
 }

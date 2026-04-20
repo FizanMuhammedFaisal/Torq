@@ -4,23 +4,32 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { Alert02Icon } from '@hugeicons/core-free-icons';
 import { Button } from '@/components/ui/button';
 import { type ValidationError, YamlEditor } from '@/components/yaml-editor';
-import type { Workflow } from '@/features/workflows/types';
+import { useGetWorkflowSpec } from '../../hooks/use-get-workflow-spec';
+import { useWorkFlowActions, useWorkFlowStore } from '@/store/workflow';
+export function EditorTab({ workflowId }: { workflowId: string }) {
 
-export function EditorTab({ workflow }: { workflow: Workflow }) {
-	const [yamlContent, setYamlContent] = useState('');
+	useGetWorkflowSpec(workflowId)
+	const { workflows } = useWorkFlowStore()
+	const { setEditingSpecContent, setSaved } = useWorkFlowActions()
+	const { editingSpec: yamlContent, saved, spec } = workflows[workflowId]
+
+
 	const [errors, setErrors] = useState<ValidationError[]>([]);
-	const [saved, setSaved] = useState(true);
+
 
 	const handleChange = (val: string) => {
-		setYamlContent(val);
-		setSaved(false);
+		setEditingSpecContent(workflowId, val);
+		setSaved(workflowId, false);
 	};
 
 	const handleSave = () => {
 		if (errors.length > 0) return;
-		setSaved(true);
+		setSaved(workflowId, true);
 	};
-
+	const hanldeDiscard = () => {
+		setEditingSpecContent(workflowId, spec);
+		setSaved(workflowId, true);
+	}
 	return (
 		<div className="flex flex-col items-center justify-center w-full pb-12">
 			<div className="w-full max-w-4xl space-y-6">
@@ -56,8 +65,7 @@ export function EditorTab({ workflow }: { workflow: Workflow }) {
 								variant="ghost"
 								className="rounded-full h-8 px-4 text-[12px] text-white/50 hover:text-white hover:bg-white/5 transition-all"
 								onClick={() => {
-									setYamlContent('');
-									setSaved(true);
+									hanldeDiscard()
 								}}
 								disabled={saved}
 							>

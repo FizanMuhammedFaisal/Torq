@@ -12,7 +12,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useAppConfig } from '@/lib/app-config';
 import { authClient } from '@/lib/auth';
-import { useAuthStore } from '@/store/use-auth-store';
+import { useAuthStore } from '@/store/auth';
 
 /* ── Setting Section ─── */
 

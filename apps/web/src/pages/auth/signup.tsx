@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { SignupForm } from '@/features/auth';
-import { useAuthStore } from '@/store/use-auth-store';
+import { useAuthStore } from '@/store/auth';
 
 export function SignupPage() {
 	const { user, isLoading } = useAuthStore();

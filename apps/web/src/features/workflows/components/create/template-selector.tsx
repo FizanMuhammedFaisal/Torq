@@ -9,7 +9,7 @@ import {
 	SelectValue,
 } from '@/components/ui/select';
 import type { WorkflowTemplate } from '@/features/workflows/config/templates';
-import type { TorqVersion } from '@/store/version-store';
+import type { TorqVersion } from '@/store/version';
 
 interface TemplateSelectorProps {
 	activeVersion: TorqVersion;
@@ -73,11 +73,10 @@ export function TemplateSelector({
 								delay: i * 0.05,
 							}}
 							onClick={() => onSelect(tmpl.id)}
-							className={`relative group cursor-pointer rounded-2xl p-4 border transition-all duration-500 ease-out overflow-hidden ${
-								isSelected
+							className={`relative group cursor-pointer rounded-2xl p-4 border transition-all duration-500 ease-out overflow-hidden ${isSelected
 									? 'border-white/20 bg-white/5 shadow-[0_0_20px_rgba(255,255,255,0.03)]'
 									: 'border-white/5 bg-neutral-950 hover:bg-white/3 hover:border-white/10'
-							}`}
+								}`}
 						>
 							<div
 								className={
@@ -90,18 +89,16 @@ export function TemplateSelector({
 
 							<div className="flex items-center gap-3 mb-3 relative z-10">
 								<div
-									className={`size-8 rounded-xl flex items-center justify-center border transition-all duration-500 ease-out ${
-										isSelected
+									className={`size-8 rounded-xl flex items-center justify-center border transition-all duration-500 ease-out ${isSelected
 											? 'bg-white/10 border-white/20 ' + tmpl.accent
 											: 'bg-white/5 border-white/10 text-white/40 group-hover:text-white/70'
-									}`}
+										}`}
 								>
 									<HugeiconsIcon icon={tmpl.icon as any} className="size-4" />
 								</div>
 								<h3
-									className={`font-medium text-[14px] flex-1 transition-colors duration-500 ease-out ${
-										isSelected ? 'text-white' : 'text-white/80'
-									}`}
+									className={`font-medium text-[14px] flex-1 transition-colors duration-500 ease-out ${isSelected ? 'text-white' : 'text-white/80'
+										}`}
 								>
 									{tmpl.name}
 								</h3>

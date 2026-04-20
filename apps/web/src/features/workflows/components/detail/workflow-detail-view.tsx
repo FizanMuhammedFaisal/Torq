@@ -9,7 +9,6 @@ import { statusConfig as statusMap } from '@/features/workflows/config';
 import { OverviewTab } from '@/features/workflows/components/detail/overview-tab';
 import { EditorTab } from '@/features/workflows/components/detail/editor-tab';
 import { RunsTab } from '@/features/runs/components/runs-tab';
-import { MetricsTab } from '@/features/workflows/components/detail/metrics-tab';
 import { SecretsTab } from '@/features/workflows/components/detail/secrets-tab';
 import { useTriggerRun } from '@/features/workflows/hooks/use-trigger-run';
 import { useWorkflow } from '@/features/workflows/hooks/use-workflow';
@@ -26,8 +25,25 @@ export function WorkflowDetailView() {
 	const [showDelete, setShowDelete] = useState(false);
 
 	const triggerRun = useTriggerRun();
-	const { data: workflow, isLoading, error } = useWorkflow(id);
-	const { runs } = useRuns();
+	const { data: workflow, isLoading, error } = useWorkflow(id, {
+		expand: ['latestRun']
+	}, {
+		refetchInterval: (data) => (data?.status === 'RUNNING' ? 2000 : 15000)
+	});
+	const { runs } = useRuns({
+		workflowId: id,
+		refetchInterval: workflow?.status === 'RUNNING' ? 2000 : 15000
+	});
+
+	const hanldeWorkflowTrigger = (id) => {
+		const triggerPromise = triggerRun.mutateAsync({ id });
+		toast.promise(triggerPromise, {
+			loading: 'Triggering workflow execution...',
+			success: 'Workflow execution started!',
+			error: (err) => err.response?.data?.message || 'Failed to trigger workflow',
+		});
+		triggerPromise.then(() => setActiveTab('Runs')).catch(() => { });
+	}
 
 	const cfg = workflow ? (statusMap[workflow.status as keyof typeof statusMap] || statusMap.IDLE) : statusMap.IDLE;
 
@@ -124,34 +140,10 @@ export function WorkflowDetailView() {
 
 					<div className="flex items-center gap-3">
 						<Button
-							variant="outline"
-							size="sm"
-							className="rounded-full gap-1.5 px-5 bg-white/2 border-white/8 hover:bg-white/4"
-						>
-							<svg
-								className="size-3.5 text-white/40"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-							>
-								<title>Edit workflow</title>
-								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-							</svg>
-							Edit
-						</Button>
-						<Button
 							size="sm"
 							className="rounded-full gap-2 px-5 shadow-[0_4px_12px_rgba(16,185,129,0.2)]"
 							onClick={() => {
-								const triggerPromise = triggerRun.mutateAsync({ id });
-								toast.promise(triggerPromise, {
-									loading: 'Triggering workflow execution...',
-									success: 'Workflow execution started!',
-									error: (err) => err.response?.data?.message || 'Failed to trigger workflow',
-								});
-								triggerPromise.then(() => setActiveTab('Runs')).catch(() => { });
+								hanldeWorkflowTrigger(id)
 							}}
 							disabled={triggerRun.isPending}
 						>
@@ -168,7 +160,7 @@ export function WorkflowDetailView() {
 					</div>
 				</div>
 
-				{/* Tabs — sliding pill */}
+
 				<div className="max-w-[1400px] mx-auto px-8 pb-4">
 					<div className="flex items-center gap-1 p-1 rounded-full bg-white/3 border border-white/5 w-fit">
 						{tabs.map((tab) => (
@@ -177,9 +169,9 @@ export function WorkflowDetailView() {
 								type="button"
 								onClick={() => setActiveTab(tab)}
 								className={`
-                  px-5 py-1.5 rounded-full text-[13px] font-medium transition-all relative
-                  ${activeTab === tab ? 'text-white' : 'text-white/40 hover:text-white/60'}
-                `}
+              				    px-5 py-1.5 rounded-full text-[13px] font-medium transition-all relative
+              				    ${activeTab === tab ? 'text-white' : 'text-white/40 hover:text-white/60'}
+              				  `}
 							>
 								{activeTab === tab && (
 									<div className="absolute inset-0 bg-white/10 rounded-full shadow-[0_2px_10px_rgba(255,255,255,0.05)]" />
@@ -191,13 +183,12 @@ export function WorkflowDetailView() {
 				</div>
 			</div>
 
-			{/* Main Content Area */}
 			<div className="flex-1 overflow-auto bg-black/95">
 				<div className="max-w-[1400px] mx-auto p-8">
 					{activeTab === 'Overview' && <OverviewTab workflow={workflow} runs={runs} />}
-					{activeTab === 'Editor' && <EditorTab workflow={workflow} />}
+					{activeTab === 'Editor' && <EditorTab workflowId={workflow.id} />}
 					{activeTab === 'Runs' && <RunsTab workflowId={id} />}
-					{activeTab === 'Metrics' && <MetricsTab workflowId={id} />}
+					{/* {activeTab === 'Metrics' && <MetricsTab workflowId={id} />} */}
 					{activeTab === 'Secrets' && <SecretsTab workflowId={id} />}
 				</div>
 			</div>

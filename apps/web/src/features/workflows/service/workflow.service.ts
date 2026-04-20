@@ -12,6 +12,8 @@ import type {
 	RevealSecretResponse,
 	TriggerWorkflowPayload,
 	TriggerWorkflowResponse,
+	GetWorkflowBySpecPayload,
+	GetWorkflowBySpecResponse,
 } from '../schema/api.dto';
 
 export const workflowService = {
@@ -69,6 +71,13 @@ export const workflowService = {
 	trigger: async (workflowId: string, payload?: TriggerWorkflowPayload): Promise<TriggerWorkflowResponse> => {
 		const { data } = await apiClient.post<TriggerWorkflowResponse>(
 			API_ROUTES.WORKFLOWS.TRIGGER(workflowId),
+			payload,
+		);
+		return data;
+	},
+	getWorkflowSpec: async (workflowId: string, payload?: GetWorkflowBySpecPayload): Promise<GetWorkflowBySpecResponse> => {
+		const { data } = await apiClient.post<GetWorkflowBySpecResponse>(
+			API_ROUTES.WORKFLOWS.GET_SPEC(workflowId),
 			payload,
 		);
 		return data;

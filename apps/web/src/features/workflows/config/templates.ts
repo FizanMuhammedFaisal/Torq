@@ -4,7 +4,7 @@ import {
 	GitMergeIcon,
 } from '@hugeicons/core-free-icons';
 import type { IconSvgElement } from '@hugeicons/react';
-import type { TorqVersion } from '@/store/version-store';
+import type { TorqVersion } from '@/store/version';
 
 export interface WorkflowTemplate {
 	id: string;
