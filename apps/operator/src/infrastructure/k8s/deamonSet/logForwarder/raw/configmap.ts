@@ -1,13 +1,15 @@
-import { V1ConfigMap } from "@kubernetes/client-node";
+import type { V1ConfigMap } from '@kubernetes/client-node';
+import { Envconfig } from '@/config/envconfig';
+
 const name = 'fluent-bit-config';
-const namespace = 'logging'
-// needs cahnging 
+const namespace = 'logging';
+// needs cahnging
 export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
-    apiVersion: 'v1',
-    kind: "ConfigMap",
-    metadata: { name, namespace },
-    data: {
-        'fluent-bit.conf': `[SERVICE]
+	apiVersion: 'v1',
+	kind: 'ConfigMap',
+	metadata: { name, namespace },
+	data: {
+		'fluent-bit.conf': `[SERVICE]
     Flush         3
     Log_Level     info
     HTTP_Server   On
@@ -50,10 +52,10 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
     Name    http
     Format  json_stream
     Match   kube.*
-    Host    log-ingestor-service.default.svc.cluster.local
-    Port    3000
+    Host    ${Envconfig.services.logIngestor.host}
+    Port    ${Envconfig.services.logIngestor.port}
     URI     /ingest
     storage.total_limit_size 2G
-    Retry_Limit False`
-    }
+    Retry_Limit False`,
+	},
 };

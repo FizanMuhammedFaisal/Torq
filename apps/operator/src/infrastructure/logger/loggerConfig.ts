@@ -95,15 +95,14 @@ export class Logger implements ILogger {
 			// Pretty printing for development
 			transport: isDevelopment
 				? {
-						target: 'pino-pretty',
-						options: {
-							colorize: true,
-							translateTime: 'SYS:HH:MM:ss',
-							ignore: 'pid,hostname',
-							singleLine: true,
-							messageFormat: '[{service}] {msg}',
-						},
-					}
+					target: 'pino-pretty',
+					options: {
+						colorize: true,
+						translateTime: 'SYS:HH:MM:ss',
+						ignore: 'pid,hostname',
+						singleLine: true,
+					},
+				}
 				: undefined,
 		};
 

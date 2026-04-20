@@ -18,29 +18,41 @@ export class WorkflowRunStatusRepository implements IWorkflowRunStatusRepository
 		reason?: string;
 		observedGeneration: number;
 	}): Promise<void> {
-		const body = {
-			status: {
-				phase:              params.phase,
-				steps:              params.steps,
-				observedGeneration: params.observedGeneration,
-				...(params.startedAt   !== undefined ? { startedAt:   params.startedAt   } : {}),
-				...(params.completedAt !== undefined ? { completedAt: params.completedAt } : {}),
-				...(params.reason      !== undefined ? { reason:      params.reason      } : {}),
-			},
-		};
-
-		await customObjectsClient.patchNamespacedCustomObjectStatus({
+		const current = (await customObjectsClient.getNamespacedCustomObject({
 			group: Envconfig.k8s.group,
 			version: Envconfig.k8s.version,
 			plural: Envconfig.k8s.plural,
 			namespace: params.namespace,
 			name: params.name,
-			body,
-		});
+		})) as Record<string, unknown>;
 
+		const currentStatus = (current?.status ?? {}) as Record<string, unknown>;
+
+		const updatedStatus = {
+			...currentStatus,
+			phase: params.phase,
+			steps: params.steps,
+			observedGeneration: params.observedGeneration,
+			...(params.startedAt !== undefined ? { startedAt: params.startedAt } : {}),
+			...(params.completedAt !== undefined ? { completedAt: params.completedAt } : {}),
+			...(params.reason !== undefined ? { reason: params.reason } : {}),
+		};
+
+		await customObjectsClient.replaceNamespacedCustomObjectStatus({
+			group: Envconfig.k8s.group,
+			version: Envconfig.k8s.version,
+			plural: Envconfig.k8s.plural,
+			namespace: params.namespace,
+			name: params.name,
+			body: {
+				...current,
+				status: updatedStatus,
+			},
+		});
+		console.log(params)
 		logger.debug(
 			{ name: params.name, phase: params.phase },
-			'WorkflowRun status patched',
+			'WorkflowRun status replaced',
 		);
 	}
 
@@ -55,30 +67,26 @@ export class WorkflowRunStatusRepository implements IWorkflowRunStatusRepository
 		for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
 			// GET the latest version of the object (includes resourceVersion for optimistic lock)
 			const current = (await customObjectsClient.getNamespacedCustomObject({
-				group:     Envconfig.k8s.group,
-				version:   Envconfig.k8s.version,
-				plural:    Envconfig.k8s.plural,
+				group: Envconfig.k8s.group,
+				version: Envconfig.k8s.version,
+				plural: Envconfig.k8s.plural,
 				namespace: params.namespace,
-				name:      params.name,
+				name: params.name,
 			})) as Record<string, unknown>;
 
-			const metadata       = (current?.metadata ?? {}) as Record<string, unknown>;
-			const resourceVersion = metadata.resourceVersion as string | undefined;
-			const currentStatus  = (current?.status ?? {}) as Record<string, unknown>;
-			const currentSteps   = { ...(currentStatus.steps as Record<string, StepState> | undefined ?? {}) };
+			const currentStatus = (current?.status ?? {}) as Record<string, unknown>;
+			const currentSteps = { ...(currentStatus.steps as Record<string, StepState> | undefined ?? {}) };
 			currentSteps[params.stepName] = params.stepState;
 
 			try {
-				await customObjectsClient.patchNamespacedCustomObjectStatus({
-					group:     Envconfig.k8s.group,
-					version:   Envconfig.k8s.version,
-					plural:    Envconfig.k8s.plural,
+				await customObjectsClient.replaceNamespacedCustomObjectStatus({
+					group: Envconfig.k8s.group,
+					version: Envconfig.k8s.version,
+					plural: Envconfig.k8s.plural,
 					namespace: params.namespace,
-					name:      params.name,
+					name: params.name,
 					body: {
-						// Include resourceVersion so K8s rejects this with 409 if another
-						// write occurred between our GET and this PATCH (optimistic concurrency).
-						metadata: { resourceVersion },
+						...current,
 						status: {
 							...currentStatus,
 							steps: currentSteps,
@@ -88,7 +96,7 @@ export class WorkflowRunStatusRepository implements IWorkflowRunStatusRepository
 
 				logger.info(
 					{ name: params.name, stepName: params.stepName, status: params.stepState.status, attempt },
-					'WorkflowRun step status patched',
+					'WorkflowRun step status replaced',
 				);
 				return; // success
 			} catch (err) {
@@ -124,13 +132,16 @@ export class WorkflowRunStatusRepository implements IWorkflowRunStatusRepository
 		const finalizers = (metadata.finalizers as string[] | undefined) ?? [];
 		const updated = finalizers.filter((f) => f !== finalizerName);
 
-		await customObjectsClient.patchNamespacedCustomObject({
+		await customObjectsClient.replaceNamespacedCustomObject({
 			group: Envconfig.k8s.group,
 			version: Envconfig.k8s.version,
 			plural: Envconfig.k8s.plural,
 			namespace,
 			name,
-			body: { metadata: { finalizers: updated } },
+			body: {
+				...current,
+				metadata: { ...metadata, finalizers: updated }
+			},
 		});
 
 		logger.info({ name, finalizerName }, 'Finalizer removed from WorkflowRun');

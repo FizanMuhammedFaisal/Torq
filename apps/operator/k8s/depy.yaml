@@ -18,6 +18,9 @@ spec:
           image: fizanmuhammedfaisal/torq-operator
           ports:
             - containerPort: 4001
+          envFrom:
+            - configMapRef:
+                name: operator-config
 
 ---
 apiVersion: v1
@@ -29,9 +32,11 @@ spec:
     app: torq-operator
   ports:
     - name: http
+      protocol: TCP
       port: 4001
       targetPort: 4001
     - name: grpc
+      protocol: TCP
       port: 50051
       targetPort: 50051
   type: ClusterIP

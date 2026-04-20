@@ -6,7 +6,8 @@ import { TOKENS } from './config/di/tokens';
 import type { IHealthServer } from './presentation/http/health';
 import type { K8sWatchManager } from './infrastructure/k8s/watch';
 import type { RedisClientInterface } from './infrastructure/messageBroker/Client.interface';
-import { ILogForwarderManager } from './infrastructure/k8s/deamonSet/logForwarder/ensureDeamonSet';
+import type { ILogForwarderManager } from './infrastructure/k8s/deamonSet/logForwarder/ensureDeamonSet';
+
 
 async function Main() {
 	const grpcServer = container.resolve<GRpcServer>(TOKENS.GRPCServer);
@@ -18,25 +19,23 @@ async function Main() {
 
 	healthServer.start();
 	//ensure the torq crd is preset
-	// ensureCrd()
 	await crdManager.ensureCrd();
-	await logForwarderManager.ensureDeamonSet()
+	await logForwarderManager.ensureDeamonSet();
 	//  start grpc server
-	// await grpcServer.start();
+
+	await grpcServer.start();
 
 	// // connect to message queue
-	// await redisClient.getClient();
+	await redisClient.getClient();
 	// start watchers right before marking as ready
-	// await k8sWatchManager.startWatchers();
+	await k8sWatchManager.startWatchers();
 
 	// Graceful shutdown handling
 	process.on('SIGTERM', async () => {
-		console.log('SIGTERM received, shutting down gracefully');
 		await close();
 		process.exit(0);
 	});
 	process.on('SIGINT', async () => {
-		console.log('SIGINT received, shutting down gracefully');
 		await close();
 		process.exit(0);
 	});

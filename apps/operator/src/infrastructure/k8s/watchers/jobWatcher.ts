@@ -46,12 +46,17 @@ export class JobWatcher extends BaseWatcher {
 	}
 
 	private async handler(phase: string, job: k8s.V1Job): Promise<void> {
+		logger.info({
+			messsage: "[Job-watcher] Reached",
+			job,
+			phase
+		})
 		if (job.metadata?.resourceVersion) {
 			this.lastResourceVersion = job.metadata.resourceVersion;
 		}
 
-		// Only care about state changes
-		if (phase !== 'MODIFIED') return;
+		// Only care about state changes and existing terminal states
+		if (phase !== 'MODIFIED' && phase !== 'ADDED') return;
 
 		// Terminal detection via status counters
 		// K8s updates these atomically; conditions can lag in some edge cases.

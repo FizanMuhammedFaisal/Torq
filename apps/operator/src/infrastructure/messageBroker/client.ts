@@ -22,24 +22,28 @@ export class RedisClient implements RedisClientInterface {
 		}
 
 		if (this.isConnecting) {
-			logger.info('RedisConnectionManager: Connection already in progress. Waiting...');
-			await new Promise((resolve) => setTimeout(resolve, 50));
+			logger.warn('RedisConnectionManager: Connection already in progress. Waiting...');
+			let attempts = 0;
+			while (this.isConnecting && attempts < 100) {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+				attempts++;
+			}
 			if (this.client?.isReady) {
 				return this.client;
-			} else {
-				throw new Error('Redis connection attempt timed out or failed to establish concurrently.');
 			}
+			throw new Error('Redis connection attempt timed out or failed to establish concurrently.');
 		}
+
 		this.isConnecting = true;
 		try {
 			if (!this.client) {
 				this.client = createClient({ url: Envconfig.redis.url });
-				this.client.on('error', (err) => logger.error('Redis Client Error:', err));
+				this.client.on('error', (err) => logger.error({ err, url: Envconfig.redis.url }, 'Redis Client Error:'));
 				this.client.on('connect', () => logger.info('Redis Client Connected.'));
 				this.client.on('reconnecting', () => logger.info('Redis Client Reconnecting...'));
 				this.client.on('end', () => logger.info('Redis Client Disconnected.'));
 			}
-			if (!this.client.isReady) {
+			if (!this.client.isOpen) {
 				await this.client.connect();
 				logger.info('Redis client connected successfully.');
 			}

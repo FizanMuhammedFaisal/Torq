@@ -23,10 +23,14 @@ export const Envconfig = {
 				baseUrl: process.env.API_SERVER_GRPC_BASE_URL || 'http://localhost:50052',
 			},
 		},
+		logIngestor: {
+			host: process.env.LOG_INGESTOR_HOST || 'log-ingestor-service.default.svc.cluster.local',
+			port: process.env.LOG_INGESTOR_PORT || '4001',
+		},
 	},
 	grpc: {
 		PORT: process.env.RPC_PORT || 50051,
-		HOST: process.env.RPC_HOST || 'localhost',
+		HOST: process.env.RPC_HOST || '0.0.0.0',
 	},
 	k8s: {
 		group: process.env.K8S_GROUP || 'torq.dev',

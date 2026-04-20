@@ -8,7 +8,7 @@ export interface IPublisher {
 	 *                    `data` field. If false, the message is spread as flat
 	 *                    string key-value pairs (required for Redis Streams xAdd).
 	 */
-	publish<T>(topic: string, message: T, stringify: boolean): Promise<PublishResult>;
+	publish<T>(topic: string, message: T, stringify?: boolean): Promise<PublishResult>;
 }
 
 export type PublishResult = {

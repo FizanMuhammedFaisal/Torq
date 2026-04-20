@@ -18,7 +18,11 @@ rules:
     verbs: ["get", "create", "update", "patch", "delete", "list", "watch"]
   # custom resources
   - apiGroups: ["torq.dev"]
-    resources: ["workflowruns"]
+    resources: ["workflowruns", "workflowruns/status"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Jobs management
+  - apiGroups: ["batch"]
+    resources: ["jobs"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   # DaemonSet management (for fluent-bit in logging namespace)
   - apiGroups: ["apps"]
@@ -60,3 +64,10 @@ roleRef:
 
 # By default, every pod gets zero permissions
 # here we grand permisson for our operator pod deploybed in kuber as a pod to access api server
+---
+# The ServiceAccount used by the torq jobs to execute workflow steps
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: torq-job-runner
+  namespace: default

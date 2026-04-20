@@ -25,7 +25,7 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 			kind: Envconfig.k8s.kind,
 			metadata: {
 				// https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#dns-subdomain-names
-				name: `run-${run.workflowId.toLowerCase()}`,
+				name: `run-${run.runId.toLowerCase()}`,
 				namespace: Envconfig.k8s.namespace,
 				labels: {
 					'torq.dev/workflow': run.workflowId,
@@ -37,6 +37,7 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 				finalizers: ['torq.dev/cleanup'],
 			},
 			spec: {
+				runId: run.runId,
 				workflowId: run.workflowId,
 				versionId: run.versionId,
 				torqVersion: run.torqVersion,

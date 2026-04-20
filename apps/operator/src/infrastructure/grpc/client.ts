@@ -3,6 +3,7 @@ import { type Transport, type Client, createClient } from '@connectrpc/connect';
 import { createGrpcTransport } from '@connectrpc/connect-node';
 import { loggingInterceptor } from './interceptors/loggingInterceptor';
 import { ApiServerService } from '@torq-system/grpc';
+
 // Keep-alive settings
 // https://github.com/connectrpc/connect-es/pull/673 read if want to know aboout keep alive
 export class GrpcClient {
@@ -20,3 +21,5 @@ export class GrpcClient {
 		return this.apiServerClient;
 	}
 }
+
+

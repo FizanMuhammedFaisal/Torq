@@ -1,7 +1,7 @@
 import type { ICleanUpService } from '@/application/port/services/cleanUp.inerface';
 import type { IWorkflowRunStatusRepository } from '@/application/port/repository/workflowRunStatus.interface';
 import type { IJobRepository } from '@/application/port/repository/jobs.interface';
-import type { IPublisher } from '@/infrastructure/messageBroker/redisMessageBroker';
+import type { IPublisher } from '@/application/port/messageBroker/publisher.interface';
 import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
 import { logger } from '@/infrastructure/logger/logger';
 import { inject, injectable } from 'tsyringe';
@@ -25,8 +25,8 @@ const FINALIZER = 'torq.dev/cleanup';
 export class CleanUpService implements ICleanUpService {
 	constructor(
 		@inject(TOKENS.WorkflowRunStatusRepository) private statusRepository: IWorkflowRunStatusRepository,
-		@inject(TOKENS.JobRepository)               private jobRepository:    IJobRepository,
-		@inject(TOKENS.RedisPublisher)              private publisher:        IPublisher,
+		@inject(TOKENS.JobRepository) private jobRepository: IJobRepository,
+		@inject(TOKENS.RedisPublisher) private publisher: IPublisher,
 	) { }
 
 	async handle(run: WorkflowRunSnapshot): Promise<void> {
@@ -52,11 +52,16 @@ export class CleanUpService implements ICleanUpService {
 		}
 
 		// Publish terminal event to Redis
-		const finalPhase = run.status?.phase ?? 'Unknown';
-		await this.publisher.publish(name, {
+		const finalPhase = run.status?.phase ?? 'PENDING';
+		const result = await this.publisher.publish('workflow_run_states', {
+			runName: name,
 			status: finalPhase,
 			reason: 'WorkflowRun deleted',
+			ts: new Date().toISOString(),
 		});
+		if (!result.success) {
+			logger.warn({ err: result.error, runName: name }, '[cleanup] terminal event publish failed');
+		}
 
 		// Remove the finalizer -> allows Kubernetes to delete the CRD
 		try {

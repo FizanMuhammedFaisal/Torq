@@ -14,6 +14,7 @@ import { injectable } from 'tsyringe';
 export class WorkflowMapper implements IWorkflowRPCMapper {
 	fromProtoGetTriggerWorkflowRunRequest(request: TriggerWorkflowRunRequest): TriggerRunInput {
 		return {
+			runId: request.workflowRunId,
 			workflowId: request.workflowId,
 			versionId: request.versionId,
 			torqVersion: request.torqVersion as Registry, // gRPC hands us a plain string; API server validates the value at the boundary

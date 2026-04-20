@@ -17,7 +17,7 @@ import { WorkflowMapper } from '@/presentation/grpc/mappers/workflow.mapper';
 import { Reconciler } from '@/application/reconcile/reconciler';
 import { CleanUpService } from '@/infrastructure/service/cleanUp.service';
 import { ReconcilerVersionRouter } from '@/application/reconcile/reconcilerVersionRouter';
-import { V1AlphaReconciliationHandler } from '@/application/reconcile/handlers/v1apha.handler';
+import { V1AlphaReconciliationHandler } from '@/application/reconcile/handlers/v1alpha.handler';
 import { SpecRepository } from '@/infrastructure/repository/grpc/spec.repository';
 import { GrpcClient } from '@/infrastructure/grpc/client';
 import { RedisClient } from '@/infrastructure/messageBroker/client';

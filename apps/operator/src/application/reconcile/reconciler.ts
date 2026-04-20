@@ -3,7 +3,7 @@ import type { IReconciler } from '../port/reconciler/reconciler.interface';
 import type { ICleanUpService } from '../port/services/cleanUp.inerface';
 import type { IReconcilerVersionRouter } from '../port/reconciler/versionRouter.interface';
 import type { IWorkflowRunStatusRepository } from '../port/repository/workflowRunStatus.interface';
-import type { IPublisher } from '@/infrastructure/messageBroker/redisMessageBroker';
+import type { IPublisher } from '@/application/port/messageBroker/publisher.interface';
 import { logger } from '@/infrastructure/logger/logger';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
@@ -58,16 +58,21 @@ export class Reconciler implements IReconciler {
 				await this.statusRepository.patchStatus({
 					name: run.metadata.name,
 					namespace: run.metadata.namespace,
-					phase: 'Failed',
+					phase: 'FAILED',
 					steps: run.status?.steps ?? {},
 					completedAt: new Date().toISOString(),
 					reason: 'Internal Runner error',
 					observedGeneration: run.metadata.generation,
 				});
-				await this.publisher.publish(run.metadata.name, {
-					status: 'Failed',
+				const result = await this.publisher.publish('workflow_run_states', {
+					runName: run.metadata.name,
+					status: 'FAILED',
 					reason: 'Internal Runner Error',
+					ts: new Date().toISOString(),
 				});
+				if (!result.success) {
+					logger.warn({ err: result.error, runName: run.metadata.name }, '[reconciler] publish failed after unexpected error');
+				}
 			} catch (patchErr) {
 				logger.error({ patchErr, runName: run.metadata.name }, '[reconciler] could not patch run to Failed after unexpected error');
 			}
@@ -84,16 +89,21 @@ export class Reconciler implements IReconciler {
 			await this.statusRepository.patchStatus({
 				name: run.metadata.name,
 				namespace: run.metadata.namespace,
-				phase: 'Failed',
+				phase: 'FAILED',
 				steps: run.status?.steps ?? {},
 				completedAt: new Date().toISOString(),
 				reason,
 				observedGeneration: run.metadata.generation,
 			});
-			await this.publisher.publish(run.metadata.name, {
-				status: 'Failed',
+			const result = await this.publisher.publish('workflow_run_states', {
+				runName: run.metadata.name,
+				status: 'FAILED',
 				reason,
+				ts: new Date().toISOString(),
 			});
+			if (!result.success) {
+				logger.warn({ err: result.error, runName: run.metadata.name }, '[reconciler] publish failed after marking unsupported version');
+			}
 		} catch (err) {
 			logger.error({ err, runName: run.metadata.name, reason }, '[reconciler] failed to mark unsupported version');
 		}

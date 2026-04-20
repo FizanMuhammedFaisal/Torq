@@ -8,6 +8,7 @@ export const TriggerType = {
 export type TriggerType = (typeof TriggerType)[keyof typeof TriggerType];
 export class Workflow {
 	private constructor(
+		public readonly runId: string,
 		public readonly workflowId: string,
 		public readonly versionId: string,
 		public readonly torqVersion: Registry,
@@ -16,18 +17,20 @@ export class Workflow {
 	) {}
 
 	static create({
+		runId,
 		workflowId,
 		versionId,
 		torqVersion,
 		createdAt,
 		triggerType,
 	}: {
+		runId: string;
 		workflowId: string;
 		versionId: string;
 		torqVersion: Registry;
 		triggerType: TriggerType;
 		createdAt: Date;
 	}) {
-		return new Workflow(workflowId, versionId, torqVersion, triggerType, createdAt);
+		return new Workflow(runId, workflowId, versionId, torqVersion, triggerType, createdAt);
 	}
 }

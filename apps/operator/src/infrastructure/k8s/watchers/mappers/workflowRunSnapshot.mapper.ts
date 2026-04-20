@@ -42,7 +42,7 @@ export function toDomainWorkflowRun(raw: WorkflowRunK8s): WorkflowRunSnapshot {
         },
         status: raw.status
             ? {
-                phase: raw.status.phase ?? 'Pending',
+                phase: raw.status.phase ?? 'PENDING',
                 startedAt: raw.status.startedAt,
                 completedAt: raw.status.completedAt,
                 reason: raw.status.reason,

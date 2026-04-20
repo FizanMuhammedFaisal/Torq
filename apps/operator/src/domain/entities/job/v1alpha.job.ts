@@ -1,4 +1,4 @@
-export interface V1AphaSteps {
+export interface V1AlphaSteps {
 	index: number;
 	run: string;
 }
@@ -13,8 +13,9 @@ export class V1AlphaTorqJob {
 		public workflowId: string,
 		public versionId: string,
 		public torqVersion: string,
+		public identityId: string,
 		public image: string,
-		public steps: V1AphaSteps[],
+		public steps: V1AlphaSteps[],
 		public needs: string[],
 		public envs: Record<string, string>,
 		public secrets: SecretRef[],

@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 const triggerType = z.enum(['MANUAL', 'WEBHOOK', 'SCHEDULE']);
 export const triggerRunSchema = z.object({
+	runId: z.string(),
 	workflowId: z.string(),
 	versionId: z.string(),
 	torqVersion: z.enum(Array.from(Object.values(Registry))),

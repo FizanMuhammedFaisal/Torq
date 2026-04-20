@@ -10,7 +10,7 @@ export class K8sWatchManager {
 		private readonly workflowRunWatcher: CRDWatcher,
 		@inject(TOKENS.JobWatcher)
 		private readonly jobWatcher: JobWatcher,
-	) {}
+	) { }
 
 	async startWatchers(): Promise<void> {
 		console.log('Initializing K8s resource watchers...');
@@ -18,7 +18,7 @@ export class K8sWatchManager {
 		try {
 			await Promise.all([
 				this.workflowRunWatcher.start(),
-				// this.jobWatcher.start(),
+				this.jobWatcher.start(),
 			]);
 
 			console.log('All configured K8s watchers are running.');

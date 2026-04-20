@@ -3,7 +3,7 @@ import type { ICacheService } from '@/application/port/services/cache.interface'
 import { TOKENS } from '@/config/di/tokens';
 import { WorkflowSpec } from '@/domain/entities/workflowSpec';
 import type { GrpcClient } from '@/infrastructure/grpc/client';
-import { type GetSpecResponse } from "@torq-system/grpc/apiserver/workflowrun/v1";
+import type { GetSpecResponse } from '@torq-system/grpc/apiserver/workflowrun/v1';
 import type { JsonObject } from '@bufbuild/protobuf';
 import { logger } from '@/infrastructure/logger/logger';
 import { inject, injectable } from 'tsyringe';
@@ -24,22 +24,24 @@ export class SpecRepository implements ISpecRepository {
 			const client = this.rpcClient.getApiServerClient();
 			try {
 				const res = await client.getSpec({ workflowRunId: workflowId, versionId: versionId });
-
+				console.log(res)
 				if (res) {
 					const workflowSpec = this.fromProtoToWorkflowSpec(res);
 					await this.specCache.set(`${workflowId}:${versionId}`, workflowSpec);
 					return workflowSpec;
 				}
 			} catch (error) {
-				logger.error({ error, workflowRunId: `${workflowId}:${versionId}` }, 'Failed to fetch spec from gRPC');
+				logger.error(
+					{ error, workflowRunId: `${workflowId}:${versionId}` },
+					'Failed to fetch spec from gRPC',
+				);
 				// error hanlding should be gracefull
-				return null
+				return null;
 			}
 			return null;
 		}
 	}
 	fromProtoToWorkflowSpec(protoSpec: GetSpecResponse): WorkflowSpec {
-
 		function mapSpecType(spec: JsonObject | undefined): Record<string, unknown> {
 			return structuredClone(spec) as Record<string, unknown>;
 		}

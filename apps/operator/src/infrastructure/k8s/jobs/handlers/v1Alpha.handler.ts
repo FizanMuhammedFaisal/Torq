@@ -35,7 +35,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
                         serviceAccountName: 'torq-job-runner',
                         initContainers: [
                             // this.buildLogSidecarContainer(job), // moved to deamonset node wide
-                            ...this.InitStepContainers(job)
+                            ...this.initStepContainers(job)
                         ],
                         containers: [this.completionContainer()], // alteast one is reqruied
                         volumes: this.volumes()
@@ -117,7 +117,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
             },
         ]
     }
-    private InitStepContainers(job: TorqJob): V1Container[] {
+    private initStepContainers(job: TorqJob): V1Container[] {
         return job.steps.map((step) => this.makeInitStepContainer(job, step))
     }
     private makeInitStepContainer(job: TorqJob, step: TorqJobSteps): V1Container {

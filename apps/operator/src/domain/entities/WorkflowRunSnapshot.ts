@@ -1,5 +1,5 @@
-export type RunPhase = 'Pending' | 'Running' | 'Succeeded' | 'Failed' | 'Cancelled';
-export type StepStatus = 'Pending' | 'Scheduled' | 'Running' | 'Succeeded' | 'Failed';
+export type RunPhase = 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'CANCELLED';
+export type StepStatus = 'PENDING' | 'SCHEDULED' | 'RUNNING' | 'SUCCESS' | 'FAILED';
 
 export interface StepSpec {
     name: string;
