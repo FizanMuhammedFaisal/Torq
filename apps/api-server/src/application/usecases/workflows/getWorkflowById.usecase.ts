@@ -27,9 +27,17 @@ export class GetWorkflowByIdUseCase implements IGetWorkflowByIdUseCase {
 			description: aggregate.workflow.description,
 			createdAt: aggregate.workflow.createdAt,
 			status: aggregate.latestRun?.status,
-			// latestRun: aggregate.latestRun,
-			// totalRuns: aggregate.totalRuns,
-			// averageDuration: aggregate.averageDuration,
+			spec: aggregate.latestSpec as any, // Assert to match the typed Dto while keeping domain generic
+			latestRun: aggregate.latestRun
+				? {
+						id: aggregate.latestRun.id,
+						status: aggregate.latestRun.status,
+						startedAt: aggregate.latestRun.startedAt,
+						completedAt: aggregate.latestRun.completedAt ?? undefined,
+						duration: aggregate.latestRun.duration ?? undefined,
+						steps: aggregate.latestRun.steps as Record<string, { status: string; ts?: number }>,
+					}
+				: undefined,
 		};
 	}
 }

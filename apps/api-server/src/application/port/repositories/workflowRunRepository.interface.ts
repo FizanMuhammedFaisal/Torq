@@ -20,5 +20,13 @@ export type PersistRunDto = {
 export interface IWorkflowRunRepository extends IBaseRepository<WorkflowRun> {
 	create(data: PersistRunDto): Promise<WorkflowRun>;
 	updateStatus(id: string, status: RunStatus): Promise<void>;
+	updateRunState(runId: string, status?: string, stepName?: string, ts?: Date): Promise<void>;
 	findByWorkflowId(workflowId: string, options?: { limit?: number }): Promise<WorkflowRun[]>;
+	findAllPaged(options: {
+		userId: string;
+		page: number;
+		pageSize: number;
+		search?: string;
+		workflowId?: string;
+	}): Promise<{ runs: (WorkflowRun & { workflowName: string })[]; total: number }>;
 }

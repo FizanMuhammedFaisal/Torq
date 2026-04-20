@@ -2,10 +2,14 @@ import type { HandlerContext } from '@connectrpc/connect';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
 import { create } from '@bufbuild/protobuf';
-import { type IWorkflowRPCController } from '../interfaces/controllers/workflow.interface';
-import { GetSpecRequest, GetSpecResponse, GetSpecResponseSchema } from '@torq-system/grpc';
+import type { IWorkflowRPCController } from '../interfaces/controllers/workflow.interface';
+import {
+    type GetSpecRequest,
+    type GetSpecResponse,
+    GetSpecResponseSchema,
+} from '@torq-system/grpc';
 import type { IWorkflowRPCMapper } from '../interfaces/mappers/workflow.interface';
-import { type IGetWorkflowSpecUseCase } from '@/application/port/usecases/workflows/getWorkflowSpec.interface';
+import type { IGetWorkflowSpecUseCase } from '@/application/port/usecases/workflows/getWorkflowSpec.interface';
 
 @injectable()
 export class WorkflowRunController implements IWorkflowRPCController {

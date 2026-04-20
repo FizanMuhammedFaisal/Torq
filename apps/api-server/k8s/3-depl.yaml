@@ -6,7 +6,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: torq-apiserver 
+      app: torq-apiserver
   template:
     metadata:
       labels:
@@ -17,24 +17,41 @@ spec:
           image: fizanmuhammedfaisal/torq-apiserver
           ports:
             - containerPort: 4000
+            - containerPort: 50052
           envFrom:
             - configMapRef:
                 name: apiserver-config
             - secretRef:
                 name: apiserver-secret
 --- 
-apiVersion: v1 
+# External HTTP access - NodePort
+apiVersion: v1
 kind: Service
 metadata:
-  name: torq-apiserver-service 
+  name: torq-apiserver-service
 spec:
   selector:
     app: torq-apiserver
   ports:
     - name: http
-      port: 4000 
+      protocol: TCP
+      port: 4000
       targetPort: 4000
+      nodePort: 31990
+  type: NodePort
+
+---
+# Internal gRPC access - ClusterIP
+apiVersion: v1
+kind: Service
+metadata:
+  name: torq-apiserver-grpc-service
+spec:
+  selector:
+    app: torq-apiserver
+  ports:
     - name: grpc
+      protocol: TCP
       port: 50052
       targetPort: 50052
-  type: NodePort
+  type: ClusterIP

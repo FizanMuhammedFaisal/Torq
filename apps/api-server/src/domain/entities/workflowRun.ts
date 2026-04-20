@@ -4,6 +4,7 @@ export const RunStatus = {
 	SUCCESS: 'SUCCESS',
 	FAILED: 'FAILED',
 	IDLE: 'IDLE',
+	NOT_SUPPORTED_RUN: 'NOT_SUPPORTED_RUN',
 } as const;
 export type RunStatus = (typeof RunStatus)[keyof typeof RunStatus];
 
@@ -26,6 +27,7 @@ export class WorkflowRun {
 		public readonly startedAt: Date,
 		public readonly completedAt: Date | null,
 		public readonly duration: number | null,
+		public readonly steps: Record<string, { status: string; ts?: number }> = {},
 	) { }
 
 	static create(props: {
@@ -38,6 +40,7 @@ export class WorkflowRun {
 		startedAt: Date;
 		completedAt: Date | null;
 		duration: number | null;
+		steps?: Record<string, { status: string; ts?: number }>;
 	}) {
 		return new WorkflowRun(
 			props.id,
@@ -49,6 +52,7 @@ export class WorkflowRun {
 			props.startedAt,
 			props.completedAt,
 			props.duration,
+			props.steps ?? {},
 		);
 	}
 }

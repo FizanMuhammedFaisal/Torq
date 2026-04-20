@@ -8,7 +8,7 @@ type WorkflowInsert = typeof workflow.$inferInsert;
 
 @injectable()
 export class WorkflowMapper implements IWorkflowMapper<WorkflowTable, WorkflowInsert> {
-	toDomain(row: WorkflowTable): Workflow {
+	toDomain(row: Pick<WorkflowTable, 'id' | 'identityId' | 'name' | 'description' | 'createdAt'>): Workflow {
 		return Workflow.create({
 			id: row.id,
 			identityId: row.identityId,

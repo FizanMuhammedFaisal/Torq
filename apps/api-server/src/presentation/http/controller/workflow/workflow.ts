@@ -15,6 +15,8 @@ import type { GetSecretsOutputDto } from '@/application/dto/worflows/getSecrets.
 import type { UpsertSecretsInputDto } from '@/application/dto/worflows/upsertSecrets.dto';
 import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows.dto';
 import { validate } from '../../validator';
+import { type GetWorkflowSpecOutput } from '@/application/dto/worflows/getWorkflowSpec.dto';
+import { type IGetWorkflowSpecUseCase } from '@/application/port/usecases/workflows/getWorkflowSpec.interface';
 
 @injectable()
 export class WorkflowController implements IWorkflowController {
@@ -33,6 +35,8 @@ export class WorkflowController implements IWorkflowController {
 		private revealSecretUseCase: IRevealSecretUseCase,
 		@inject(TOKENS.TriggerWorkflowRunUseCase)
 		private triggerWorkflowRunUseCase: ITriggerWorkflowRunUseCase,
+		@inject(TOKENS.GetWorkflowSpecUseCase)
+		private getWorkflowSpecUseCase: IGetWorkflowSpecUseCase,
 	) { }
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
@@ -84,6 +88,13 @@ export class WorkflowController implements IWorkflowController {
 		return this.getSecretsUseCase.execute({
 			id: workflowId,
 			req: ctx.user,
+		});
+	};
+	getWorkflowSpec = async (ctx: AuthenticatedContext): Promise<GetWorkflowSpecOutput> => {
+		const workflowId = ctx.params.id;
+		return this.getWorkflowSpecUseCase.execute({
+			workflowId: workflowId,
+			secrets: false
 		});
 	};
 }

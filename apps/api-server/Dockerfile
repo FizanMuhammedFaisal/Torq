@@ -1,12 +1,13 @@
-FROM oven/bun:latest 
+FROM node:22.18.0
 
-WORKDIR /app 
+WORKDIR /app
 
-COPY package.json bun.lock ./
-
-RUN bun install 
+COPY package.json package-lock.json* ./
+# Mount a persistent cache to the root user's npm cache directory
+# Use npm ci for faster, strictly lockfile-based installations
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 COPY . .
 
-
-CMD ["bun", "run", "dev"]
+CMD ["npm", "run", "dev"]

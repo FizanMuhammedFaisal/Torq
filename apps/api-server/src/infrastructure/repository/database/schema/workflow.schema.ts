@@ -81,6 +81,8 @@ export const workflowRun = pgTable('workflow_run', {
 	startedAt: timestamp('started_at').defaultNow().notNull(),
 	completedAt: timestamp('completed_at'),
 	duration: integer('duration'),
+	// Maps stepName -> { status: string, ts?: number }
+	steps: json('steps').$type<Record<string, { status: string; ts?: number }>>().default({}),
 });
 
 export const workflowRunRelations = relations(workflowRun, ({ one }) => ({

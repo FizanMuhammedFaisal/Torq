@@ -16,7 +16,7 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 		private readonly workflowMapper: WorkflowMapper,
 		@inject(TOKENS.WorkflowRunMapper)
 		private readonly runMapper: WorkflowRunMapper,
-	) {}
+	) { }
 	async findCount(identityId: string): Promise<number> {
 		try {
 			const result = await getExecutor()
@@ -43,6 +43,10 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 						orderBy: (run, { desc }) => [desc(run.startedAt)],
 						limit: 1,
 					},
+					versions: {
+						orderBy: (v, { desc }) => [desc(v.createdAt)],
+						limit: 1,
+					},
 				},
 				orderBy: (wf, { desc }) => [desc(wf.createdAt)],
 				limit,
@@ -53,7 +57,8 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 				const workflow = this.workflowMapper.toDomain(row);
 				const latestRunData = row.runs[0] || null;
 				const latestRun = latestRunData ? this.runMapper.toDomain(latestRunData) : null;
-				return WorkflowWithLatestRun.create({ workflow, latestRun });
+				const latestSpec = row.versions[0]?.workflowSpec || null;
+				return WorkflowWithLatestRun.create({ workflow, latestRun, latestSpec });
 			});
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'Workflow' });
@@ -69,6 +74,10 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 						orderBy: (run, { desc }) => [desc(run.startedAt)],
 						limit: 1,
 					},
+					versions: {
+						orderBy: (v, { desc }) => [desc(v.createdAt)],
+						limit: 1,
+					},
 				},
 			});
 
@@ -77,7 +86,8 @@ export class WorkflowAggregateRepository implements IWorkflowAggregateRepository
 			const workflow = this.workflowMapper.toDomain(result);
 			const latestRunData = result.runs[0] || null;
 			const latestRun = latestRunData ? this.runMapper.toDomain(latestRunData) : null;
-			return WorkflowWithLatestRun.create({ workflow, latestRun });
+			const latestSpec = result.versions[0]?.workflowSpec || null;
+			return WorkflowWithLatestRun.create({ workflow, latestRun, latestSpec });
 		} catch (error) {
 			throw PostgresErrorMapper.mapError(error, { entity: 'WorkflowAggregate' });
 		}

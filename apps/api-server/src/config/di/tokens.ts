@@ -35,6 +35,7 @@ export const TOKENS = {
 	GrpcClient: Symbol.for('GrpcClient'),
 	WorkflowAggregateRepository: Symbol.for('WorkflowAggregateRepository'),
 	WorkflowRunMapper: Symbol.for('WorkflowRunMapper'),
+	RedisClient: Symbol.for('RedisClient'),
 
 	// usecases
 	GetWorkflowSpecUseCase: Symbol.for('GetWorkflowSpecUseCase'),
@@ -42,4 +43,7 @@ export const TOKENS = {
 	//
 	WorkflowRPCMapper: Symbol.for('WorkflowRPCMapper'),
 	WorkflowRPCController: Symbol.for('WorkflowRPCController'),
+	RunController: Symbol.for('RunController'),
+	RunRouter: Symbol.for('RunRouter'),
+	GetRunsUseCase: Symbol.for('GetRunsUseCase'),
 } as const;
