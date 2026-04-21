@@ -48,6 +48,7 @@ export const CRD_DEFINITION: V1CustomResourceDefinition = {
 									torqVersion: { type: 'string', _enum: ['v1alpha'] },
 									triggerType: { type: 'string' },
 									createdAt: { type: 'string', format: 'date-time' },
+									runId: { type: 'string' },
 									// inputs: {
 									// 	type: 'object',
 									// 	x_kubernetes_preserve_unknown_fields: true,

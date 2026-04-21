@@ -4,12 +4,13 @@ import type { IWorkflowRunRepository } from '@/application/port/repository/workf
 import type { IJobService } from '@/application/port/services/jobService.interface';
 import type { IWorkflowRunStatusRepository } from '@/application/port/repository/workflowRunStatus.interface';
 import type { WorkflowSpec } from '@/domain/entities/workflowSpec';
-import type { WorkflowRunSnapshot, RunPhase, StepState } from '@/domain/entities/workflowRunSnapshot';
+import type { WorkflowRunSnapshot, RunPhase, StepState } from '@/domain/entities/WorkflowRunSnapshot';
 import type { IPublisher } from '@/application/port/messageBroker/publisher.interface';
 import { V1AlphaTorqJob, type V1AlphaSteps } from '@/domain/entities/job/v1alpha.job';
 import { TOKENS } from '@/config/di/tokens';
 import { logger } from '@/infrastructure/logger/logger';
 import { inject, injectable } from 'tsyringe';
+import { topoSort } from '@/domain/dsl/common/topoSort';
 
 //  V1Alpha DSL types (mirrors api-server/src/domain/dsl/versions/v1alpha)
 // The API server's DSL pipeline validates this shape before storage — we trust the contract.
@@ -124,14 +125,14 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 		// Cycles / unknown deps were caught by the API server semantic validator, still retry hrer
 		let waves: string[][];
 		try {
-			waves = this.topoSort(workflowSpec.jobs);
+			waves = topoSort(workflowSpec.jobs);
 		} catch (err) {
 			logger.error({ err, name: run.metadata.name }, '[v1alpha] DAG error, marking run as Failed');
 			await this.failRun(run, `DAG error: ${(err as Error).message}`);
 			return;
 		}
 
-
+		console.log(waves)
 		const stepStates: Record<string, StepState> = { ...(run.status?.steps ?? {}) };
 
 		// Main scheduling loop (wave-by-wave, jobs within a wave run in parallel)
@@ -167,6 +168,8 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 
 				//  Schedule the K8s Job 
 				const torqJob = this.buildTorqJob(run, jobName, job, spec);
+				console.log("torqJob")
+				console.log(torqJob)
 				try {
 					const { created } = await this.jobService.createJob(torqJob);
 					if (created) {
@@ -175,6 +178,7 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 							status: 'SCHEDULED',
 							attempt: (state?.attempt ?? 0) + 1,
 						};
+
 						await this.publisher.publish('workflow_run_states', {
 							runName: run.metadata.name,
 							stepName: jobName,
@@ -304,10 +308,11 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 				);
 			}
 		}
-
+		console.log("run")
+		console.log(run)
 		return new V1AlphaTorqJob(
 			jobName,             // id — the step/job name, unique within this run
-			run.metadata.uid,    // workflowRunId — K8s UID, used as the log-stream key
+			run.spec.workflowRunId,    // workflowRunId — K8s UID, used as the log-stream key
 			run.metadata.name,   // workflowRunName — CRD name, used by JobWatcher to patch status
 			run.spec.workflowId,
 			run.spec.versionId,
@@ -345,60 +350,5 @@ export class V1AlphaReconciliationHandler implements IReconciliationHandler {
 			logger.error({ err, name: run.metadata.name, reason }, '[v1alpha] Could not patch run to Failed');
 		}
 	}
-	/**
-	 * Kahn's BFS topological sort.
-	 * Returns job names grouped into execution waves:
-	 *   Wave 0 — no dependencies (run immediately)
-	 *   Wave N — all dependencies satisfied by waves 0..N-1
-	 *
-	 * Edge cases:
-	 *   - Unknown dep name  → throws (defensive; API server catches this at write time)
-	 *   - Self-dep          → caught by cycle detection below
-	 *   - Cycle             → throws (defensive; API server catches this at write time)
-	 *   - Empty jobs map    → returns [] (caller treats as immediately Succeeded)
-	 */
-	private topoSort(jobs: Record<string, Job>): string[][] {
-		const names = Object.keys(jobs);
-		if (names.length === 0) return [];
 
-		const inDegree: Record<string, number> = {};
-		const adj: Record<string, string[]> = {};
-		for (const name of names) {
-			inDegree[name] = 0;
-			adj[name] = [];
-		}
-
-		for (const [name, job] of Object.entries(jobs)) {
-			for (const dep of job.needs ?? []) {
-				if (!(dep in adj)) {
-					throw new Error(`Job "${name}" depends on unknown job "${dep}"`);
-				}
-				adj[dep].push(name);
-				inDegree[name]++;
-			}
-		}
-
-		let queue = names.filter((n) => inDegree[n] === 0);
-		const waves: string[][] = [];
-
-		while (queue.length > 0) {
-			waves.push([...queue]);
-			const next: string[] = [];
-			for (const node of queue) {
-				for (const neighbor of adj[node]) {
-					if (--inDegree[neighbor] === 0) next.push(neighbor);
-				}
-			}
-			queue = next;
-		}
-
-		// If not all nodes were processed, a cycle exists
-		const processed = waves.reduce((sum, w) => sum + w.length, 0);
-		if (processed < names.length) {
-			const cycleNodes = names.filter((n) => inDegree[n] > 0);
-			throw new Error(`Cyclic dependency detected involving: ${cycleNodes.join(', ')}`);
-		}
-
-		return waves;
-	}
 }

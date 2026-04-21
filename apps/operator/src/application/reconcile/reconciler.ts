@@ -1,4 +1,4 @@
-import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
 import type { IReconciler } from '../port/reconciler/reconciler.interface';
 import type { ICleanUpService } from '../port/services/cleanUp.inerface';
 import type { IReconcilerVersionRouter } from '../port/reconciler/versionRouter.interface';

@@ -18,7 +18,8 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 			metadata: k8s.V1ObjectMeta;
 			spec: Workflow;
 		}
-
+		console.log("trigering run")
+		console.log(run)
 		const manifest: WorkflowRunCustomResource = {
 			// https://github.com/kubernetes/community/blob/main/contributors/devel/sig-architecture/api-conventions.md#resources
 			apiVersion: `${Envconfig.k8s.group}/${Envconfig.k8s.version}`,
@@ -30,6 +31,7 @@ export class WorkflowRunDispatcherService implements IWorkflowRunDispatcherServi
 				labels: {
 					'torq.dev/workflow': run.workflowId,
 					'torq.dev/version': run.versionId,
+					'torq.dev/workflowRunId': run.runId,
 				},
 				// Finalizer keeps the CRD alive until CleanUpService removes it.
 				// K8s sets deletionTimestamp instead of immediately deleting,

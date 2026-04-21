@@ -69,7 +69,7 @@ export class V1AlphaJobBuilder implements IJobBuilder {
     // private buildLogSidecarContainer(job: TorqJob): V1Container {
     //     return {
     //         name: 'torq-log-aggregator',
-    //         image: "image of the service",//TODO
+    //         image: "image of the service",// moved to a deamon set architeture
     //         restartPolicy: 'Always',// this is waht makes this a sidecar
     //         env: [
     //             { name: 'WORKFLOW_RUN_ID', value: job.workflowRunId },

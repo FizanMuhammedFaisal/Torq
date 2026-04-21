@@ -1,4 +1,4 @@
-import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
 
 export interface IWorkflowRunRepository {
 	create(manifest: object): Promise<void>;

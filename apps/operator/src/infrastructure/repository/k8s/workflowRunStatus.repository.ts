@@ -1,5 +1,5 @@
 import type { IWorkflowRunStatusRepository } from '@/application/port/repository/workflowRunStatus.interface';
-import type { RunPhase, StepState } from '@/domain/entities/workflowRunSnapshot';
+import type { RunPhase, StepState } from '@/domain/entities/WorkflowRunSnapshot';
 import { Envconfig } from '@/config/envconfig';
 import { customObjectsClient } from '@/infrastructure/k8s/client';
 import { logger } from '@/infrastructure/logger/logger';

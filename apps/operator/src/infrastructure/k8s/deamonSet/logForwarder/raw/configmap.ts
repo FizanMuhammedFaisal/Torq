@@ -5,11 +5,11 @@ const name = 'fluent-bit-config';
 const namespace = 'logging';
 // needs cahnging
 export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
-	apiVersion: 'v1',
-	kind: 'ConfigMap',
-	metadata: { name, namespace },
-	data: {
-		'fluent-bit.conf': `[SERVICE]
+    apiVersion: 'v1',
+    kind: 'ConfigMap',
+    metadata: { name, namespace },
+    data: {
+        'fluent-bit.conf': `[SERVICE]
     Flush         3
     Log_Level     info
     HTTP_Server   On
@@ -50,12 +50,12 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
 
 [OUTPUT]
     Name    http
-    Format  json_stream
+    Format  json
     Match   kube.*
     Host    ${Envconfig.services.logIngestor.host}
     Port    ${Envconfig.services.logIngestor.port}
     URI     /ingest
     storage.total_limit_size 2G
     Retry_Limit False`,
-	},
+    },
 };

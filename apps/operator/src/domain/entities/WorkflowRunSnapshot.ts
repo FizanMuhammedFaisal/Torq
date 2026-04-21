@@ -53,6 +53,7 @@ export class WorkflowRunSnapshot {
             torqVersion: string;
             triggeredBy: string;
             createdAt?: string;
+            workflowRunId: string
         },
         //actual state
         public readonly status?: {
@@ -80,6 +81,7 @@ export class WorkflowRunSnapshot {
             torqVersion: string;
             triggeredBy: string;
             createdAt?: string;
+            workflowRunId: string
         };
         status?: {
             phase: RunPhase;

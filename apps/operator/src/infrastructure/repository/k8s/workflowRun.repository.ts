@@ -1,5 +1,5 @@
 import type { IWorkflowRunRepository } from '@/application/port/repository/workflowRun.interface';
-import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
 import { Envconfig } from '@/config/envconfig';
 import { customObjectsClient } from '@/infrastructure/k8s/client';
 import { ApiException } from '@kubernetes/client-node';

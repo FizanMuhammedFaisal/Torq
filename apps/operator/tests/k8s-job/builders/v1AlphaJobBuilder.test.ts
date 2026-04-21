@@ -12,6 +12,7 @@ const baseJob: TorqJob = {
 	versionId: 'ULID',
 	image: 'node:20-alpine',
 	namespace: 'torq-system',
+	identityId: "uasdfasf",
 	steps: [
 		{ index: 0, run: 'npm ci' },
 		{ index: 1, run: 'npm test' },
@@ -23,13 +24,13 @@ const baseJob: TorqJob = {
 const builder = new V1AlphaJobBuilder();
 
 describe('metadata', () => {
-    it('sets managed-by label', () => {
-        const job = builder.buildJob(baseJob);
-        expect(job.metadata?.labels?.['app.kubernetes.io/managed-by']).toBe('torq');
-    });
+	it('sets managed-by label', () => {
+		const job = builder.buildJob(baseJob);
+		expect(job.metadata?.labels?.['app.kubernetes.io/managed-by']).toBe('torq');
+	});
 
-    it('name is DNS-1123 compliant', () => {
-        const job = builder.buildJob(baseJob);
-        expect(job.metadata?.name).toMatch(/^[a-z0-9-]{1,63}$/);
-    });
+	it('name is DNS-1123 compliant', () => {
+		const job = builder.buildJob(baseJob);
+		expect(job.metadata?.name).toMatch(/^[a-z0-9-]{1,63}$/);
+	});
 });

@@ -1,4 +1,4 @@
-import type { RunPhase, StepState } from '@/domain/entities/workflowRunSnapshot';
+import type { RunPhase, StepState } from '@/domain/entities/WorkflowRunSnapshot';
 
 export interface IWorkflowRunStatusRepository {
 	/**

@@ -2,7 +2,7 @@ import type { ICleanUpService } from '@/application/port/services/cleanUp.inerfa
 import type { IWorkflowRunStatusRepository } from '@/application/port/repository/workflowRunStatus.interface';
 import type { IJobRepository } from '@/application/port/repository/jobs.interface';
 import type { IPublisher } from '@/application/port/messageBroker/publisher.interface';
-import type { WorkflowRunSnapshot } from '@/domain/entities/workflowRunSnapshot';
+import type { WorkflowRunSnapshot } from '@/domain/entities/WorkflowRunSnapshot';
 import { logger } from '@/infrastructure/logger/logger';
 import { inject, injectable } from 'tsyringe';
 import { TOKENS } from '@/config/di/tokens';
