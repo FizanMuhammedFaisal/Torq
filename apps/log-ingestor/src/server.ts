@@ -87,7 +87,7 @@ export class Server {
 
 						// Stream key: `logs:run:${WorkflowRunId}:job${jobId}`;
 						// Consumers (API server) read per-pod and fan-out by workflowRunId label
-						const streamKey = `logs:run:${WorkflowRunId}:job${jobId}`;
+						const streamKey = `logs:run:${WorkflowRunId}:job:${jobId}`;
 						const queued = this.enqueue({ streamKey, log });
 						if (queued) {
 							accepted++;

@@ -17,13 +17,13 @@ export class RunRouter implements Router {
 		private readonly runController: IRunController,
 		@inject(TOKENS.AuthMacro)
 		private readonly authMacro: AuthMacro,
-	) {}
+	) { }
 
 	register() {
 		return new Elysia({ prefix: this.prefix }).use(this.streamRunLogs()).use(this.getRuns());
 	}
 	getRuns() {
-		return new Elysia({ prefix: this.prefix }).use(this.authMacro.plugin()).get(
+		return new Elysia().use(this.authMacro.plugin()).get(
 			'/',
 			(ctx) => {
 				return this.runController.getRuns(ctx);
@@ -35,14 +35,14 @@ export class RunRouter implements Router {
 		);
 	}
 	streamRunLogs() {
-		return new Elysia({ prefix: this.prefix }).use(this.authMacro.plugin()).get(
-			'/',
+		return new Elysia().use(this.authMacro.plugin()).post(
+			'/runlogs',
 			(ctx) => {
 				return this.runController.streamRunLogs(ctx);
 			},
 			{
-				params: StreamRunLogsSchema,
-				auth: true,
+				body: StreamRunLogsSchema,
+				auth: false,
 			},
 		);
 	}

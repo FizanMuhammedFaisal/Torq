@@ -7,21 +7,23 @@ import { validate } from '../validator';
 import type { IRunController } from '../interfaces/controller/runController.interface';
 import type { IStreamRunLogsUseCase } from '@/application/port/usecases/runs/streamRunLogs.interface';
 import { sse } from 'elysia';
-import type { StreamRunLogsOutputDTO } from '@/application/dto/runs/streamRunLogs';
+import type { StreamRunLogsInputDTO, StreamRunLogsOutputDTO } from '@/application/dto/runs/streamRunLogs';
 
 @injectable()
 export class RunController implements IRunController {
 	constructor(
 		@inject(TOKENS.GetRunsUseCase)
 		private readonly getRunsUseCase: IGetRunsUseCase,
-		@inject(TOKENS.GetRunsUseCase)
+		@inject(TOKENS.StreamRunLogsUseCase)
 		private readonly streamRunLogsUseCase: IStreamRunLogsUseCase,
-	) {}
+	) { }
 	async *streamRunLogs(ctx: AuthenticatedContext) {
+		const body = ctx.body as Omit<StreamRunLogsInputDTO, 'abort'>
 		const gen = this.streamRunLogsUseCase.execute({
 			// elysia giving build in abort controller else make one
 			abort: ctx.request.signal,
-			runId: ctx.params.runId,
+			...body
+
 		});
 
 		for await (const event of gen) {

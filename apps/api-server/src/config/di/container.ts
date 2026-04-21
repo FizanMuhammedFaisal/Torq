@@ -46,6 +46,8 @@ import { WorkflowRPCMapper } from '@/presentation/grpc/mappers/workflow.mapper';
 import { RedisClient } from '@/infrastructure/redis/redisClient';
 import { WorkflowRunStateConsumer } from '@/infrastructure/redis/WorkflowRunStateConsumer';
 import { UpdateWorkflowUseCase } from '@/application/usecases/workflows/updateWorkflow.usecase';
+import { StreamRunLogsUseCase } from '@/application/usecases/runs/streamRunLogs.usecase';
+import { EventBusService } from '@/infrastructure/services/EventBusService';
 // Register as singletons using Symbols
 container.register(TOKENS.WorkflowController, { useClass: WorkflowController }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.WorkflowRouter, { useClass: WorkflowRouter }, { lifecycle: Lifecycle.Singleton });
@@ -94,6 +96,8 @@ container.register(TOKENS.GetRunsUseCase, { useClass: GetRunsUseCase }, { lifecy
 container.register(TOKENS.RunController, { useClass: RunController }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.RunRouter, { useClass: RunRouter }, { lifecycle: Lifecycle.Singleton });
 container.register(TOKENS.UpdateWorkflowUseCase, { useClass: UpdateWorkflowUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.StreamRunLogsUseCase, { useClass: StreamRunLogsUseCase }, { lifecycle: Lifecycle.Singleton });
+container.register(TOKENS.EventBus, { useClass: EventBusService }, { lifecycle: Lifecycle.Singleton });
 container.register(WorkflowRunStateConsumer, { useClass: WorkflowRunStateConsumer }, { lifecycle: Lifecycle.Singleton });
 
 export { container };

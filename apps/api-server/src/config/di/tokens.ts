@@ -41,6 +41,7 @@ export const TOKENS = {
 	// usecases
 	GetWorkflowSpecUseCase: Symbol.for('GetWorkflowSpecUseCase'),
 	UpdateWorkflowUseCase: Symbol.for('UpdateWorkflowUseCase'),
+	StreamRunLogsUseCase: Symbol.for('StreamRunLogsUseCase'),
 
 	//
 	WorkflowRPCMapper: Symbol.for('WorkflowRPCMapper'),
@@ -48,4 +49,5 @@ export const TOKENS = {
 	RunController: Symbol.for('RunController'),
 	RunRouter: Symbol.for('RunRouter'),
 	GetRunsUseCase: Symbol.for('GetRunsUseCase'),
+	EventBus: Symbol.for("IEventBus")
 } as const;
