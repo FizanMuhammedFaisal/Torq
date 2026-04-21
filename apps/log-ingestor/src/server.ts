@@ -41,28 +41,30 @@ export class Server {
                 req.on('data', (chunk: Buffer) => { chunks.push(chunk); });
                 req.on('end', () => {
                     const body = Buffer.concat(chunks).toString('utf8');
-                    const lines = body.split('\n');
+
                     let accepted = 0;
                     let dropped = 0;
+                    let logs
+                    try {
+                        logs = JSON.parse(body) as FluentBitLog[];
+                        logger.info("parsedd")
+                    } catch {
+                        logger.info("cant parse")
+                        dropped++
+                        logger.info({ accepted, dropped, bufferSize: this.buffer.length }, '[ingestor] POST /ingest');
 
-                    for (const line of lines) {
-                        const trimmed = line.trim();
-                        if (!trimmed) continue;
-
-                        let log: FluentBitLog;
-                        try {
-                            log = JSON.parse(trimmed) as FluentBitLog;
-                        } catch {
-                            dropped++;
-                            continue;
-                        }
+                        res.writeHead(400);
+                        res.end('invalid JSON');
+                        return;
+                    }
+                    for (const log of logs) {
 
                         // Build a per-pod stream key.
                         // FluentBit kubernetes filter uses snake_case field names.
-                        const podName = log.kubernetes?.pod_name;
-                        const namespace = log.kubernetes?.namespace_name;
+                        const jobId = log.kubernetes?.labels?.["torq/job-id"];
+                        const WorkflowRunId = log.kubernetes?.labels?.["torq/workflow-run-id"];
 
-                        if (!podName || !namespace) {
+                        if (!jobId || !WorkflowRunId) {
                             // Not a pod log or missing metadata — skip
                             dropped++;
                             continue;
@@ -75,9 +77,9 @@ export class Server {
                             continue;
                         }
 
-                        // Stream key: logs:pod:{namespace}:{podName}
+                        // Stream key: `logs:run:${WorkflowRunId}:job${jobId}`;
                         // Consumers (API server) read per-pod and fan-out by workflowRunId label
-                        const streamKey = `logs:pod:${namespace}:${podName}`;
+                        const streamKey = `logs:run:${WorkflowRunId}:job${jobId}`;
                         const queued = this.enqueue({ streamKey, log });
                         if (queued) { accepted++; } else { dropped++; }
                     }
@@ -186,7 +188,7 @@ export class Server {
     async flushToRedis(batch: LogEntry[]): Promise<void> {
         const client = await this.redisInstance.getClient();
         const pipeline = client.multi();
-
+        // filters and only send what is needed
         for (const entry of batch) {
             pipeline.xAdd(
                 entry.streamKey,
