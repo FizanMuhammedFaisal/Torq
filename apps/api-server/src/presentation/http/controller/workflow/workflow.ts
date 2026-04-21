@@ -17,8 +17,11 @@ import { GetWorkflowsInputSchema } from '@/application/dto/worflows/getWorkflows
 import { validate } from '../../validator';
 import type { GetWorkflowSpecOutput } from '@/application/dto/worflows/getWorkflowSpec.dto';
 import type { IGetWorkflowSpecUseCase } from '@/application/port/usecases/workflows/getWorkflowSpec.interface';
-import { UpdateWorkflowInputDto, UpdateWorkflowOutputDto } from '@/application/dto/worflows/updateWorkflow.dto';
-import { type IUpdateWorkflowUseCase } from '@/application/port/usecases/workflows/updateWorkflow.interface';
+import type {
+	UpdateWorkflowInputDto,
+	UpdateWorkflowOutputDto,
+} from '@/application/dto/worflows/updateWorkflow.dto';
+import type { IUpdateWorkflowUseCase } from '@/application/port/usecases/workflows/updateWorkflow.interface';
 
 @injectable()
 export class WorkflowController implements IWorkflowController {
@@ -41,7 +44,7 @@ export class WorkflowController implements IWorkflowController {
 		private getWorkflowSpecUseCase: IGetWorkflowSpecUseCase,
 		@inject(TOKENS.UpdateWorkflowUseCase)
 		private updateWorkflowUseCase: IUpdateWorkflowUseCase,
-	) { }
+	) {}
 
 	getWorkflows = async (ctx: AuthenticatedContext) => {
 		const query = validate(GetWorkflowsInputSchema, ctx.query);
@@ -99,7 +102,7 @@ export class WorkflowController implements IWorkflowController {
 		return this.getWorkflowSpecUseCase.execute({
 			workflowId: workflowId,
 			secrets: false,
-			raw: true
+			raw: true,
 		});
 	};
 	updateWorkflow = async (ctx: AuthenticatedContext): Promise<UpdateWorkflowOutputDto> => {
@@ -107,7 +110,7 @@ export class WorkflowController implements IWorkflowController {
 		const body = ctx.body as Omit<UpdateWorkflowInputDto, 'req'>;
 		return this.updateWorkflowUseCase.execute({
 			...body,
-			id: workflowId
+			id: workflowId,
 		});
 	};
 }

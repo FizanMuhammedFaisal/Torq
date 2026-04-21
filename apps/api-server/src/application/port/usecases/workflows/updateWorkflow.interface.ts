@@ -1,5 +1,8 @@
-import { UpdateWorkflowInputDto, UpdateWorkflowOutputDto } from "@/application/dto/worflows/updateWorkflow.dto";
+import type {
+	UpdateWorkflowInputDto,
+	UpdateWorkflowOutputDto,
+} from '@/application/dto/worflows/updateWorkflow.dto';
 
 export interface IUpdateWorkflowUseCase {
-    execute(data: UpdateWorkflowInputDto): Promise<UpdateWorkflowOutputDto>;
+	execute(data: UpdateWorkflowInputDto): Promise<UpdateWorkflowOutputDto>;
 }

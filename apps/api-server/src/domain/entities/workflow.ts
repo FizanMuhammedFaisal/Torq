@@ -5,7 +5,7 @@ export class Workflow {
 		public name: string,
 		public readonly createdAt: Date,
 		public description?: string,
-	) { }
+	) {}
 
 	static create({
 		id,
@@ -24,10 +24,10 @@ export class Workflow {
 	}
 	update(name?: string, description?: string) {
 		if (name) {
-			this.name = name
+			this.name = name;
 		}
 		if (description) {
-			this.description = description
+			this.description = description;
 		}
 	}
 }

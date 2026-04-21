@@ -5,6 +5,8 @@ import type { RunController } from '@/presentation/http/controller/run.controlle
 import type { Router } from '@/presentation/http/interfaces/routes';
 import type { AuthMacro } from '@/presentation/http/macros/auth.macro';
 import { GetRunsQueryInputSchema } from '@/application/dto/runs/getRuns.dto';
+import type { IRunController } from '../../interfaces/controller/runController.interface';
+import { StreamRunLogsSchema } from '@/application/dto/runs/streamRunLogs';
 
 @injectable()
 export class RunRouter implements Router {
@@ -12,12 +14,15 @@ export class RunRouter implements Router {
 
 	constructor(
 		@inject(TOKENS.RunController)
-		private readonly runController: RunController,
+		private readonly runController: IRunController,
 		@inject(TOKENS.AuthMacro)
 		private readonly authMacro: AuthMacro,
 	) {}
 
 	register() {
+		return new Elysia({ prefix: this.prefix }).use(this.streamRunLogs()).use(this.getRuns());
+	}
+	getRuns() {
 		return new Elysia({ prefix: this.prefix }).use(this.authMacro.plugin()).get(
 			'/',
 			(ctx) => {
@@ -26,6 +31,18 @@ export class RunRouter implements Router {
 			{
 				auth: true,
 				query: GetRunsQueryInputSchema,
+			},
+		);
+	}
+	streamRunLogs() {
+		return new Elysia({ prefix: this.prefix }).use(this.authMacro.plugin()).get(
+			'/',
+			(ctx) => {
+				return this.runController.streamRunLogs(ctx);
+			},
+			{
+				params: StreamRunLogsSchema,
+				auth: true,
 			},
 		);
 	}

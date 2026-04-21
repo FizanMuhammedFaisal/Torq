@@ -16,8 +16,15 @@ import {
 	GetWorkflowByIdInputParamsSchema,
 	GetWorkflowByIdInputQuerySchema,
 } from '@/application/dto/worflows/getWorkflowById.dto';
-import { GetWorkflowSpecInputSchema, GetWorkflowSpecInputSchemaParams, GetWorkflowSpecInputSchemaQuery } from '@/application/dto/worflows/getWorkflowSpec.dto';
-import { UpdateWorkflowBodySchema, UpdateWorkflowParamsSchema } from '@/application/dto/worflows/updateWorkflow.dto';
+import {
+	GetWorkflowSpecInputSchema,
+	GetWorkflowSpecInputSchemaParams,
+	GetWorkflowSpecInputSchemaQuery,
+} from '@/application/dto/worflows/getWorkflowSpec.dto';
+import {
+	UpdateWorkflowBodySchema,
+	UpdateWorkflowParamsSchema,
+} from '@/application/dto/worflows/updateWorkflow.dto';
 
 @injectable()
 export class WorkflowRouter implements Router {
@@ -28,7 +35,7 @@ export class WorkflowRouter implements Router {
 		private workflowController: IWorkflowController,
 		@inject(TOKENS.AuthMacro)
 		private authMacro: AuthMacro,
-	) { }
+	) {}
 
 	register() {
 		return new Elysia({ prefix: this.prefix })

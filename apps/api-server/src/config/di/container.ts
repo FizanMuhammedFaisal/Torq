@@ -96,5 +96,4 @@ container.register(TOKENS.RunRouter, { useClass: RunRouter }, { lifecycle: Lifec
 container.register(TOKENS.UpdateWorkflowUseCase, { useClass: UpdateWorkflowUseCase }, { lifecycle: Lifecycle.Singleton });
 container.register(WorkflowRunStateConsumer, { useClass: WorkflowRunStateConsumer }, { lifecycle: Lifecycle.Singleton });
 
-
 export { container };

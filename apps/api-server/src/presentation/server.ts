@@ -40,7 +40,7 @@ export class HTTPServer {
 		this.app.use(
 			cors({
 				origin: this.envconfig.app.cors.origins,
-				methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', "PATCH"],
+				methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 				credentials: true,
 				allowedHeaders: ['Content-Type', 'Authorization'],
 			}),
@@ -52,6 +52,8 @@ export class HTTPServer {
 		this.setupRoutes();
 		this.app.listen(this.envconfig.server.port);
 
-		console.log(`🦊 Server is running at ${this.envconfig.server.hostname}:${this.envconfig.server.port}`);
+		console.log(
+			`🦊 Server is running at ${this.envconfig.server.hostname}:${this.envconfig.server.port}`,
+		);
 	}
 }

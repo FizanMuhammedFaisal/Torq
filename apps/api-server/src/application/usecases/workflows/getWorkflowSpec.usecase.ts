@@ -20,9 +20,9 @@ export class GetWorkflowSpecUseCase implements IGetWorkflowSpecUseCase {
 		private workflowVersionRepository: IWorkflowVersionRepository,
 		@inject(TOKENS.SecretRepository) private secretRepository: ISecrectRepository,
 		@inject(TOKENS.SecretManagementService) private secretService: ISecretManagementService,
-	) { }
+	) {}
 	async execute(data: GetWorkflowSpecInput): Promise<GetWorkflowSpecOutput> {
-		console.log(data)
+		console.log(data);
 		let workflow: WorkflowVersion | null = null;
 		if (!data.versionId) {
 			workflow = await this.workflowVersionRepository.findLatestByWorkflowId(data.workflowId);
@@ -35,9 +35,9 @@ export class GetWorkflowSpecUseCase implements IGetWorkflowSpecUseCase {
 		let secrets:
 			| undefined
 			| {
-				name: string;
-				value: string;
-			}[];
+					name: string;
+					value: string;
+			  }[];
 		if (data.secrets) {
 			const secretsFromDB = await this.secretRepository.findByWorkflowId(workflow.workflowId);
 
