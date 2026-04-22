@@ -15,6 +15,7 @@ export interface Run {
 	durationMs?: number;
 	namespace: string;
 	stepCount: number;
+	workflowVersion?: string;
 	stepsMap: Record<string, { status: string; ts?: number }>;
 }
 
@@ -33,6 +34,7 @@ async function fetchRuns(workflowId?: string): Promise<Run[]> {
 		durationMs: r.durationMs,
 		namespace: r.namespace || 'default',
 		stepCount: r.stepCount ?? 0,
+		workflowVersion: r.workflowVersion || '1',
 		stepsMap: r.steps || {},
 	}));
 }

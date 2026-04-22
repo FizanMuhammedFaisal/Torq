@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { cn } from '@/lib/utils';
-import { fieldVariants, stepVariants } from './components/animations';
-import { EmailStep } from './components/signup-email-step';
-import { OtpStep } from './components/signup-otp-step';
-import { useSignup } from './hooks';
+import { useSignup } from '../hooks';
+import { fieldVariants, stepVariants } from './animations';
+import { EmailStep } from './signup-email-step';
+import { OtpStep } from './signup-otp-step';
 
 export function SignupForm({
 	className,

@@ -159,10 +159,8 @@ export function RunsView() {
 										<DropdownMenuItem
 											onClick={(e) => {
 												e.stopPropagation();
-												// Typically this would go to a specific run ID view
 												// /dashboard/workflows/:workflowId/runs/:runId
-												// But for this mockup demo we'll go to the WF page
-												navigate(`/dashboard/workflows/${run.workflowId}`);
+												navigate(`/dashboard/workflows/${run.workflowId}/runs/${run.id}`);
 											}}
 										>
 											<HugeiconsIcon
@@ -424,7 +422,7 @@ export function RunsView() {
 								searchKey="workflowName"
 								searchQuery={searchQuery}
 								onRowClick={(run) =>
-									navigate(`/dashboard/workflows/${run.workflowId}`)
+									navigate(`/dashboard/workflows/${run.workflowId}/runs/${run.id}`)
 								}
 								noResultsMessage="No runs found"
 								noResultsSubtext={

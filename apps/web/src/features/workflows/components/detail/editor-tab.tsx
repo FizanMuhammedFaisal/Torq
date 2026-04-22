@@ -8,21 +8,42 @@ import { useGetWorkflowSpec } from '../../hooks/use-get-workflow-spec';
 import { useWorkFlowActions, useWorkFlowStore } from '@/store/workflow';
 import { useUpdateWorkflow } from '../../hooks/use-update-workflow';
 import toast from 'react-hot-toast';
-export function EditorTab({ workflowId }: { workflowId: string }) {
+import { useWorkflowDetail } from './workflow-context';
 
-	const { isPending, isLoading } = useGetWorkflowSpec(workflowId)
-	const updateWorkflowMutation = useUpdateWorkflow(workflowId)
+export function EditorTab() {
+	const { workflow } = useWorkflowDetail();
+	const workflowId = workflow.id;
+	const { isLoading, isError } = useGetWorkflowSpec(workflowId);
+	const updateWorkflowMutation = useUpdateWorkflow(workflowId);
 
-	const { workflows } = useWorkFlowStore()
-	const { setEditingSpecContent, setSaved } = useWorkFlowActions()
+	const { workflows } = useWorkFlowStore();
+	const { setEditingSpecContent, setSaved } = useWorkFlowActions();
 	const [errors, setErrors] = useState<ValidationError[]>([]);
 
+	const workflowEntry = workflows[workflowId];
 
-	if (isPending || isLoading || !workflows[workflowId]) {
-		return <div> loding</div>
+	// Cache-first: if we have the spec in the store, don't show loading even if query is pending/fetching
+	const isDataLoading = isLoading && !workflowEntry?.spec;
+
+	if (isDataLoading) {
+		return <EditorSkeleton />;
 	}
-	const { editingSpec: yamlContent, saved, spec } = workflows[workflowId]
 
+	if (isError || !workflowEntry) {
+		return (
+			<div className="flex flex-col items-center justify-center min-h-[400px] text-center p-8 border border-white/5 bg-white/2 rounded-3xl">
+				<div className="size-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+					<HugeiconsIcon icon={Alert02Icon} className="size-6 text-red-400" />
+				</div>
+				<h3 className="text-white font-medium mb-1">Failed to Load Specification</h3>
+				<p className="text-white/40 text-sm max-w-xs">
+					We couldn't retrieve the workflow definition. Please check your connection and try again.
+				</p>
+			</div>
+		);
+	}
+
+	const { editingSpec: yamlContent, saved, spec } = workflowEntry;
 
 	const handleChange = (val: string) => {
 		setEditingSpecContent(workflowId, val);
@@ -31,25 +52,29 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 
 	const handleSave = async () => {
 		if (errors.length > 0) return;
-		if (saved) return
-		updateWorkflowMutation.mutate({ raw: yamlContent }, {
-			onSuccess: (data) => {
-				if (data.raw) {
-					setEditingSpecContent(workflowId, data.raw)
-				}
-				toast.success("Workflow Updated")
-				setSaved(workflowId, true);
+		if (saved) return;
+		updateWorkflowMutation.mutate(
+			{ raw: yamlContent },
+			{
+				onSuccess: (data) => {
+					if (data.raw) {
+						setEditingSpecContent(workflowId, data.raw);
+					}
+					toast.success('Workflow Updated');
+					setSaved(workflowId, true);
+				},
+				onError: () => {
+					toast.error('Update Failed, Try again');
+					setSaved(workflowId, false);
+				},
 			},
-			onError: (error) => {
-				toast.error("Update Failed, Try again")
-				setSaved(workflowId, false);
-			}
-		})
+		);
 	};
+
 	const hanldeDiscard = () => {
 		setEditingSpecContent(workflowId, spec);
 		setSaved(workflowId, true);
-	}
+	};
 
 	return (
 		<div className="flex flex-col items-center justify-center w-full pb-12">
@@ -58,9 +83,7 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 					<div>
 						<h3 className="text-[18px] font-semibold text-white/90">Workflow Definition</h3>
-						<p className="text-[13px] text-white/40 mt-1">
-							Edit the declarative YAML for this workflow.
-						</p>
+						<p className="text-[13px] text-white/40 mt-1">Edit the declarative YAML for this workflow.</p>
 					</div>
 
 					<div className="flex items-center gap-3">
@@ -85,9 +108,7 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 								size="sm"
 								variant="ghost"
 								className="rounded-full h-8 px-4 text-[12px] text-white/50 hover:text-white hover:bg-white/5 transition-all"
-								onClick={() => {
-									hanldeDiscard()
-								}}
+								onClick={hanldeDiscard}
 								disabled={saved}
 							>
 								Discard
@@ -118,7 +139,10 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 								<div className="space-y-1 w-full">
 									<p className="text-[13px] font-semibold text-red-400/90 mb-2">Validation Errors Found</p>
 									{errors.map((err) => (
-										<div key={`${err.line}-${err.message}`} className="flex items-start gap-2 text-[13px] text-red-300/80 bg-red-500/5 p-2 rounded-md">
+										<div
+											key={`${err.line}-${err.message}`}
+											className="flex items-start gap-2 text-[13px] text-red-300/80 bg-red-500/5 p-2 rounded-md"
+										>
 											<span className="font-mono text-red-400/50 w-12 shrink-0">L{err.line + 1}:</span>
 											<span className="font-mono">{err.message}</span>
 										</div>
@@ -140,7 +164,10 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 					<div className="absolute -inset-1.5 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-[28px] blur-xl opacity-0 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 pointer-events-none" />
 
 					{/* Editor Pane */}
-					<div className="relative rounded-[24px] border border-white/8 bg-black/95 p-1.5 shadow-2xl overflow-hidden" style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.04)' }}>
+					<div
+						className="relative rounded-[24px] border border-white/8 bg-black/95 p-1.5 shadow-2xl overflow-hidden"
+						style={{ boxShadow: 'inset 0 1px 1px 0 rgba(255,255,255,0.04)' }}
+					>
 						<YamlEditor
 							value={yamlContent}
 							onChange={handleChange}
@@ -150,6 +177,40 @@ export function EditorTab({ workflowId }: { workflowId: string }) {
 						/>
 					</div>
 				</motion.div>
+			</div>
+		</div>
+	);
+}
+
+function EditorSkeleton() {
+	return (
+		<div className="flex flex-col items-center justify-center w-full animate-in fade-in duration-500">
+			<div className="w-full max-w-4xl space-y-6">
+				<div className="flex justify-between items-end">
+					<div className="space-y-2">
+						<div className="h-6 w-48 bg-white/5 rounded-md animate-pulse" />
+						<div className="h-4 w-64 bg-white/5 rounded-md animate-pulse" />
+					</div>
+					<div className="flex gap-2">
+						<div className="h-8 w-24 bg-white/5 rounded-full animate-pulse" />
+						<div className="h-8 w-32 bg-white/10 rounded-full animate-pulse" />
+					</div>
+				</div>
+				<div className="h-[600px] w-full bg-white/2 border border-white/5 rounded-[24px] overflow-hidden relative">
+					<div className="absolute top-0 left-0 right-0 h-10 bg-white/5 border-b border-white/5 flex items-center px-4 gap-2">
+						<div className="size-4 rounded bg-white/10 animate-pulse" />
+						<div className="h-3 w-24 bg-white/10 rounded animate-pulse" />
+					</div>
+					<div className="p-6 space-y-4">
+						{[...Array(12)].map((_, i) => (
+							<div
+								key={i}
+								className="h-4 bg-white/5 rounded animate-pulse"
+								style={{ width: `${Math.random() * 40 + 40}%`, animationDelay: `${i * 100}ms` }}
+							/>
+						))}
+					</div>
+				</div>
 			</div>
 		</div>
 	);

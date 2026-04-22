@@ -13,7 +13,7 @@ export function DashboardHeader({
 	isAuthEnabled,
 }: DashboardHeaderProps) {
 	return (
-		<div className="flex items-center justify-between px-6 lg:px-8 py-8 border-b border-white/5 bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-blue-900/5 via-zinc-950 to-zinc-950">
+		<div className="flex items-center justify-between px-8 py-8 border-b border-white/5 bg-zinc-950">
 			<div>
 				<h1 className="text-3xl font-black tracking-tight text-white flex items-center gap-3">
 					Command Center
@@ -34,7 +34,7 @@ export function DashboardHeader({
 						exit={{ opacity: 0, filter: 'blur(8px)', scale: 0.95 }}
 						transition={{ duration: 0.2 }}
 					>
-						<Button className="gap-2 rounded-full px-5 text-[13px] font-bold h-9 shadow-[0_4px_20px_-4px_rgba(52,211,153,0.3)] bg-emerald-400 text-emerald-950 hover:bg-emerald-500 border-0">
+						<Button className="gap-2 rounded-lg px-5 text-[13px] font-bold h-9 shadow-[0_4px_12px_rgba(16,185,129,0.2)] bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.97] border-0">
 							<HugeiconsIcon
 								icon={PlusSignIcon}
 								className="size-4"

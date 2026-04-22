@@ -3,11 +3,14 @@ import { motion } from 'motion/react';
 import { HugeiconsIcon } from '@hugeicons/react';
 import { GearsIcon, File02Icon } from '@hugeicons/core-free-icons';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
-import { useRuns } from '@/features/runs/hooks/use-runs';
 
 
-export function MetricsTab({ workflowId }: { workflowId: string }) {
-	const { runs } = useRuns();
+
+import { useWorkflowDetail } from './workflow-context';
+
+export function MetricsTab() {
+	const { workflow, runs } = useWorkflowDetail();
+	const workflowId = workflow.id;
 	const successRate = runs.length > 0 ? Math.round((runs.filter(r => r.status === 'SUCCESS').length / runs.length) * 100) : 0;
 	const totalRuns = runs.length;
 

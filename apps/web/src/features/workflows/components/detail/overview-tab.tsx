@@ -3,9 +3,7 @@ import { HugeiconsIcon } from '@hugeicons/react';
 import { File02Icon, GearsIcon, GridIcon, Alert02Icon } from '@hugeicons/core-free-icons';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { statusConfig as statusMap } from '@/features/workflows/config';
-import type { Workflow, WorkflowStatus } from '@/features/workflows/types';
-import type { GetWorkflowByIdResponse } from '@/features/workflows/schema/api.dto';
-import type { Run } from '@/features/runs/hooks/use-runs';
+import { useWorkflowDetail } from './workflow-context';
 
 function MetricCard({
 	label,
@@ -80,13 +78,8 @@ function MetricCard({
 	);
 }
 
-export function OverviewTab({
-	workflow,
-	runs,
-}: {
-	workflow: GetWorkflowByIdResponse;
-	runs: Run[];
-}) {
+export function OverviewTab() {
+	const { workflow, runs } = useWorkflowDetail();
 	// Calculate Metrics
 	const totalRuns = runs.length;
 	const successfulRuns = runs.filter((r) => r.status === 'SUCCESS').length;

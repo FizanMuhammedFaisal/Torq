@@ -102,29 +102,22 @@ export function YamlEditor({
 		>
 			{/* Title bar */}
 			{!hideHeader && (
-				<div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/4 bg-neutral-950">
-					<div className="flex items-center justify-center size-5 rounded-[4px] bg-primary/10 border border-primary/20 text-primary">
-						<svg
-							className="size-3"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							strokeWidth="2.5"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-						>
-							<title>File Icon</title>
-							<path d="M4 17l6-6-6-6" />
-							<path d="M12 19h8" />
-						</svg>
+				<div className="flex items-center gap-4 px-5 py-3 border-b border-white/5 bg-zinc-900/50 backdrop-blur-md">
+					<div className="flex items-center gap-1.5">
+						<div className="size-2 rounded-full bg-rose-500/20 border border-rose-500/30" />
+						<div className="size-2 rounded-full bg-amber-500/20 border border-amber-500/30" />
+						<div className="size-2 rounded-full bg-emerald-500/20 border border-emerald-500/30" />
 					</div>
-					<span className="flex-1 text-[11px] font-mono text-white/50 tracking-wider">
+					<div className="h-4 w-px bg-white/10 mx-1" />
+					<span className="flex-1 text-[12px] font-mono font-bold text-white/40 tracking-wider">
 						workflow.yaml
 					</span>
 					{readOnly && (
-						<span className="text-[9px] text-white/20 uppercase tracking-widest font-semibold bg-white/5 px-2 py-0.5 rounded-md">
-							READ-ONLY
-						</span>
+						<div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/[0.03] border border-white/5">
+							<span className="text-[9px] font-black uppercase tracking-widest text-white/20">
+								READ-ONLY
+							</span>
+						</div>
 					)}
 				</div>
 			)}

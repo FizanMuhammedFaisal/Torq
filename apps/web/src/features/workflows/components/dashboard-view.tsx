@@ -32,7 +32,7 @@ export function DashboardView() {
 				isAuthEnabled={authEnabled}
 			/>
 
-			<div className="flex-1 overflow-y-auto w-full p-6 lg:p-8">
+			<div className="flex-1 overflow-y-auto w-full p-8 lg:p-10">
 				<div className="w-full max-w-7xl mx-auto space-y-8">
 					<DashboardMetrics isLoading={isLoading} metrics={metrics} />
 

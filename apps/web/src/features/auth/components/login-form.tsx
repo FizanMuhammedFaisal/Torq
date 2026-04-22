@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { fieldVariants } from './components/animations';
-import { OrDivider } from './components/or-divider';
-import { SocialAuth } from './components/social-auth';
-import { useLogin } from './hooks';
-import { type LoginInput, loginSchema } from './schema';
+import { loginSchema } from '../schema';
+import type { LoginInput } from '../schema';
+import { useLogin } from '../hooks';
+import { fieldVariants } from './animations';
+import { SocialAuth } from './social-auth';
+import { OrDivider } from './or-divider';
 
 export function LoginForm({
 	className,

@@ -18,7 +18,11 @@ import { useUpsertSecrets } from '@/features/workflows/hooks/use-upsert-secrets'
 import { useRevealSecret } from '@/features/workflows/hooks/use-reveal-secret';
 import { formatRelativeTime } from '@/lib/format';
 
-export function SecretsTab({ workflowId }: { workflowId: string }) {
+import { useWorkflowDetail } from './workflow-context';
+
+export function SecretsTab() {
+	const { workflow } = useWorkflowDetail();
+	const workflowId = workflow.id;
 	const { data: existingSecrets, isLoading, isError } = useGetSecrets(workflowId);
 	const { mutate: upsertSecrets, isPending } = useUpsertSecrets(workflowId);
 
@@ -27,7 +31,7 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 	const [isAdding, setIsAdding] = useState(false);
 	const [newKey, setNewKey] = useState('');
 	const [newValue, setNewValue] = useState('');
-    const [revealedValues, setRevealedValues] = useState<Record<string, string>>({});
+	const [revealedValues, setRevealedValues] = useState<Record<string, string>>({});
 	const [revealingIds, setRevealingIds] = useState<Set<string>>(new Set());
 
 	const secrets = existingSecrets ?? [];
@@ -47,20 +51,20 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 		revealSecret(key, {
 			onSuccess: (data) => {
 				setRevealedValues((prev) => ({ ...prev, [id]: data.value }));
-                setRevealingIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(id);
-                    return next;
-                });
+				setRevealingIds((prev) => {
+					const next = new Set(prev);
+					next.delete(id);
+					return next;
+				});
 			},
 			onError: (error) => {
 				const err = error as any;
 				toast.error(err.response?.data?.message || 'Failed to reveal secret');
-                setRevealingIds((prev) => {
-                    const next = new Set(prev);
-                    next.delete(id);
-                    return next;
-                });
+				setRevealingIds((prev) => {
+					const next = new Set(prev);
+					next.delete(id);
+					return next;
+				});
 			},
 		});
 	};
@@ -89,7 +93,7 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 			>
 
 				<h3 className="text-[13px] font-semibold tracking-widest uppercase text-white/40 mb-2 flex items-center gap-2">
-					<HugeiconsIcon icon={KeyIcon as object} className="size-4 text-emerald-400" />
+					<HugeiconsIcon icon={KeyIcon} className="size-4 text-emerald-400" />
 					Encrypted Secrets
 				</h3>
 				<div className="flex items-baseline gap-1">
@@ -300,8 +304,8 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 											<div className="hidden sm:flex items-center gap-2">
 												<div className="h-8 flex items-center px-3 rounded-lg bg-black/30 border border-white/5 font-mono text-[12px] text-white/20 tracking-normal select-all overflow-hidden max-w-[200px]">
 													{revealingIds.has(sec.id) ? (
-                                                        <HugeiconsIcon icon={Loading03Icon as object} className="size-3 animate-spin mx-auto saturate-0 opacity-50" />
-                                                    ) : revealedValues[sec.id] ? (
+														<HugeiconsIcon icon={Loading03Icon as object} className="size-3 animate-spin mx-auto saturate-0 opacity-50" />
+													) : revealedValues[sec.id] ? (
 														<span className="text-emerald-400/90">{revealedValues[sec.id]}</span>
 													) : (
 														<span className="tracking-widest">••••••••</span>
@@ -310,7 +314,7 @@ export function SecretsTab({ workflowId }: { workflowId: string }) {
 												<button
 													type="button"
 													onClick={() => handleToggleReveal(sec.id, sec.key)}
-                                                    disabled={revealingIds.has(sec.id)}
+													disabled={revealingIds.has(sec.id)}
 													className="size-8 flex items-center justify-center rounded-lg text-white/20 hover:text-white/50 hover:bg-white/5 transition-colors disabled:opacity-50"
 													title={
 														revealedValues[sec.id]

@@ -10,5 +10,6 @@ export const API_ROUTES = {
 	},
 	RUNS: {
 		BASE: '/runs',
+		RUN_LOGS: '/runs/runlogs',
 	},
 };
