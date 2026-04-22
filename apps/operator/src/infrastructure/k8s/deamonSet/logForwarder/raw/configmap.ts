@@ -31,6 +31,8 @@ export const CONFIG_MAP_DEFINITION: V1ConfigMap = {
     Mem_Buf_Limit     50MB
     Skip_Long_Lines   On
     storage.type      filesystem
+    threaded          off       
+
 
 [FILTER]
     Name                kubernetes

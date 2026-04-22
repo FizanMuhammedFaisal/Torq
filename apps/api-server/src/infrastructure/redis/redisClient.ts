@@ -80,10 +80,30 @@ export class RedisClient implements IRedisClient {
 		}
 	}
 
+	/**
+	 * Creates a NEW dedicated Redis connection for blocking operations (xRead BLOCK).
+	 * Each call returns a fresh connection — the caller MUST close it when done
+	 * by calling `client.quit()`.
+	 *
+	 * This enables concurrent blocking reads: 100 users = 100 independent connections,
+	 * none of them blocking each other or the main client.
+	 */
+	public async createBlockingClient(): Promise<RedisClientType> {
+		const mainClient = await this.getClient();
+		const blockingClient = mainClient.duplicate() as RedisClientType;
+
+		blockingClient.on('error', (err) => {
+			logger.error({ err }, '[RedisClient:blocking] Session connection error');
+		});
+
+		await blockingClient.connect();
+		return blockingClient;
+	}
+
 	public async closeClient(): Promise<void> {
 		if (this.client?.isReady) {
 			await this.client.quit();
-			logger.info('[RedisClient] Disconnected from Redis');
+			logger.info('[RedisClient] Main client disconnected');
 			this.client = null;
 		}
 	}

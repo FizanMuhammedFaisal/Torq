@@ -16,6 +16,22 @@ export interface IEventBus {
     ): Promise<EventEntry[] | null>;
 
     /**
+     * Creates a dedicated blocking subscription that yields event batches
+     * as they arrive. Manages its own connection lifecycle internally.
+     * The generator cleans up when the abort signal fires or the caller
+     * breaks out of the loop.
+     *
+     * @param topic Stream key to subscribe to
+     * @param abort Signal to terminate the subscription
+     * @param cursorId Starting cursor (defaults to '$' for new events only)
+     */
+    streamEvents(
+        topic: string,
+        abort: AbortSignal,
+        cursorId?: string,
+    ): AsyncGenerator<EventEntry[]>;
+
+    /**
      * get this number of recent messages
      * 
      * @param topic Which topic

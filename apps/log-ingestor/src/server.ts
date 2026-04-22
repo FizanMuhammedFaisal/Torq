@@ -47,7 +47,7 @@ export class Server {
 				});
 				req.on('end', () => {
 					const body = Buffer.concat(chunks).toString('utf8');
-
+					const validTorqLogs: FluentBitLog[] = [];
 					let accepted = 0;
 					let dropped = 0;
 					let logs;
@@ -55,43 +55,60 @@ export class Server {
 						logs = JSON.parse(body) as FluentBitLog[];
 						logger.info('parsedd');
 					} catch {
-						logger.info('cant parse');
 						dropped++;
 						logger.info(
 							{ accepted, dropped, bufferSize: this.buffer.length },
 							'[ingestor] POST /ingest',
 						);
-
 						res.writeHead(400);
 						res.end('invalid JSON');
 						return;
 					}
-					for (const log of logs) {
-						// Build a per-pod stream key.
-						// FluentBit kubernetes filter uses snake_case field names.
-						const jobId = log.kubernetes?.labels?.['torq/job-id'];
-						const WorkflowRunId = log.kubernetes?.labels?.['torq/workflow-run-id'];
-
-						if (!jobId || !WorkflowRunId) {
-							// Not a pod log or missing metadata — skip
+					for (const rawLog of logs) {
+						if (
+							typeof rawLog !== 'object' ||
+							rawLog === null ||
+							typeof rawLog.date !== 'number' ||
+							typeof rawLog.log !== 'string'
+						) {
 							dropped++;
 							continue;
 						}
 
-						// Only ingest logs from pods managed by Torq
-						const isTorqPod = log.kubernetes?.labels?.[Envconfig.ingetionConfig.WORKFLOW_RUN_LABEL];
-						if (!isTorqPod) {
+						const labels = rawLog.kubernetes?.labels;
+
+						if (!labels) {
 							dropped++;
 							continue;
 						}
 
-						// Stream key: `logs:run:${WorkflowRunId}:job${jobId}`;
-						// Consumers (API server) read per-pod and fan-out by workflowRunId label
-						const streamKey = `logs:run:${WorkflowRunId}:job:${jobId}`;
+						const jobId = labels['torq/job-id'];
+						const workflowRunId = labels['torq/workflow-run-id'];
+						const isTorqPod = labels[Envconfig.ingetionConfig.WORKFLOW_RUN_LABEL];
+
+						if (!jobId || !workflowRunId || !isTorqPod) {
+							dropped++;
+							continue;
+						}
+
+						// only if passed checks
+						validTorqLogs.push(rawLog);
+					}
+
+					this.sortLogs(validTorqLogs)
+
+					for (const log of validTorqLogs) {
+						// already guareded
+						const jobId = log.kubernetes!.labels!['torq/job-id'];
+						const workflowRunId = log.kubernetes!.labels!['torq/workflow-run-id'];
+
+						const streamKey = `logs:run:${workflowRunId}:job:${jobId}`;
+
 						const queued = this.enqueue({ streamKey, log });
 						if (queued) {
 							accepted++;
 						} else {
+							// Enqueue queue might be full
 							dropped++;
 						}
 					}
@@ -222,5 +239,17 @@ export class Server {
 		}
 
 		await pipeline.exec();
+	}
+	sortLogs(validTorqLogs: FluentBitLog[]): FluentBitLog[] {
+		return validTorqLogs.sort((a, b) => {
+			if (a.date === b.date) {
+				// tie braeker since the steps names are 0-step,1-step
+				const containerA = a.kubernetes?.container_name || '';
+				const containerB = b.kubernetes?.container_name || '';
+				return containerA.localeCompare(containerB);
+			}
+			return a.date - b.date;
+		});
+
 	}
 }

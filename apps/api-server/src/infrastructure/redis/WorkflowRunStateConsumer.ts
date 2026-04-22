@@ -26,7 +26,7 @@ export class WorkflowRunStateConsumer implements IConsumer {
 	constructor(
 		@inject(TOKENS.RedisClient) private redisClientWrapper: IRedisClient,
 		@inject(TOKENS.WorkflowRunRepository) private workflowRunRepository: IWorkflowRunRepository,
-	) {}
+	) { }
 
 	public async start(): Promise<void> {
 		if (this.isRunning) return;
@@ -111,30 +111,38 @@ export class WorkflowRunStateConsumer implements IConsumer {
 	}
 
 	private async consumeLoop(): Promise<void> {
-		const redis = await this.redisClientWrapper.getClient();
-		logger.info('[DB Updater] Entering main consume loop');
+		// Create a dedicated connection for the blocking consume loop
+		// so it doesn't block the main client used by xRange, etc.
+		const redis = await this.redisClientWrapper.createBlockingClient();
+		logger.info('[DB Updater] Entering main consume loop (dedicated connection)');
 
-		while (this.isRunning) {
-			try {
-				const result = await redis.xReadGroup(
-					GROUP_NAME,
-					CONSUMER_NAME,
-					[{ key: STREAM_KEY, id: '>' }],
-					{ BLOCK: 5000, COUNT: 10 },
-				);
+		try {
+			while (this.isRunning) {
+				try {
+					const result = await redis.xReadGroup(
+						GROUP_NAME,
+						CONSUMER_NAME,
+						[{ key: STREAM_KEY, id: '>' }],
+						{ BLOCK: 5000, COUNT: 10 },
+					);
 
-				if (!result || result.length === 0) {
-					continue;
+					if (!result || result.length === 0) {
+						continue;
+					}
+
+					const streamEntries = result[0].messages;
+					for (const entry of streamEntries) {
+						await this.processMessage(entry.id, entry.message);
+					}
+				} catch (error) {
+					logger.error({ error }, '[DB Updater] Error in main consume loop');
+					await new Promise((r) => setTimeout(r, 5000));
 				}
-
-				const streamEntries = result[0].messages;
-				for (const entry of streamEntries) {
-					await this.processMessage(entry.id, entry.message);
-				}
-			} catch (error) {
-				logger.error({ error }, '[DB Updater] Error in main consume loop');
-				await new Promise((r) => setTimeout(r, 5000));
 			}
+		} finally {
+			await redis.quit().catch((err) => {
+				logger.warn({ err }, '[DB Updater] Error closing blocking client');
+			});
 		}
 	}
 	/**
