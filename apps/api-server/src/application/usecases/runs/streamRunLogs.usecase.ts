@@ -8,12 +8,6 @@ import { TOKENS } from '@/config/di/tokens';
 import { BadRequst } from '@/domain/errors/BadRequestError';
 import { inject, injectable } from 'tsyringe';
 
-type LogFields = {
-    log: string;
-    container: string;
-    ts: string;
-};
-
 @injectable()
 export class StreamRunLogsUseCase implements IStreamRunLogsUseCase {
     constructor(
@@ -24,75 +18,61 @@ export class StreamRunLogsUseCase implements IStreamRunLogsUseCase {
         const streamKey = `logs:run:${data.runId}:job:${data.jobId}`;
         let cursor = data.cursorId;
 
+        yield { event: 'PING', id: 'ping', data: '' };
+
         try {
             if (data.type === 'READ_FROM') {
-                // streamEvents manages its own per-session blocking connection
+
                 for await (const batch of this.eventBus.streamEvents(streamKey, data.abort, cursor)) {
-                    console.log("A batch")
-                    console.log(batch)
-                    for (const entry of batch) {
+                    const messages = batch;
+                    for (let i = 0; i < messages.length; i++) {
+                        const entry = messages[i];
                         cursor = entry.id;
-                        const logData = this.getLogData(entry.fields);
-                        if (!logData) continue;
-                        yield {
-                            id: entry.id,
-                            data: logData,
-                            event: 'LOG',
-                        } satisfies StreamRunLogsOutputDTO;
+                        const log = entry.fields.log;
+                        if (typeof log !== 'string') continue;
+                        yield { id: entry.id, data: log, event: 'LOG' };
                     }
+                }
+                // Stream ended naturally (STREAM_END detected or already ended)
+                if (!data.abort.aborted) {
+                    yield { event: 'STREAM_DONE', id: 'stream-done', data: '' };
                 }
             } else if (data.type === 'READ_BEFORE') {
                 if (!data.cursorId) {
                     throw new BadRequst('Read input not given');
                 }
                 const logs = await this.eventBus.getEventsBefore(streamKey, data.cursorId, 100);
-                for (const entry of logs) {
+                for (let i = 0; i < logs.length; i++) {
                     if (data.abort?.aborted) break;
+                    const entry = logs[i];
                     cursor = entry.id;
-                    const logData = this.getLogData(entry.fields);
-                    if (!logData) continue;
-                    yield {
-                        id: entry.id,
-                        data: logData,
-                        event: 'LOG',
-                    } satisfies StreamRunLogsOutputDTO;
+                    const log = entry.fields.log;
+                    if (typeof log !== 'string') continue;
+                    yield { id: entry.id, data: log, event: 'LOG' };
                 }
-                yield { event: 'END', id: 'end', data: '' } satisfies StreamRunLogsOutputDTO;
+                // END = "this batch is done"
+                yield { event: 'END', id: 'end', data: '' };
+                // Check if the overall stream is also done
+                if (await this.eventBus.isStreamEnded(streamKey)) {
+                    yield { event: 'STREAM_DONE', id: 'stream-done', data: '' };
+                }
             } else if (data.type === 'READ_FULL') {
-
                 outer: for await (const logsChunks of this.eventBus.getAllEvents(streamKey)) {
-                    console.log("A batch Full")
-                    console.log(logsChunks)
-                    for (const entry of logsChunks) {
+                    for (let i = 0; i < logsChunks.length; i++) {
                         if (data.abort?.aborted) break outer;
-
-                        const logData = this.getLogData(entry.fields);
-                        if (!logData) continue;
-
-                        yield {
-                            id: entry.id,
-                            data: logData,
-                            event: 'LOG',
-                        } satisfies StreamRunLogsOutputDTO;
+                        const entry = logsChunks[i];
+                        const log = entry.fields.log;
+                        if (typeof log !== 'string') continue;
+                        yield { id: entry.id, data: log, event: 'LOG' };
                     }
                 }
-                yield { event: 'END', id: 'end', data: '' } satisfies StreamRunLogsOutputDTO;
+                yield { event: 'END', id: 'end', data: '' };
+                if (await this.eventBus.isStreamEnded(streamKey)) {
+                    yield { event: 'STREAM_DONE', id: 'stream-done', data: '' };
+                }
             }
         } catch (error) {
             throw new BadRequst('HANG UP');
         }
-    }
-
-    getLogData(data: Record<string, string>): string | null {
-        if (!this.isValidLogFields(data)) return null;
-        return data.log;
-    }
-
-    isValidLogFields(data: Record<string, string>): data is LogFields {
-        return (
-            typeof data.log === 'string' &&
-            typeof data.container === 'string' &&
-            typeof data.ts === 'string'
-        );
     }
 }

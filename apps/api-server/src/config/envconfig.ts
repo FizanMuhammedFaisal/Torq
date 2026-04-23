@@ -23,6 +23,9 @@ export const Envconfig = {
 		masterKeyFile: './src/config/torq/master.key',
 	},
 	services: {
+		betterAuth: {
+			baseURL: process.env.BETTER_AUTH_URL
+		},
 		email: {
 			resendKey: process.env.RESEND_KEY || 'NEEDED',
 			//resend verified domain since implemented service uses resend
@@ -37,6 +40,10 @@ export const Envconfig = {
 				baseUrl: process.env.OPERATOR_GRPC_URL || 'http://localhost:50051',
 			},
 		},
+		githubAuth: {
+			clientId: process.env.GITHUB_CLIENT_ID as string,
+			clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
+		}
 	},
 	grpc: {
 		PORT: process.env.GRPC_PORT || 50052,

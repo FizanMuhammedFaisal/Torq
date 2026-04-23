@@ -42,7 +42,7 @@ export class RunRouter implements Router {
 			},
 			{
 				body: StreamRunLogsSchema,
-				auth: false,
+				auth: true,
 			},
 		);
 	}

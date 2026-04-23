@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { openAPI } from 'better-auth/plugins';
+import { bearer, openAPI } from 'better-auth/plugins';
 import db from '@/infrastructure/repository/database/database.config';
 import { Envconfig } from '@/config/envconfig';
 import * as schema from '@/infrastructure/repository/database/schema/auth.schema';
@@ -13,6 +13,7 @@ import { TOKENS } from '@/config/di/tokens';
 
 export const auth = betterAuth({
 	basePath: '/auth/api',
+	baseURL: Envconfig.services.betterAuth.baseURL,
 	trustedOrigins: Envconfig.app.cors.origins,
 	database: drizzleAdapter(db, {
 		provider: 'pg',
@@ -20,8 +21,13 @@ export const auth = betterAuth({
 	}),
 	emailAndPassword: {
 		enabled: true,
+		requireEmailVerification: false,
+		autoSignIn: true,
+
 	},
+
 	plugins: [
+		bearer(),
 		emailOTP({
 			async sendVerificationOTP({ email, otp, type }) {
 				const sendOTP = container.resolve<ISendOTPEmail>(TOKENS.SendOTPEmail);
@@ -29,6 +35,7 @@ export const auth = betterAuth({
 			},
 			expiresIn: 15 * 60,
 			allowedAttempts: 3,
+			overrideDefaultEmailVerification: true,
 		}),
 		openAPI(),
 		jwt({
@@ -45,14 +52,23 @@ export const auth = betterAuth({
 		expiresIn: 60 * 60 * 24 * 30, // 30 days , "refresh token" lives
 		updateAge: 60 * 60 * 24,
 		cookieCache: {
-			enabled: true,
+			enabled: false,
 			maxAge: 5 * 60, // Cache duration in seconds
 		},
+
 	},
+	advanced: {
+		useSecureCookies: false,
+	},
+
 	socialProviders: {
 		google: {
 			clientId: Envconfig.services.googleAuth.clientId,
 			clientSecret: Envconfig.services.googleAuth.clientSecret,
+		},
+		github: {
+			clientId: Envconfig.services.githubAuth.clientId,
+			clientSecret: Envconfig.services.githubAuth.clientSecret,
 		},
 	},
 });

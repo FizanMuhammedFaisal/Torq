@@ -42,7 +42,7 @@ export class HTTPServer {
 				origin: this.envconfig.app.cors.origins,
 				methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 				credentials: true,
-				allowedHeaders: ['Content-Type', 'Authorization'],
+				allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
 			}),
 		);
 	}

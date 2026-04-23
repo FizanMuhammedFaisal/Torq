@@ -11,7 +11,7 @@ export type StreamRunLogsInputDTO = z.infer<typeof StreamRunLogsSchema> & {
 	abort: AbortSignal;
 };
 export type StreamRunLogsOutputDTO = {
-	event: 'LOG' | 'STATUS' | 'END';
+	event: 'LOG' | 'STATUS' | 'END' | 'PING' | 'STREAM_DONE';
 	id: string;
 	data: string;
 };

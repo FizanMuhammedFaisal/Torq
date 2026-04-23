@@ -55,11 +55,16 @@ export interface IEventBus {
         count: number
     ): Promise<EventEntry[]>;
 
-
     getAllEvents(
         topic: string,
         chunkSize?: number
     ): AsyncGenerator<EventEntry[]>;
+
+    /**
+     * Checks if a stream has been marked as ended (STREAM_END is the last entry).
+     * Used by the use case to decide whether to send STREAM_DONE to the client.
+     */
+    isStreamEnded(topic: string): Promise<boolean>;
 }
 
 export type EventEntry = {
